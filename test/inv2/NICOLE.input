@@ -1,0 +1,74 @@
+# Configuration file for NICOLE
+# Use # to create comments and "=" to specify values
+Command=../../main/nicole
+Mode = i
+Cycles=2
+#
+# Fields required for both modes, synthesis and inversion:
+#
+Input model= guess.bin
+Output profiles= inversion.bin # Output profiles
+Heliocentric angle= 1.0 # Cos(mu)
+#
+# Fields required only for the inversion mode:
+#
+Observed profiles= observed.bin
+Output model= inversion.mod
+#
+# Other misc optional fields
+#
+Formal solution method= 0 # (0=auto, 1=Hermite, 2=WPM)
+Printout detail= 4 # (default=1)
+Acceptable Chi-square=10
+Maximum number of inversions=1
+Debug mode= 3
+Restart=-1
+#
+Impose hydrostatic equilibrium= Y # Y/N (Only for synthesis)
+Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
+#
+# Spectral regions
+#
+[Region 1]
+  First wavelength=6300.
+  Wavelength step= 20 mA
+  Number of wavelengths= 100
+[Region 2]
+  First wavelength=10825
+  Wavelength step= 40 mA
+  Number of wavelengths= 100
+#
+# Spectral lines
+#
+[Line 1]
+Line=OI 6300a
+[Line 2]
+Line=NiI 6300a
+[Line 3]
+Line=NiI 6300b
+[Line 4]
+Line=ScII 6301
+[Line 5]
+Line=FeI 6301.5
+[Line 6]
+Line=SiI 10827
+
+#Abundances
+[Abundances]
+[[Override]]
+Fe=5.1
+O=8.5
+Ni=6.3
+
+#Nodes
+[Nodes]
+Abundances= Fe O Ni
+# T =0
+# v_los =0
+# v_mic =0
+# B_long =0
+# B_x =0
+# B_y =0
+# Stray light =0
+# v_mac =0
+# expansion=0 

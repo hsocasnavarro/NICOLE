@@ -1,0 +1,30 @@
+# LINES database file
+# Use # to create comments and "=" to specify values
+# Each line is defined by a label in brackets. This label will be used to
+# refer to it in NICOLE so make sure it's easy to remember. It is recommended
+# to follow a standard notation such as FeI 6302.5
+#
+[FeI 6301.5]
+   Element=Fe
+   Ionization stage=1
+   Wavelength=6301.5080
+   Excitation potential= 29440.17 cm-1 # 3.65 eV
+   Log(gf)=-0.59
+   Term (lower)=5P2.0
+   Term (upper)=5D2.0
+   Collisions=Unsold
+   Width=2
+
+[CaII 8542]
+   Element=Ca
+   Ionization stage=2
+   Wavelength=8542.09
+   Excitation potential= 1.69995
+   Log(gf)=-0.463
+   Term (lower)=2D2.5
+   Term (upper)=2P1.5
+   Collisions=Unsold
+   Damping enhancement=2.01
+   Width=20
+   Mode=NLTE
+   Transition index in model atom=5

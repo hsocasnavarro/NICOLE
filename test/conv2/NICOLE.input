@@ -1,0 +1,25 @@
+# Configuration file for NICOLE
+# Use # to create comments and "=" to specify values
+Command=../../main/nicole
+Mode = C
+#
+# Fields required for both modes, synthesis and inversion:
+#
+Input model= hsra_pg.model
+Output profiles= modelout.pro # Output profiles
+Output model= modelout.model
+Heliocentric angle= 1.0 # Cos(mu)
+#
+# Other misc optional fields
+#
+Formal solution method= 0 # (0=auto, 1=Hermite, 2=WPM)
+Printout detail= 2 # (default=1)
+Debug mode= 3
+Restart=-1
+#
+Impose hydrostatic equilibrium= N # Y/N (Only for synthesis)
+Input density= PGas # (Can be Pgas, Pel, Nel, Dens)
+[Region 1]
+  First wavelength=5000.
+  Wavelength step= 20 mA
+  Number of wavelengths= 1

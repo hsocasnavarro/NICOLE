@@ -1,0 +1,432 @@
+[Mn3 6300a]
+Element= Mn
+Ionization stage= 3
+Wavelength= 6300.0860
+Excitation potential= 14.9970
+Log(gf)= -3.783
+Term (lower)= 5P3.5 # Warning! Mock value
+Term (upper)= 5D3.5 # Warning! Mock value
+Collisions= 1
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe1 6300a]
+Element= Fe
+Ionization stage= 1
+Wavelength= 6300.1210
+Excitation potential= 3.0180
+Log(gf)= -9.098
+Term (lower)= 5P3.0 # Warning! Mock value
+Term (upper)= 5D3.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Mn1 6300]
+Element= Mn
+Ionization stage= 1
+Wavelength= 6300.1700
+Excitation potential= 4.4350
+Log(gf)= -3.497
+Term (lower)= 5P3.5 # Warning! Mock value
+Term (upper)= 5D2.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Ce1 6300]
+Element= Ce
+Ionization stage= 1
+Wavelength= 6300.2040
+Excitation potential= 0.1590
+Log(gf)= -1.213
+Term (lower)= 5P4.0 # Warning! Mock value
+Term (upper)= 5D4.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Cr1 6300]
+Element= Cr
+Ionization stage= 1
+Wavelength= 6300.2560
+Excitation potential= 4.6130
+Log(gf)= -4.421
+Term (lower)= 5P3.0 # Warning! Mock value
+Term (upper)= 5D3.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Ce2 6300]
+Element= Ce
+Ionization stage= 2
+Wavelength= 6300.2650
+Excitation potential= 3.8220
+Log(gf)= -2.460
+Term (lower)= 5P3.5 # Warning! Mock value
+Term (upper)= 5D4.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[O1 6300]
+Element= O
+Ionization stage= 1
+Wavelength= 6300.3040
+Excitation potential= 0.0000
+#Log(gf)= -9.819 # VAL-D Value
+Log(gf)= -9.7127 # Recommended by Scott et al (2009), from Storey & Zeippen 2000
+Term (lower)= 5P2.0 # Warning! Mock value
+Term (upper)= 5D2.0 # Warning! Mock value
+Collisions= 3 
+Gamma Radiative= 0.00
+Gamma Stark= 0.05
+Gamma Van der Waals= 1.00
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Ni1 6300a]
+Element= Ni
+Ionization stage= 1
+Wavelength= 6300.335
+Excitation potential= 4.2660
+Log(gf)= -2.253
+Term (lower)= 5P1.0 # Warning! Mock value
+Term (upper)= 5D0.0 # Warning! Mock value
+Collisions= 3 # Default 
+Gamma Radiative= 2.63
+Gamma Stark= 0.054
+Gamma Van der Waals= 1.82
+Damping enhancement= 3.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Ni1 6300b]
+Element= Ni
+Ionization stage= 1
+Wavelength= 6300.355
+Excitation potential= 4.2660
+Log(gf)= -2.663
+Term (lower)= 5P1.0 # Warning! Mock value
+Term (upper)= 5D0.0 # Warning! Mock value
+Collisions= 3 # Default 
+Gamma Radiative= 2.63
+Gamma Stark= 0.054
+Gamma Van der Waals= 1.82
+Damping enhancement= 3.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Tm2 6300]
+Element= Tm
+Ionization stage= 2
+Wavelength= 6300.3550
+Excitation potential= 2.6920
+Log(gf)= -2.690
+Term (lower)= 5P3.0 # Warning! Mock value
+Term (upper)= 5D4.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe1 6300b]
+Element= Fe
+Ionization stage= 1
+Wavelength= 6300.4150
+Excitation potential= 5.0330
+Log(gf)= -3.413
+Term (lower)= 5P4.0 # Warning! Mock value
+Term (upper)= 5D3.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Mn3 6300b]
+Element= Mn
+Ionization stage= 3
+Wavelength= 6300.4710
+Excitation potential= 26.7210
+Log(gf)= 0.801
+Term (lower)= 5P2.5 # Warning! Mock value
+Term (upper)= 5D3.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Ni3 6301]
+Element= Ni
+Ionization stage= 3
+Wavelength= 6300.5910
+Excitation potential= 23.2460
+Log(gf)= -1.255
+Term (lower)= 5P2.0 # Warning! Mock value
+Term (upper)= 5D3.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe1 6301a]
+Element= Fe
+Ionization stage= 1
+Wavelength= 6300.6090
+Excitation potential= 5.4100
+Log(gf)= -6.413
+Term (lower)= 5P2.0 # Warning! Mock value
+Term (upper)= 5D1.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe2 6301a]
+Element= Fe
+Ionization stage= 2
+Wavelength= 6300.6180
+Excitation potential= 10.9870
+Log(gf)= -3.542
+Term (lower)= 5P4.5 # Warning! Mock value
+Term (upper)= 5D3.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe1 6301b]
+Element= Fe
+Ionization stage= 1
+Wavelength= 6300.6230
+Excitation potential= 5.3570
+Log(gf)= -5.723
+Term (lower)= 5P2.0 # Warning! Mock value
+Term (upper)= 5D1.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Mn1 6301]
+Element= Mn
+Ionization stage= 1
+Wavelength= 6300.7100
+Excitation potential= 4.7550
+Log(gf)= -3.491
+Term (lower)= 5P0.5 # Warning! Mock value
+Term (upper)= 5D1.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Ti1 6301]
+Element= Ti
+Ionization stage= 1
+Wavelength= 6300.7990
+Excitation potential= 3.7160
+Log(gf)= -3.316
+Term (lower)= 5P4.0 # Warning! Mock value
+Term (upper)= 5D3.0 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe2 6301b]
+Element= Fe
+Ionization stage= 2
+Wavelength= 6300.8130
+Excitation potential= 12.7190
+Log(gf)= -8.192
+Term (lower)= 5P5.5 # Warning! Mock value
+Term (upper)= 5D5.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe2 6301c]
+Element= Fe
+Ionization stage= 2
+Wavelength= 6300.8140
+Excitation potential= 12.7190
+Log(gf)= -7.806
+Term (lower)= 5P5.5 # Warning! Mock value
+Term (upper)= 5D4.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Yb2 6301]
+Element= Yb
+Ionization stage= 2
+Wavelength= 6300.9440
+Excitation potential= 7.5200
+Log(gf)= -1.490
+Term (lower)= 5P4.5 # Warning! Mock value
+Term (upper)= 5D4.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Fe2 6301d]
+Element= Fe
+Ionization stage= 2
+Wavelength= 6300.9820
+Excitation potential= 11.3070
+Log(gf)= -1.926
+Term (lower)= 5P0.5 # Warning! Mock value
+Term (upper)= 5D1.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[Pr3 6301]
+Element= Pr
+Ionization stage= 3
+Wavelength= 6300.9980
+Excitation potential= 14.7030
+Log(gf)= -1.130
+Term (lower)= 5P2.5 # Warning! Mock value
+Term (upper)= 5D3.5 # Warning! Mock value
+Collisions= Unsold # Default 
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+
+
+
+[NiI 6300a]
+Element= Ni
+Ionization stage= 1
+Wavelength= 6300.335
+Excitation potential= 4.2660
+Log(gf)= -2.253
+Term (lower)= 5P1.0 # Warning! Mock value
+Term (upper)= 5D0.0 # Warning! Mock value
+Collisions= 3 # Default 
+Gamma Radiative= 2.63
+Gamma Stark= 0.054
+Gamma Van der Waals= 1.82
+Damping enhancement= 3.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[NiI 6300b]
+Element= Ni
+Ionization stage= 1
+Wavelength= 6300.355
+Excitation potential= 4.2660
+Log(gf)= -2.663
+Term (lower)= 5P1.0 # Warning! Mock value
+Term (upper)= 5D0.0 # Warning! Mock value
+Collisions= 3 # Default 
+Gamma Radiative= 2.63
+Gamma Stark= 0.054
+Gamma Van der Waals= 1.82
+Damping enhancement= 3.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[OI 6300a]
+Element= O
+Ionization stage= 1
+Wavelength= 6300.3040
+Excitation potential= 0.0000
+#Log(gf)= -9.819 # VAL-D Value
+Log(gf)= -9.7127 # Recommended by Scott et al (2009), from Storey & Zeippen 2000
+Term (lower)= 5P2.0 # Warning! Mock value
+Term (upper)= 5D2.0 # Warning! Mock value
+Collisions= 3 
+Gamma Radiative= 0.00
+Gamma Stark= 0.05
+Gamma Van der Waals= 1.00
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+
+[ScII 6301]
+Element= Sc
+Ionization stage= 2
+Wavelength= 6300.6780
+Excitation potential= 1.5070
+#Log(gf)= -2.015 # Ayres
+Log(gf)= -1.89 # VALD
+Term (lower)=3P2.0
+Term (upper)= 3D2.0
+Collisions= 3
+Gamma Radiative= 2.30
+Gamma Stark=0.050
+Gamma van der Waals= 1.30
+Damping enhancement= 1.0 # Default 
+Width= 2.0 # Default 
+Mode= LTE # Default 
+Hyperfine structure=no # In HSRA, HF effects are identical to microturb=8e4
+Nuclear spin=3.5 # e.g., Arnesen et al (1982)
+# Uncertainty commented in parenthesis. Values from (mean):
+# Arnesen et al (1982), A&A 106, 327
+#Hyperfine Alow= -27.7 # (8) # 3d2 3P2
+#Hyperfine Blow= 8 # (8) # 3d2 3P2
+#Hyperfine Aup= 125.4 # (1) # 3d4p 3D02
+#Hyperfine Bup= -7 # (7) # 3d4p 3D02
+# Uncertainty commented in parenthesis. Values from:
+# Young et al (1988), Phys Rev A 37, 11; Some values from Arnesen et al (1982)
+Hyperfine Alow= -.00093064 # -27.9 # (4) # 3d2 3P2
+Hyperfine Blow= .0006337718 # 19 # (6) # 3d2 3P2
+Hyperfine Aup=  .0041828938 # 125.4 # (1) # 3d4p 3D02
+Hyperfine Bup= .00023349487 #  7 # (7) # 3d4p 3D02
+
+[FeI 6301.5]
+  Element='Fe'
+  Ionization stage=1
+  Wavelength=6301.5012
+  Excitation potential= 3.6540
+  Log(gf)=-0.718
+  Term (lower)= 5P2.0
+  Term (upper)= 5D2.0
+  Collisions='Barklem'
+  Damping sigma=834.4
+  Damping alpha=0.243
+  Width=2.
+  Mode='LTE'
+
+[FeI 6302]
+  Element='Fe'	
+  Ionization stage=1
+  Wavelength=6302.4940
+  Excitation potential= 3.6860
+  Log(gf)=-1.16
+  Term (lower)= 5P1.0
+  Term (upper)= 5D0.0
+  Collisions='Barklem'
+  Damping sigma=850.2
+  Damping alpha=0.239
+  Damping enhancement=1.2
+  Width=2.
+  Mode='LTE'
+
+[SiI 10827]
+  Element='Si'	
+  Ionization stage=1
+  Wavelength=10827.091
+  Excitation potential=4.9538
+  Log(gf)=0.239
+  Term (lower)= 3P2
+  Term (upper)= 3P2
+  Collisions='Unsold'
+  Width=4.
+  Mode='LTE'
