@@ -1,0 +1,985 @@
+User did not specify a F90 compiler. Searching for available options...
+Found f95
+Found gfortran
+pgf90 not found
+xlf90 not found
+Found ifort
+mpif90 not found
+**** Using ifort ****
+
+Testing system byte order (endianness)
+Found little endian system
+
+Testing compiler and flags with Hello World program
+Command: ifort -O3 test.f90
+Ok. Compiler and flags seem to work
+
+Trying to determine recl parameter
+Using recl =             2
+Checking for availability of required routines from the Numerical Recipes
+  ...Ok
+Modifying Numerical Recipes routines
+Testing availability of FLUSH statement...
+   Flush is available
+*** Producing serial version ***
+
+**** Analyzing source tree for dependences and modules ****
+File:  ../compex/model_struct.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+File:  ../compex/select_number_of_nodes.f90
+....../compex/nodes_info.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+File:  ../compex/compex.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../compex/nodes_info.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+....../forward/bezier.f90
+File:  ../compex/compress_variable.f90
+File:  ../compex/randomize_model.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/nodes_info.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+File:  ../compex/record_to_model.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+File:  ../compex/nodes_info.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+File:  ../forward/atomic_data.f90
+File:  ../forward/eq_state.f90
+....../time_code/profiling.f90
+....../numerical_recipes/nrtype.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../forward/atomic_data.f90
+....../main/debug.f90
+....../forward/lte.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/line_data_struct.f90
+........../forward/atomic_data.f90
+File:  ../forward/lte.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/line_data_struct.f90
+....../forward/atomic_data.f90
+File:  ../forward/line_data_struct.f90
+File:  ../forward/zeeman_splitting.f90
+File:  ../forward/forward.f90
+....../forward/forward_supp.f90
+........../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../forward/line_data_struct.f90
+........../forward/eq_state.f90
+............../time_code/profiling.f90
+............../numerical_recipes/nrtype.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+........../main/debug.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/eq_state.f90
+........../time_code/profiling.f90
+........../numerical_recipes/nrtype.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+....../forward/zeeman_splitting.f90
+....../forward/lte.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/line_data_struct.f90
+........../forward/atomic_data.f90
+....../forward/NLTE/NLTE.f90
+........../misc/file_ops.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/line_data_struct.f90
+........../forward/forward_supp.f90
+............../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../forward/line_data_struct.f90
+............../forward/eq_state.f90
+................../time_code/profiling.f90
+................../numerical_recipes/nrtype.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+............../main/debug.f90
+........../forward/gauss_quad.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+........../forward/eq_state.f90
+............../time_code/profiling.f90
+............../numerical_recipes/nrtype.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+........../forward/background.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+........../forward/zeeman_splitting.f90
+........../forward/bezier.f90
+........../main/debug.f90
+........../time_code/profiling.f90
+........../main/phys_constants.f90
+....../forward/atomic_data.f90
+....../forward/gauss_quad.f90
+....../forward/line_data_struct.f90
+....../forward/bezier.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+....../misc/file_ops.f90
+....../time_code/profiling.f90
+....../main/debug.f90
+File:  ../forward/gauss_quad.f90
+File:  ../forward/hydrostatic.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/eq_state.f90
+........../time_code/profiling.f90
+........../numerical_recipes/nrtype.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+....../forward/atomic_data.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+....../main/debug.f90
+....../time_code/profiling.f90
+File:  ../forward/background.f90
+....../forward/atomic_data.f90
+....../main/debug.f90
+File:  ../forward/forward_supp.f90
+....../main/phys_constants.f90
+....../forward/atomic_data.f90
+....../forward/line_data_struct.f90
+....../forward/eq_state.f90
+........../time_code/profiling.f90
+........../numerical_recipes/nrtype.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+....../main/debug.f90
+File:  ../forward/bezier.f90
+File:  ../forward/ann/ann_pefrompg.f90
+....../forward/ann/ann_pefrompg_data.f90
+....../main/debug.f90
+File:  ../forward/ann/ann_nh2frompe_data.f90
+File:  ../forward/ann/ann_background_opacity.f90
+....../forward/ann/ann_background_opacity_data.f90
+....../time_code/profiling.f90
+....../main/debug.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+File:  ../forward/ann/ann_nh2frompe.f90
+....../forward/ann/ann_nh2frompe_data.f90
+....../main/debug.f90
+File:  ../forward/ann/ann_nhfrompe.f90
+....../forward/ann/ann_nhfrompe_data.f90
+....../main/debug.f90
+File:  ../forward/ann/ann_pgfrompe.f90
+....../forward/ann/ann_pgfrompe_data.f90
+....../main/debug.f90
+File:  ../forward/ann/ann_pgfrompe_data.f90
+File:  ../forward/ann/ann_nhfrompe_data.f90
+File:  ../forward/ann/ann_background_opacity_data.f90
+File:  ../forward/ann/ann_pefrompg_data.f90
+File:  ../forward/ann/ANN_forward.f90
+File:  ../forward/hyperfine/zeeman_hyperfine.f90
+....../forward/line_data_struct.f90
+....../forward/hyperfine/hyperfine.f90
+........../numerical_recipes/nr.f90
+............../numerical_recipes/nrtype.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../time_code/profiling.f90
+File:  ../forward/hyperfine/hyperfine.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+File:  ../forward/sopa/sopa.f90
+File:  ../forward/NLTE/NLTE.f90
+....../misc/file_ops.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/line_data_struct.f90
+....../forward/forward_supp.f90
+........../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../forward/line_data_struct.f90
+........../forward/eq_state.f90
+............../time_code/profiling.f90
+............../numerical_recipes/nrtype.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+........../main/debug.f90
+....../forward/gauss_quad.f90
+....../forward/lte.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/line_data_struct.f90
+........../forward/atomic_data.f90
+....../forward/eq_state.f90
+........../time_code/profiling.f90
+........../numerical_recipes/nrtype.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+....../forward/zeeman_splitting.f90
+....../forward/bezier.f90
+....../main/debug.f90
+....../time_code/profiling.f90
+....../main/phys_constants.f90
+File:  ../main/phys_constants.f90
+File:  ../main/param_struct.f90
+....../main/phys_constants.f90
+File:  ../main/nicole.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../forward/line_data_struct.f90
+....../misc/nicole_input.f90
+....../compex/compex.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../compex/nodes_info.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+........../forward/bezier.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../lorien/lorien.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/compex.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../compex/nodes_info.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+............../forward/bezier.f90
+........../forward/forward.f90
+............../forward/forward_supp.f90
+................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../forward/line_data_struct.f90
+................../forward/eq_state.f90
+....................../time_code/profiling.f90
+....................../numerical_recipes/nrtype.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../forward/atomic_data.f90
+....................../main/debug.f90
+....................../forward/lte.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+........................../compex/model_struct.f90
+............................../main/param_struct.f90
+................................../main/phys_constants.f90
+........................../forward/line_data_struct.f90
+........................../forward/atomic_data.f90
+................../main/debug.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/eq_state.f90
+................../time_code/profiling.f90
+................../numerical_recipes/nrtype.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+............../forward/zeeman_splitting.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+............../forward/NLTE/NLTE.f90
+................../misc/file_ops.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/forward_supp.f90
+....................../main/phys_constants.f90
+....................../forward/atomic_data.f90
+....................../forward/line_data_struct.f90
+....................../forward/eq_state.f90
+........................../time_code/profiling.f90
+........................../numerical_recipes/nrtype.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+........................../forward/atomic_data.f90
+........................../main/debug.f90
+........................../forward/lte.f90
+............................../main/param_struct.f90
+................................../main/phys_constants.f90
+............................../compex/model_struct.f90
+................................../main/param_struct.f90
+....................................../main/phys_constants.f90
+............................../forward/line_data_struct.f90
+............................../forward/atomic_data.f90
+....................../main/debug.f90
+................../forward/gauss_quad.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+................../forward/eq_state.f90
+....................../time_code/profiling.f90
+....................../numerical_recipes/nrtype.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../forward/atomic_data.f90
+....................../main/debug.f90
+....................../forward/lte.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+........................../compex/model_struct.f90
+............................../main/param_struct.f90
+................................../main/phys_constants.f90
+........................../forward/line_data_struct.f90
+........................../forward/atomic_data.f90
+................../forward/background.f90
+....................../forward/atomic_data.f90
+....................../main/debug.f90
+................../forward/zeeman_splitting.f90
+................../forward/bezier.f90
+................../main/debug.f90
+................../time_code/profiling.f90
+................../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../forward/gauss_quad.f90
+............../forward/line_data_struct.f90
+............../forward/bezier.f90
+............../forward/background.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+............../numerical_recipes/nr.f90
+................../numerical_recipes/nrtype.f90
+............../misc/file_ops.f90
+............../time_code/profiling.f90
+............../main/debug.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/line_data_struct.f90
+........../compex/nodes_info.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+........../time_code/profiling.f90
+........../main/debug.f90
+....../forward/forward.f90
+........../forward/forward_supp.f90
+............../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../forward/line_data_struct.f90
+............../forward/eq_state.f90
+................../time_code/profiling.f90
+................../numerical_recipes/nrtype.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+............../main/debug.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/eq_state.f90
+............../time_code/profiling.f90
+............../numerical_recipes/nrtype.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+........../forward/zeeman_splitting.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+........../forward/NLTE/NLTE.f90
+............../misc/file_ops.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/forward_supp.f90
+................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../forward/line_data_struct.f90
+................../forward/eq_state.f90
+....................../time_code/profiling.f90
+....................../numerical_recipes/nrtype.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../forward/atomic_data.f90
+....................../main/debug.f90
+....................../forward/lte.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+........................../compex/model_struct.f90
+............................../main/param_struct.f90
+................................../main/phys_constants.f90
+........................../forward/line_data_struct.f90
+........................../forward/atomic_data.f90
+................../main/debug.f90
+............../forward/gauss_quad.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+............../forward/eq_state.f90
+................../time_code/profiling.f90
+................../numerical_recipes/nrtype.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+............../forward/background.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+............../forward/zeeman_splitting.f90
+............../forward/bezier.f90
+............../main/debug.f90
+............../time_code/profiling.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../forward/gauss_quad.f90
+........../forward/line_data_struct.f90
+........../forward/bezier.f90
+........../forward/background.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+........../numerical_recipes/nr.f90
+............../numerical_recipes/nrtype.f90
+........../misc/file_ops.f90
+........../time_code/profiling.f90
+........../main/debug.f90
+....../compex/nodes_info.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+....../forward/atomic_data.f90
+....../misc/file_ops.f90
+....../main/debug.f90
+....../time_code/profiling.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+File:  ../main/debug.f90
+File:  ../time_code/profiling.f90
+File:  ../misc/checknan.f90
+File:  ../misc/tolower.f90
+File:  ../misc/parab_interp.f90
+File:  ../misc/get_lun.f90
+File:  ../misc/myflush.f90
+File:  ../misc/roman_to_int.f90
+File:  ../misc/set_params.f90
+....../misc/nicole_input.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+File:  ../misc/tau_to_z.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+File:  ../misc/write_profile.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../forward/line_data_struct.f90
+File:  ../misc/read_weights.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+File:  ../misc/write_direct.f90
+File:  ../misc/z_to_tau.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../forward/eq_state.f90
+........../time_code/profiling.f90
+........../numerical_recipes/nrtype.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/atomic_data.f90
+....../forward/background.f90
+........../forward/atomic_data.f90
+........../main/debug.f90
+....../main/debug.f90
+File:  ../misc/file_ops.f90
+File:  ../misc/printout.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/line_data_struct.f90
+File:  ../misc/cubic_interp.f90
+File:  ../misc/los_to_local.f90
+File:  ../misc/smoothed_lines.f90
+File:  ../misc/local_to_los.f90
+File:  ../misc/read_next_nocomment.f90
+File:  ../misc/nicole_input.f90
+File:  ../misc/read_profile.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+File:  ../misc/compute_weights.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+File:  ../misc/los_to_local_errors.f90
+File:  ../misc/write_model.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../misc/file_ops.f90
+....../forward/line_data_struct.f90
+File:  ../misc/toupper.f90
+File:  ../numerical_recipes/twofft.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/added.f90
+....../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/lubksb.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/lubksb_dp.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/svbksb.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/realft.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/svdcmp.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+....../main/debug.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/nr.f90
+....../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/pythag.f90
+....../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/ludcmp_dp.f90
+....../numerical_recipes/nrtype.f90
+....../main/debug.f90
+....../numerical_recipes/added.f90
+........../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/four1.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/convlv.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/fourrow.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/tqli.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/nrutil.f90
+....../numerical_recipes/nrtype.f90
+File:  ../numerical_recipes/ludcmp.f90
+....../numerical_recipes/nrtype.f90
+....../numerical_recipes/nrutil.f90
+........../numerical_recipes/nrtype.f90
+File:  ../lorien/SVD_solve.f90
+....../numerical_recipes/nr.f90
+........../numerical_recipes/nrtype.f90
+....../main/debug.f90
+File:  ../lorien/lorien.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+....../compex/compex.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../compex/nodes_info.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+........../forward/bezier.f90
+....../forward/forward.f90
+........../forward/forward_supp.f90
+............../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../forward/line_data_struct.f90
+............../forward/eq_state.f90
+................../time_code/profiling.f90
+................../numerical_recipes/nrtype.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+............../main/debug.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+........../forward/eq_state.f90
+............../time_code/profiling.f90
+............../numerical_recipes/nrtype.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+........../forward/zeeman_splitting.f90
+........../forward/lte.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/atomic_data.f90
+........../forward/NLTE/NLTE.f90
+............../misc/file_ops.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+............../compex/model_struct.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+............../forward/line_data_struct.f90
+............../forward/forward_supp.f90
+................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../forward/line_data_struct.f90
+................../forward/eq_state.f90
+....................../time_code/profiling.f90
+....................../numerical_recipes/nrtype.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../forward/atomic_data.f90
+....................../main/debug.f90
+....................../forward/lte.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+........................../compex/model_struct.f90
+............................../main/param_struct.f90
+................................../main/phys_constants.f90
+........................../forward/line_data_struct.f90
+........................../forward/atomic_data.f90
+................../main/debug.f90
+............../forward/gauss_quad.f90
+............../forward/lte.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../compex/model_struct.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+................../forward/line_data_struct.f90
+................../forward/atomic_data.f90
+............../forward/eq_state.f90
+................../time_code/profiling.f90
+................../numerical_recipes/nrtype.f90
+................../main/param_struct.f90
+....................../main/phys_constants.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+................../forward/lte.f90
+....................../main/param_struct.f90
+........................../main/phys_constants.f90
+....................../compex/model_struct.f90
+........................../main/param_struct.f90
+............................../main/phys_constants.f90
+....................../forward/line_data_struct.f90
+....................../forward/atomic_data.f90
+............../forward/background.f90
+................../forward/atomic_data.f90
+................../main/debug.f90
+............../forward/zeeman_splitting.f90
+............../forward/bezier.f90
+............../main/debug.f90
+............../time_code/profiling.f90
+............../main/phys_constants.f90
+........../forward/atomic_data.f90
+........../forward/gauss_quad.f90
+........../forward/line_data_struct.f90
+........../forward/bezier.f90
+........../forward/background.f90
+............../forward/atomic_data.f90
+............../main/debug.f90
+........../numerical_recipes/nr.f90
+............../numerical_recipes/nrtype.f90
+........../misc/file_ops.f90
+........../time_code/profiling.f90
+........../main/debug.f90
+....../compex/model_struct.f90
+........../main/param_struct.f90
+............../main/phys_constants.f90
+....../forward/line_data_struct.f90
+....../compex/nodes_info.f90
+........../compex/model_struct.f90
+............../main/param_struct.f90
+................../main/phys_constants.f90
+....../time_code/profiling.f90
+....../main/debug.f90
+File:  ../lorien/adjust_wave_grid.f90
+....../main/param_struct.f90
+........../main/phys_constants.f90
+**** Finished analyzing dependences in source tree
+
+About to overwrite your makefile. Is this ok? [y/n] 

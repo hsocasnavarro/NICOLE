@@ -1,0 +1,170 @@
+SPAG - Version 6.70Dc
+Copyright (C) Polyhedron Software - 1986-2010 - All rights reserved
+ 
+Licensee : Polyhedron Software
+         : EVALUATION ONLY SINGLE user Licence (PC - Windows) SN P29515
+ 
+Licence data             read from plusFORT.fig
+This version dated       Sep 2010
+Maintenance Expiry Date  Dec 2011
+INTRINSIC function names read from f90func.txt
+Configuration data       read from spag.fig
+--------------------------------------------------------------------
+Finished reading AHMBF from file test.for
+Re-structuring..Writing AHMBF
+Adding declarations
+--------------------------------------------------------------------
+Finished reading AHMFF from file test.for
+Re-structuring..Writing AHMFF
+Adding declarations
+--------------------------------------------------------------------
+Finished reading BMCONST from file test.for
+Re-structuring..Writing BMCONST
+Adding declarations
+--------------------------------------------------------------------
+Sub-program too big for this version of SPAG - skipping to next
+--------------------------------------------------------------------
+Finished reading EVAL from file test.for
+Re-structuring..Writing EVAL
+Adding declarations
+--------------------------------------------------------------------
+Finished reading GAUNT from file test.for
+Re-structuring..   1 duplicated statements inserted
+Re-structuring..Writing GAUNT
+Adding declarations
+--------------------------------------------------------------------
+Finished reading GFREE from file test.for
+Re-structuring..Writing GFREE
+Adding declarations
+--------------------------------------------------------------------
+Finished reading H2PKUR from file test.for
+Re-structuring..Writing H2PKUR
+Adding declarations
+--------------------------------------------------------------------
+Finished reading LININT from file test.for
+Re-structuring..Writing LININT
+Adding declarations
+--------------------------------------------------------------------
+Finished reading OPMET from file test.for
+<>I Unreliable test for equality of reals    ELOPAC(NEL).EQ.ELMENT(K)
+    detected at line    404 of test.for
+<>I Unreliable test for equality of reals    TERM(NO1).NE.NLEVEL(I)
+    detected at line    422 of test.for
+<>I PARAMETER is not used                    MFT
+Reference to MFT removed
+<>I INTRINSIC functn name used for variable  SUM
+Re-structuring..Writing OPMET
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PARA5 from file test.for
+Re-structuring..Writing PARA5
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PARAB from file test.for
+Re-structuring..Writing PARAB
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PARABO from file test.for
+<>I Argument is not used                     K
+Re-structuring..Writing PARABO
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PARCO5 from file test.for
+<>I Unreliable test for equality of reals    C(J).EQ.0
+    detected at line    559 of test.for
+Re-structuring..Writing PARCO5
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PARCOF from file test.for
+<>I Unreliable test for equality of reals    C(J).EQ.0
+    detected at line    596 of test.for
+Re-structuring..Writing PARCOF
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PLANCK from file test.for
+Re-structuring..Writing PLANCK
+Adding declarations
+--------------------------------------------------------------------
+Finished reading PU from file test.for
+<>I Conflicting Dimension/Argument counts    NBELO1                 (  2/  1)
+<>I Conflicting Dimension/Argument counts    NTO1                   (  2/  1)
+<>I Conflicting Dimension/Argument counts    NTO1                   (  1/  2)
+Re-structuring..Writing PU
+Adding declarations
+--------------------------------------------------------------------
+Finished reading READION from file test.for
+<>I Conflicting Dimension/Argument counts    NBELO1                 (  2/  1)
+<>I Conflicting Dimension/Argument counts    NTO1                   (  2/  1)
+<>I Conflicting Dimension/Argument counts    NBELO1                 (  1/  2)
+<>I Conflicting Dimension/Argument counts    NTO1                   (  1/  2)
+<>I COMMON block is not used                 /CCONST/
+<>I Variable assigned a value but not used   BELEM
+<>I PARAMETER is not used                    MFT
+<>I PARAMETER is not used                    MK
+<>W Local variable used but not set          ND
+No clutter removal attempted
+<>I INTRINSIC functn name used for variable  SUM
+Re-structuring..Writing READION
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SCATL from file test.for
+Re-structuring..Writing SCATL
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SIGAL from file test.for
+<>I INTRINSIC functn name used for variable  ALL
+Re-structuring..Writing SIGAL
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SIGCAR from file test.for
+Re-structuring..Writing SIGCAR
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SIGFE from file test.for
+Re-structuring..Writing SIGFE
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SIGMA from file test.for
+<>I Unreliable test for equality of reals    IE.EQ.ENAME(NN)
+    detected at line    953 of test.for
+Re-structuring..Writing SIGMA
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SIGMG from file test.for
+Re-structuring..Writing SIGMG
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SIGSI from file test.for
+Re-structuring..   2 duplicated statements inserted
+Re-structuring..Writing SIGSI
+Adding declarations
+--------------------------------------------------------------------
+Finished reading SOPAS from file test.for
+<>I Variable assigned a value but not used   SF
+<>I INTRINSIC functn name used for variable  SUM
+Re-structuring..Writing SOPAS
+Adding declarations
+--------------------------------------------------------------------
+Sub-program too big for this version of SPAG - skipping to next
+--------------------------------------------------------------------
+Sub-program too big for this version of SPAG - skipping to next
+--------------------------------------------------------------------
+ 
+End of input after   25 sub-programs (  1631 lines)
+ 
+  25 were re-structured
+  25 were re-labelled
+  25 were beautified
+ 
+    24 diagnostics generated
+ 
+     5 occurrences of Unreliable test for equality of reals
+     1 occurrences of Local variable used but not set
+     1 occurrences of Argument is not used
+     1 occurrences of COMMON block is not used
+     3 occurrences of PARAMETER is not used
+     2 occurrences of Variable assigned a value but not used
+     7 occurrences of Conflicting Dimension/Argument counts
+     4 occurrences of INTRINSIC functn name used for variable
+ 
+SPAG finished normally

@@ -1,0 +1,17 @@
+ Code execution started on: 2013/09/11 at 16:03:15.810
+   Code execution ended on: 2013/09/11 at 16:03:28.917
+ Total execution time (s):          13
+ Total execution time (hours):  3.640972222222222E-003
+ Subroutines profiled   (Name, number of calls, time(s), % of total time)
+    main           1   13.1075000000000        100.000000000000     
+    forward          10   12.7735000000000        97.4518405493038     
+    solvestat          10   1.78960000000000        13.6532519549876     
+    formalsolution        4000   1.46930000000000        11.2096128170895     
+    NLTE_formalsolution       13800  0.873100000000000     
+   6.66107190539767     
+    profiles          40  0.705100000000000        5.37936296013733     
+    ann_background_opacity        3680  7.470000000000000E-002
+  0.569902727446119     
+    eneq        1840  1.360000000000000E-002  0.103757390806790     
+    Fill densities          10  8.200000000000001E-003  6.255960328056456E-002
+    compute_pg          11  7.300000000000000E-003  5.569330535952698E-002

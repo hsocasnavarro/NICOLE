@@ -1,0 +1,54 @@
+# Configuration file for NICOLE
+# Use # to create comments and "=" to specify values
+Mode = s
+#
+# Fields required for both modes, synthesis and inversion:
+#
+Input model= valc.model
+Output profiles= modelout.pro # Output profiles
+Heliocentric angle= 1 #   0.953 # Cos(mu)
+#
+# Fields required only for the inversion mode:
+#
+Observed profiles= observed.pro
+Output model= modelout.mod
+Regularization=1.0
+#
+# Other misc optional fields
+#
+Formal solution method= 0 #(0=auto,1=Hermite,2=WPM,3=Delolin,4=Delopar,5=SC)
+Printout detail= 4 # (default=1)
+#
+Maximum number of inversions= 1
+Continuum reference= 1 # Normalized to HSRA at disk center, local wavelength
+Height scale=tau
+Debug mode=1
+Optimize grid=1
+Output Populations=1
+Output NLTE Source Function=1
+Output Continuum Opacity=1
+#
+Impose hydrostatic equilibrium= N # Y/N (Only for synthesis)
+Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
+#
+# Spectral regions
+#
+[Region 1]
+  First wavelength=6300.5
+  Wavelength step= 20 mA
+  Number of wavelengths= 100
+[Region 2]
+  First wavelength=8540
+  Wavelength step= 10 mA
+  Number of wavelengths= 400
+[Region 3]
+  First wavelength=8535
+  Wavelength step= 50 mA
+  Number of wavelengths= 350
+#
+# Spectral lines
+#
+[Line 1]
+  Line=FeI 6301.5
+[Line 2]
+  Line=CaII 8542

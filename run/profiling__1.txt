@@ -1,0 +1,13 @@
+ Code execution started on: 2011/09/19 at 11:27:37.753
+   Code execution ended on: 2011/09/19 at 11:27:38.948
+ Total execution time (s):           1
+ Total execution time (hours):  3.3200000E-04
+ Subroutines profiled   (Name, number of calls, time(s), % of total time)
+    main           1   1.195200       100.0000    
+    forward           1   1.178700       98.61948    
+    solvestat           1   1.013300       84.78079    
+    NLTE_formalsolution       27600  0.7325000       61.28681    
+    profiles           4  5.2999999E-02   4.434404    
+    eneq        4370  2.2299999E-02   1.865797    
+    formalsolution         500  1.3400000E-02   1.121151    
+    gasc         665  1.2700000E-02   1.062584    

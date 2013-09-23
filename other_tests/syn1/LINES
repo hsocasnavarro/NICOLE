@@ -1,0 +1,104 @@
+[CaII 8542]
+  Element='Ca'
+  Ionization stage=2
+  Wavelength=8542.091
+  Excitation potential= 1.7000
+  Log(gf)=-0.463
+  Term (lower)=2D2.5
+  Term (upper)=2P1.5
+  Collisions='Barklem'
+  Damping sigma=291.0
+  Damping alpha=0.275
+  Width=25.
+  Mode='NLTE'
+  Transition index in model atom=5
+
+[CaII 8498]
+  Element='Ca'
+  Ionization stage=2
+  Wavelength=8498.023
+  Excitation potential= 1.6920
+  Log(gf)=-1.416
+  Term (lower)= 2D1.5
+  Term (upper)= 2P1.5
+  Collisions='Barklem'
+  Damping sigma=291.0
+  Damping alpha=0.275
+  Width=16.
+  Mode='NLTE'
+  Transition index in model atom=4
+
+[CaII 8662]
+  Element='Ca'	
+  Ionization stage=2
+  Wavelength=8666.141
+  Excitation potential= 1.6920
+  Log(gf)=-0.723
+  Term (lower)= 2D1.5
+  Term (upper)= 2P0.5
+  Collisions='Barklem'
+  Damping sigma=291.0
+  Damping alpha=0.275
+  Width=16.
+  Mode='NLTE'
+  Transition index in model atom=3
+
+[CaII K]
+  Element='Ca'	
+  Ionization stage=2
+  Wavelength=3933.660
+  Excitation potential= 0.0000
+  Log(gf)=0.105
+  Term (lower)= 2S0.5
+  Term (upper)= 2P1.5
+  Collisions='Barklem'
+  Damping sigma=234.0
+  Damping alpha=0.223
+  Width=40.
+  Mode='NLTE'
+  Transition index in model atom=2
+
+[CaII H]
+  Element='Ca'	
+  Ionization stage=2
+  Wavelength=3968.470
+  Excitation potential= 0.0000
+  Log(gf)=-0.199
+  Term (lower)= 2S0.5
+  Term (upper)= 2P0.5
+  Collisions='Barklem'
+  Damping sigma=234.0
+  Damping alpha=0.223
+  Width=40.
+  Mode='NLTE'
+  Transition index in model atom=1
+
+[FeI 6302.5]
+  Element='Fe'	
+  Ionization stage=1
+  Wavelength=6302.4940
+  Excitation potential= 3.6860
+  Log(gf)=-1.16
+  Term (lower)= 5P1.0
+  Term (upper)= 5D0.0
+  Collisions='Barklem'
+  Damping sigma=850.2
+  Damping alpha=0.239
+  Damping enhancement=1.2
+  Width=2.
+  Mode='LTE'
+
+[FeI 6301.5]
+  Element='Fe'	
+  Ionization stage=1
+  Wavelength=6301.5012
+  Excitation potential= 3.6540
+  Log(gf)=-0.718
+  Term (lower)= 5P2.0
+  Term (upper)= 5D2.0
+  Collisions='Barklem'
+  Damping sigma=834.4
+  Damping alpha=0.243
+  Width=2.
+  Mode='LTE'
+
