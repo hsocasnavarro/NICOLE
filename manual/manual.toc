@@ -14,25 +14,25 @@
 \contentsline {subsection}{\numberline {3.1.4}The model atmosphere file}{26}
 \contentsline {subsubsection}{ASCII}{27}
 \contentsline {subsubsection}{IDL savefile}{28}
-\contentsline {subsubsection}{NICOLE native format}{29}
-\contentsline {subsection}{\numberline {3.1.5}The instrumental profile file (optional)}{30}
+\contentsline {subsubsection}{NICOLE native format}{28}
+\contentsline {subsection}{\numberline {3.1.5}The instrumental profile file (optional)}{29}
 \contentsline {subsection}{\numberline {3.1.6}The departure coefficients file (optional)}{30}
-\contentsline {subsection}{\numberline {3.1.7}Running NICOLE in synthesis mode}{31}
+\contentsline {subsection}{\numberline {3.1.7}Running NICOLE in synthesis mode}{30}
 \contentsline {subsection}{\numberline {3.1.8}The profile file}{32}
 \contentsline {subsubsection}{ASCII}{32}
 \contentsline {subsubsection}{IDL savefile}{32}
-\contentsline {subsubsection}{NICOLE native format}{33}
+\contentsline {subsubsection}{NICOLE native format}{32}
 \contentsline {section}{\numberline {3.2}The inversion mode}{33}
 \contentsline {subsection}{\numberline {3.2.1}Setting the input parameters}{33}
-\contentsline {subsection}{\numberline {3.2.2}Running NICOLE in inversion mode}{34}
+\contentsline {subsection}{\numberline {3.2.2}Running NICOLE in inversion mode}{33}
 \contentsline {subsection}{\numberline {3.2.3}Inversion weights}{35}
-\contentsline {subsection}{\numberline {3.2.4}Changing the default number of nodes}{36}
-\contentsline {subsection}{\numberline {3.2.5}Monitoring the inversion}{36}
-\contentsline {subsection}{\numberline {3.2.6}The error bars}{36}
+\contentsline {subsection}{\numberline {3.2.4}Changing the default number of nodes}{35}
+\contentsline {subsection}{\numberline {3.2.5}Monitoring the inversion}{35}
+\contentsline {subsection}{\numberline {3.2.6}The error bars}{35}
 \contentsline {subsection}{\numberline {3.2.7}The file maskinvert.dat}{36}
-\contentsline {subsection}{\numberline {3.2.8}Tips for successful inversions}{37}
+\contentsline {subsection}{\numberline {3.2.8}Tips for successful inversions}{36}
 \contentsline {subsection}{\numberline {3.2.9}Restarting an inversion}{37}
-\contentsline {subsection}{\numberline {3.2.10}Debugging and profiling}{38}
+\contentsline {subsection}{\numberline {3.2.10}Debugging and profiling}{37}
 \contentsline {chapter}{\numberline {4}Compiling NICOLE}{41}
 \contentsline {section}{\numberline {4.1}Creating the makefile}{41}
 \contentsline {section}{\numberline {4.2}Compiler notes}{42}

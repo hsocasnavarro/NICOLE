@@ -869,7 +869,7 @@ nodes to be used. It starts with the line:
 In this section we specify the number of nodes. Valid tokens are:
 Temperature, T, Temp, Velocity, v, vel, vlos, v\_los, Microturbulence,
 micro, vmic, v\_mic, Macro, v\_mac, B\_long, Blong, Bl, Bz,
-B\_x, Bx, B\_y, By, Stray, Stray light, Expansion, Exp, Abundances,
+B\_x, Bx, B\_y, By, Stray, Stray light, Filling factor, ffactor, Abundances,
 Number of abundances. NICOLE has defaults for all of these values so
 you don't need to specify them all. Here is an example of such
 a section:
@@ -1028,32 +1028,7 @@ below). The second
 number in this line is the fraction of stray light that will be added
 to the synthetic profile. It must be in the range [0,1]. Note that the
 stray light parameter may also be used to account for a magnetic
-filling factor. If there is a third number in ths line, it is taken as
-the magnetic field expansion parameter (between 0 and 1). Otherwise,
-expansion is set to zero.
-
-The field expansion parameter is used to account for the fact that one
-expects the filling factor to be larger in the chromosphere than in
-the photosphere. A rigorous treatment of this dependence would require
-computing many rays in the resolution element, piercing the atmosphere
-from the center of the magnetic element all the way out to the
-non-magnetic surroundings. This would result in very high
-computational demands. Instead, we make the simple approximation that
-some particular wavelength ranges are affected by the {\it
-photospheric} filling factor, whereas other ranges are affected by the
-{\it chromospheric} filling factor. This works well because the
-transition from photospheric to chromospheric spectral regions is
-usually very sharp. For example, the polarization signal in the wings
-of the Ca infrared triplet lines is purely photospheric, while the
-signal in the line core is chromospheric. The transition between the
-two regimes is very sharp, so we can use the photospheric filling
-factor for the wings and the chromospheric filling factor for the
-core. The expansion parameter indicates how much of the pixel that was
-field-free in the photosphere is magnetic in the chromosphere. If the
-expansion is zero, it means that the chromospheric filling factor is
-the same as the photospheric one. If it's one, it means that the
-entire chromosphere is magnetic, regardless of the photospheric
-filling factor.
+filling factor. 
 
 The following lines describe the depth-dependence of the model.
 NICOLE will read eight columns, which stand for log($\tau_{5000}$),
@@ -1077,7 +1052,7 @@ nH$^2$, nH$^{2+}$ as arrays with dimensions (nx, ny,
 nz). Additionally, the following (nx,ny) arrays might exist:
 keep\_el\_p, keep\_gas\_p, keep\_rho, keep\_nH, keep\_nHminus,
 keep\_nHplus, keep\_nH2, keep\_nH2plus, v\_mac, stray\_frac,
-expansion. Finally, the array abundance (nx,ny,92) can be used to
+ffactor. Finally, the array abundance (nx,ny,92) can be used to
 specify the chemical composition of the atmosphere, in Astrophysical
 logarithmic units. All variables are in c.g.s. units (tau actually
 refers to the base-10 logarithm of the optical depth at 500nm). The
@@ -1091,7 +1066,7 @@ Sometimes, when creating or manipulating arrays where one of the
 dimensions has only 1 element, IDL will supress such dimension. Before
 you write the IDL savefile with the data, please make sure that the
 model variables have three dimensions (or two in the case of v\_mac,
-stray\_frac, expansion, and the keep flags). If you are having trouble
+stray\_frac, ffactor, and the keep flags). If you are having trouble
 with the array dimensions you can also include nx, ny and nz in the
 IDL savefile and NICOLE will use them to interpret the arrays
 correctly. As a last resort, if the arrays are not three-dimensional
@@ -1115,7 +1090,7 @@ el\_p(1:nz), v\_los(1:nz), v\_mic(1:nz), b\_long(1:nz), b\_x(1:nz),
 b\_y(1:nz), b\_local\_x(1:nz), b\_local\_y(1:nz), b\_local\_z(1:nz),
 v\_local\_x(1:nz), v\_local\_y(1:nz), v\_local\_z(1:nz), nH(1:nz),
 nHminus(1:nz), nHplus(1:nz), nH2(1:nz), nH2plus(1:nz), v\_mac,
-stray\_frac, expansion, keep\_el\_p, keep\_gas\_p, keep\_rho, 
+stray\_frac, ffactor, keep\_el\_p, keep\_gas\_p, keep\_rho, 
 keep\_nH, keep\_nHminus, keep\_nHplus, keep\_nH2, keep\_nH2plus,
 abund(1:92). The ``local'' b and v represent
 the magnetic field and velocity vectors in the local solar frame of
