@@ -1,6 +1,6 @@
 module background_opacity_module
   Use Phys_constants
-  Use Mihalas_opac_module
+  Use Wittmann_opac_module
   Use Asensio_background_opacity_module, Only: Asensio_background_opacity
   Implicit None
   Integer :: Opacity_package=1 ! Default, will be overwritten in main program
@@ -11,8 +11,8 @@ Contains
     Real :: Scat, Background_opacity
     Real :: nu, chi_0, chi_e, eta
     
-    If (Opacity_Package .eq. 1) then ! Use Mihalas'
-       Background_opacity=Mihalas_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
+    If (Opacity_Package .eq. 1) then ! Use Wittmann'
+       Background_opacity=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
        Return
     Else if (Opacity_Package .eq. 2) then ! Use Asensio's
        Background_opacity=Asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)

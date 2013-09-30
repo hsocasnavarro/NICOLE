@@ -30,6 +30,7 @@ modelout.mod
 pel       ! inputdens 
  -1   -1   -1   -1   -1   -1   -1   -1        ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ 
 t          ! hscale 
+1          ! opac 
 F     T   -1   ! sethydro, setnH, restart 
 1   ! depcoef 
 2   ! nlines 
@@ -58,3 +59,10 @@ F     T   -1   ! sethydro, setnH, restart
 -1 ! Nodes in B_y 2
 0 ! Number of abundances to invert 2
 1 1 T T T ! debug, optimize grid, outputpop, outputcontop, outputNLTEsf
+1e-3 Elim 1 
+1 1 ISUM, ISTART 
+3 0 1 NMU, usecolswitch, formalsolution 
+10 1.0 QNORM, CPER 
+T T 3 velfree, ngacc,lambdaiters 
+500 nltemaxiters 
+1 NLTE ltepop 

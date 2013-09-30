@@ -1,17 +1,17 @@
- Code execution started on: 2013/09/11 at 16:03:13.095
-   Code execution ended on: 2013/09/11 at 16:03:15.437
- Total execution time (s):           2
- Total execution time (hours):  6.506944444444444E-004
+ Code execution started on: 2013/09/30 at 10:37:47.670
+   Code execution ended on: 2013/09/30 at 10:37:48.927
+ Total execution time (s):           1
+ Total execution time (hours):  3.492222222222222E-004
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   2.34250000000000        100.000000000000     
-    forward           1   2.30800000000000        98.5272145144077     
-    solvestat           1   1.28320000000000        54.7790821771612     
-    NLTE_formalsolution       13200  0.883100000000000     
-   37.6990394877268     
-    formalsolution         400  0.145100000000000        6.19423692636073     
-    profiles           4  7.070000000000000E-002   3.01814300960512     
-    ann_background_opacity         800  1.560000000000000E-002
-  0.665955176093917     
-    eneq        1760  1.360000000000000E-002  0.580576307363928     
-    compute_pg           2  1.400000000000000E-003  5.976520811099253E-002
-    Fill densities           1  8.000000000000000E-004  3.415154749199573E-002
+    main           1   1.25720000000000        100.000000000000     
+    forward           1   1.22400000000000        97.3592109449570     
+    solvestat           1  0.782400000000000        62.2335348393255     
+    NLTE_formalsolution       15600  0.589500000000000     
+   46.8899140948139     
+    formalsolution         400  5.320000000000000E-002   4.23162583518931     
+    profiles           4  4.220000000000000E-002   3.35666560610881     
+    ann_background_opacity         800  1.160000000000000E-002
+  0.922685332484887     
+    eneq        2080  9.300000000000001E-003  0.739739102768056     
+    compute_pg           2  7.000000000000000E-004  5.567928730512248E-002
+    Fill densities           1  5.000000000000000E-004  3.977091950365892E-002

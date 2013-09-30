@@ -9,6 +9,7 @@ Module Model_structure
   Type Model
 ! temp is in K, v_los and v_mic are in cm/s, el_p and gas_p are in dyn/cm^2, 
 ! rho is in g/cm^3, b_long, b_x, b_y is in gauss, 
+! z_scale is in km (positive is up, negative is down)
 ! ne, nH, nHplus are electron, neutral H and HII number densities in cm^-3
 ! nHminus, nH2 and nH2plus are the number densities in cm^-3 of the negative 
 ! H ion, molecular Hydrogen and positive molecular ion respectively

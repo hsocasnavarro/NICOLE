@@ -273,7 +273,7 @@ for icycle in range(int(ncycles)):
     hscale=get_value(config,'Height scale','t','NICOLE.input')
     hscale=hscale[0]
     hscale=hscale.lower()
-    opacities=get_value(config,'Opacity package','Andres','NICOLE.input')
+    opacities=get_value(config,'Opacity package','Wittmann','NICOLE.input')
     opacities=opacities.lower()
     debug=get_value(config,'Debug mode','0','NICOLE.input')
     interp=get_value(config,'Optimize grid','-','NICOLE.input')
@@ -319,11 +319,13 @@ for icycle in range(int(ncycles)):
         print 'Error in NICOLE.input. Input density must be either tau or z'
         sys.exit(1)
     if opacities == 'natasha' or opacities == 'sopas' or opacities == 'shchukina': opacities == 'sopa'
-    if opacities != 'andres' and opacities != 'sopa':
+    if opacities == 'andres' or opacities == 'asensio': opacities == 'andres'
+    if opacities != 'andres' and opacities != 'sopa' and opacities != 'wittmann':
         print 'Error in NICOLE.input. Unknown opacity package:',opacities
         sys.exit(1)
-    if opacities == 'andres': opacities = '1'
-    if opacities == 'sopa': opacities = '2'
+    if opacities == 'wittmann': opacities = '1'
+    if opacities == 'andres': opacities = '2'
+    if opacities == 'sopa': opacities = '3'
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':
