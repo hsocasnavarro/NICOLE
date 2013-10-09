@@ -275,6 +275,7 @@ for icycle in range(int(ncycles)):
     hscale=hscale.lower()
     opacities=get_value(config,'Opacity package','Wittmann','NICOLE.input')
     opacities=opacities.lower()
+    eqstateH=get_value(config,'Eq state, H','0','NICOLE.input')
     debug=get_value(config,'Debug mode','0','NICOLE.input')
     interp=get_value(config,'Optimize grid','-','NICOLE.input')
     outputpop=get_value(config,'Output populations','0','NICOLE.input')
@@ -326,6 +327,9 @@ for icycle in range(int(ncycles)):
     if opacities == 'wittmann': opacities = '1'
     if opacities == 'andres': opacities = '2'
     if opacities == 'sopa': opacities = '3'
+    if eqstateH != '0' and eqstateH !='1' and eqstateH != '2':
+        print 'Eq state, H must be between 0 and 2'
+        sys.exit(1)
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':
@@ -1091,6 +1095,7 @@ for icycle in range(int(ncycles)):
             '       ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ \n')
     f.write(hscale+'          ! hscale \n')
     f.write(opacities+'          ! opac \n')
+    f.write(eqstateH+'          ! Eq state, H \n')
     f.write(sethydro+'     '+setnH+'   '+restart+'   ! sethydro, setnH, restart \n')
     f.write(depcoef+'   ! depcoef \n')
     f.write(nlines+'   ! nlines \n')

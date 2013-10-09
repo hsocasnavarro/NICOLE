@@ -1,15 +1,32 @@
 ! Extract model from a 1D vector used to read/write records
 ! Use dir=1 to extract model from vector or dir=-1 for the opposite
-Subroutine Record_to_model_2comp(np, Atmo, Vector1, Vector2, dir)
+Subroutine Record_to_model_2comp(np, Atmo, Vector1, Vector2, KeepVars, dir)
 Use Model_structure
 Implicit None
 Type (Model_2comp) :: Atmo
 Integer :: dir, np
 Real, Dimension(nvarsdepth*np+nvarssingle) :: Vector1
 Real, Dimension(nvarsdepth*np+nvarssingle) :: Vector2
+Real, Dimension(8) :: KeepVars
 !
 Call Record_to_model(np, Atmo%Comp1, Vector1, dir)
 Call Record_to_model(np, Atmo%Comp2, Vector2, dir)
+  If (KeepVars(1) .gt. -.01) Atmo%comp1%Keep_El_p=KeepVars(1)
+  If (KeepVars(2) .gt. -.01)   Atmo%comp1%Keep_Gas_p=KeepVars(2)
+  If (KeepVars(3) .gt. -.01)   Atmo%comp1%Keep_Rho=KeepVars(3)
+  If (KeepVars(4) .gt. -.01)  Atmo%comp1%Keep_nH=KeepVars(4)
+  If (KeepVars(5) .gt. -.01)  Atmo%comp1%Keep_nHminus=KeepVars(5)
+  If (KeepVars(6) .gt. -.01)  Atmo%comp1%Keep_nHplus=KeepVars(6)
+  If (KeepVars(7) .gt. -.01)   Atmo%comp1%Keep_nH2=KeepVars(7)
+  If (KeepVars(8) .gt. -.01)  Atmo%comp1%Keep_nH2plus=KeepVars(8)
+  If (KeepVars(1) .gt. -.01) Atmo%comp2%Keep_El_p=KeepVars(1)
+  If (KeepVars(2) .gt. -.01)   Atmo%comp2%Keep_Gas_p=KeepVars(2)
+  If (KeepVars(3) .gt. -.01)   Atmo%comp2%Keep_Rho=KeepVars(3)
+  If (KeepVars(4) .gt. -.01)  Atmo%comp2%Keep_nH=KeepVars(4)
+  If (KeepVars(5) .gt. -.01)  Atmo%comp2%Keep_nHminus=KeepVars(5)
+  If (KeepVars(6) .gt. -.01)  Atmo%comp2%Keep_nHplus=KeepVars(6)
+  If (KeepVars(7) .gt. -.01)   Atmo%comp2%Keep_nH2=KeepVars(7)
+  If (KeepVars(8) .gt. -.01)  Atmo%comp2%Keep_nH2plus=KeepVars(8)
 Return
 !
 End Subroutine Record_to_model_2comp

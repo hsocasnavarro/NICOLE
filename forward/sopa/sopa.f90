@@ -1,14 +1,1790 @@
-SUBROUTINE SOPAS(Id,Ihtot,Freq,Pel,Tel,Pg,Chio,Chie,Eta)
-   IMPLICIT NONE
-   INTEGER Id , Ihtot , MDEP , MFT , MK , NXTion
-   REAL ATW , BK , BNU , CC , CHE , Chie , Chio , EE , EK , EM ,     &
+! Initialization for the SOPA opacity package. This routine is only
+! needed once per execution, in order to store some proper values in
+! the SOPA common blocks.
+!
+Subroutine Init_sopas
+  Use Atomic_data
+  Implicit none
+  Logical, Save :: First_time=.TRUE.
+  Logical :: exists
+  Integer :: lun, Get_lun
+!
+  If (.not.First_time) Return
+!  Print *,'Initialzing sopa'
+  First_time=.FALSE.
+  lun=Get_lun()
+  Inquire(File='ion.dat', exist=exists)
+  If (.not.exists) then
+     Print *,'Cannot find the file ion.dat!! Aborting...'
+     Stop
+  else
+     Open(unit=lun, File='ion.dat')
+  End if
+  Call readion(N_elements, Atom_char, At_abund, lun)
+  Close (unit=lun)
+  Return
+!
+End Subroutine Init_sopas
+!*==AHMBF.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION AHMBF(Theta,Freq)
+      IMPLICIT NONE
+!*--AHMBF4
+!*** Start of declarations inserted by SPAG
+      REAL fr , Freq , th , Theta , w , xk , xl
+!*** End of declarations inserted by SPAG
+      th = Theta
+      fr = Freq
+      AHMBF = 0.0
+      w = 2.9979E15/fr
+      xl = 16.419 - w
+      IF ( xl.LT.0 ) THEN
+         AHMBF = 0.0
+      ELSE
+         IF ( w.LE.14.2 ) THEN
+            xk = 0.00680133 +                                           &
+               & (0.17878708+(0.16479+(-0.0204842+5.95244E-4*w)*w)*w)*w
+         ELSE
+            xk = (0.269818+(0.220190+(-0.0411288+0.00273236*xl)*xl)*xl) &
+               & *xl
+         ENDIF
+         AHMBF = xk*0.4158*th**2*SQRT(th)*EXP(1.737*th)
+      ENDIF
+      END
+!*==AHMFF.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION AHMFF(Theta,Freq)
+      IMPLICIT NONE
+!*--AHMFF29
+!*** Start of declarations inserted by SPAG
+      REAL a , b , c , fr , Freq , th , Theta , w
+!*** End of declarations inserted by SPAG
+      th = Theta
+      fr = Freq
+      w = 2.9979E15/fr
+      a = 0.0053666 + (-0.011493+0.027039*th)*th
+      b = -3.2062 + (11.924-5.939*th)*th
+      c = -0.40192 + (7.0355-0.34592*th)*th
+      AHMFF = a + (b+c*w)*w/1000.0
+      END
+!*==BMCONST.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      BLOCKDATA BMCONST
+      IMPLICIT NONE
+!*--BMCONST44
+!*** Start of declarations inserted by SPAG
+      REAL BK , CC , EE , EK , EM , HC2 , HCE , HCK , HH , PI , UU
+!*** End of declarations inserted by SPAG
+!
+! BMCONST 96-01-03  is taken from:
+!   MULTI version 2.0 (MATS CARLSSON)
+!
+ 
+!
+      COMMON /CCONST/ EE , HH , CC , BK , EM , UU , HCE , HC2 , HCK ,   &
+                    & EK , PI
+!
+      DATA EE/1.602189E-12/ , HH/6.626176E-27/ , CC/2.99792458E10/ ,    &
+         & EM/9.109534E-28/ , UU/1.6605655E-24/ , BK/1.380662E-16/ ,    &
+         & PI/3.14159265359/
+!
+      END
+
+!*==H2PKUR.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION H2PKUR(Temp,Freq)
+      IMPLICIT NONE
+!*--H2PKUR166
+!*** Start of declarations inserted by SPAG
+      REAL Freq , t , Temp
+!*** End of declarations inserted by SPAG
+      REAL*8 a , b , es , fr , af , kt , ex , x , fmut
+      t = Temp
+      fr = Freq
+      IF ( fr.LE.3.28805D15 ) THEN
+         af = DLOG(fr)
+         a = (-4.230D-46+(1.224D-61-1.351D-77*fr)*fr)*fr
+         es = -7.342D-3 + (-2.409D-15+(1.028D-30+a)*fr)*fr
+         b = (-1.82496D1+(3.9207D-1-3.1672D-3*af)*af)*af
+         kt = 1.38062D-16*t/1.6022D-12
+         x = ((-es/kt)-3.0233D+3+(3.7797D2+b)*af)
+         fmut = DEXP(x)
+!      WRITE(6,12345) FMUT
+99001    FORMAT (1X,'DEXP(X)=',D15.7)
+!      FMUT=DEXP((-ES/KT)-3.0233D+3+(3.7797D2+B)*AF)                    00066900
+         x = (6.624D-27*fr/1.38062D-16/t)
+         ex = 1.0/DEXP(x)
+!      EX=1.0/DEXP(6.624D-27*FR/1.38062D-16/T)                          00067000
+         fmut = fmut*(1.0-ex)
+!      WRITE(6,12346) FMUT
+99002    FORMAT (1X,'FMUT=',D15.7)
+         H2PKUR = fmut
+         GOTO 99999
+      ENDIF
+      H2PKUR = 0.0
+      RETURN
+99999 END
+ 
+      REAL*8 FUNCTION OPMET(Idep,Freq,Emis)
+      IMPLICIT NONE
+!*--OPMET222
+!*** Start of declarations inserted by SPAG
+      REAL ALFa , AS , BM , bn , CHIo , e , ELMent , eln , EXO1 , FIOn ,&
+         & Freq , G , GO1 , HK , PE , PU , t , TEMp , TO1 , UO1
+      REAL V
+      INTEGER i , id , Idep , k , kbo , KEL , kl , KU , l , MDEP , MK , &
+            & n1 , NBElo1 , nbo , nel , NELem , no , no1 , nop , NTO1
+!*** End of declarations inserted by SPAG
+!
+!          INCLUDE 'PARAMAX'
+      PARAMETER (MDEP=1,MK=1)
+!
+      REAL*8 koef , suma , d , db
+      REAL*8 SIGMA
+      REAL*8 term
+      REAL*8 NLEvel
+      LOGICAL Emis
+      DIMENSION NELem(1) , KU(1) , KEL(1)
+      DIMENSION bn(10) , nop(5) , elopac(5) , term(34)
+      DIMENSION ELMent(25) , ALFa(25) , AS(25) , CHIo(25)
+      DIMENSION NBElo1(50) , NTO1(50) , TO1(248) , UO1(248)
+      DIMENSION NLEvel(30) , EXO1(30) , GO1(30)
+ 
+      REAL NE , NATom , elopac
+!
+      COMMON V(10300)
+!
+      COMMON /BION  / BM(MDEP,30)
+!
+      COMMON /MODEL / NE(MDEP) , TEMp(MDEP) , PE(MDEP) , NATom(MDEP)
+!
+      COMMON /LTECAL/ HK , FIOn(MK) , G(MK)
+ 
+      EQUIVALENCE (V(2000),NELem(1))
+      EQUIVALENCE (V(2001),ELMent(1))
+      EQUIVALENCE (V(2026),ALFa(1))
+      EQUIVALENCE (V(2051),AS(1))
+      EQUIVALENCE (V(2076),CHIo(1))
+      EQUIVALENCE (V(2101),NBElo1(1))
+      EQUIVALENCE (V(2151),NTO1(1))
+      EQUIVALENCE (V(2201),KU(1))
+      EQUIVALENCE (V(2202),TO1(1))
+      EQUIVALENCE (V(2450),UO1(1))
+      EQUIVALENCE (V(2698),KEL(1))
+      EQUIVALENCE (V(2699),NLEvel(1))
+      EQUIVALENCE (V(2759),EXO1(1))
+      EQUIVALENCE (V(2789),GO1(1))
+ 
+      DATA nop/4*8 , 2/
+      DATA elopac(1) , elopac(2) , elopac(3) , elopac(4) , elopac(5)    &
+          &/'SI  ' , 'C   ' , 'MG  ' , 'AL  ' , 'FE  '/
+      DATA term/'3P2 3P  ' , '3P2 1D  ' , '3P2 1S  ' , '3P3 5S  ' ,     &
+          &'4S  3P0 ' , '4S1 P0  ' , '3D  3D0 ' , '4P  3SPD' ,          &
+          &'2P2 3P  ' , '2P2 1D  ' , '2P2 1S  ' , '2P3 5S0 ' ,          &
+          &'3S  3P0 ' , '3S  1P0 ' , '2P3 3D  ' , '3P  3SPD' ,          &
+          &'3S2 1S  ' , '3P3 P0  ' , '3P  1P0 ' , '4S  3S  ' ,          &
+          &'4S  1D  ' , '3D  1D  ' , '3D  3D  ' , '4P  1P0 ' ,          &
+          &'3P2 P0  ' , '4S  2S  ' , '3P  4P  ' , '3D  2D  ' ,          &
+          &'4P  2P0 ' , '5S  2S  ' , '4D  2D  ' , '5P  2P0 ' ,          &
+          &'A5  D   ' , 'A5  F   '/
+      HK = 157896.D0/3.29D15
+      id = Idep
+      eln = NE(id)
+      t = TEMp(id)
+      no = 0
+      koef = 0.0D0
+      kl = KEL(1)
+      DO nel = 1 , kl
+         kbo = 0
+ 
+!      NLM=NELEM(1)
+!      DO 1 K=1,NLM
+         DO k = 1 , NELem(1)
+ 
+            IF ( elopac(nel).EQ.ELMent(k) ) GOTO 50
+            kbo = kbo + NBElo1(2*k-1) + NBElo1(2*k)
+         ENDDO
+         WRITE (6,99001) elopac(nel)
+99001    FORMAT ('0  ERROR IN OPMET: THERE IS NOT ',A4,' IN INPUT DATA')
+         STOP
+ 50      n1 = nop(nel) + no
+         no = no + 1
+         nbo = kbo + NBElo1(2*k-1)
+         kbo = kbo + 1
+         suma = 0.0D0
+         db = 0.0D0
+         l = 0
+         DO no1 = no , n1
+            l = l + 1
+            IF ( NBElo1(2*k-1).NE.0 ) THEN
+               DO i = kbo , nbo
+                  IF ( term(no1).EQ.NLEvel(i) ) THEN
+                     db = (BM(id,i)-1.0)*GO1(i)                         &
+                        & *EXP(-1.0*EXO1(i)/0.8616D-4/t) + db
+                     bn(l) = BM(id,i)
+                     GOTO 60
+                  ENDIF
+               ENDDO
+            ENDIF
+            bn(l) = 1.0E0
+ 60         e = ELMent(k)
+            IF ( Emis ) THEN
+               suma = suma + SIGMA(e,l,Freq,t)
+            ELSE
+               suma = suma + bn(l)*(1.0-EXP(-1.*HK*Freq/t)/bn(l))         &
+                   & *SIGMA(e,l,Freq,t)
+            ENDIF
+         ENDDO
+         d = 2.0*PU(t,2,k)*EXP(-1.0*CHIo(k)/0.8616D-4/t)*t*SQRT(t)      &
+           & *2.414556D15/eln + PU(t,1,k) + db
+         koef = koef + ALFa(k)*suma/d
+         no = n1
+      ENDDO
+      OPMET = koef
+      END
+!*==PARA5.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      SUBROUTINE PARA5(Xo,Yo)
+      IMPLICIT NONE
+!*--PARA5340
+!*** Start of declarations inserted by SPAG
+      REAL A , B , C , X , Xo , Y , Yo
+      INTEGER i , il , N
+!*** End of declarations inserted by SPAG
+      COMMON /PARABC/ A(10000) , B(10000) , C(10000) , X(10000) ,       &
+                    & Y(10000) , N
+      il = 1
+      IF ( Xo.LT.X(il) ) il = 1
+      IF ( Xo.GE.X(1) ) THEN
+         IF ( Xo.GE.X(il+1) ) THEN
+            il = il + 1
+            DO i = il , N
+               IF ( X(i).GE.Xo ) GOTO 20
+            ENDDO
+            i = N
+ 20         il = i - 1
+         ENDIF
+      ENDIF
+      Yo = A(il) + B(il)*Xo + C(il)*Xo*Xo
+      END
+!*==PARAB.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      SUBROUTINE PARAB(Xo,Yo)
+      IMPLICIT NONE
+!*--PARAB364
+!*** Start of declarations inserted by SPAG
+      REAL A , B , C , DUMmy , X , Xo , Y , Yo
+      INTEGER i , il , N
+!*** End of declarations inserted by SPAG
+      COMMON A(100) , B(100) , C(100) , X(100) , Y(100) , N ,           &
+       & DUMmy(9799)
+      il = 1
+      IF ( Xo.LT.X(il) ) il = 1
+      IF ( Xo.GE.X(1) ) THEN
+         IF ( Xo.GE.X(il+1) ) THEN
+            il = il + 1
+            DO i = il , N
+               IF ( X(i).GE.Xo ) GOTO 20
+            ENDDO
+            i = N
+ 20         il = i - 1
+         ENDIF
+      ENDIF
+      Yo = A(il) + B(il)*Xo + C(il)*Xo*Xo
+      END
+!*==PARABO.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+!  Natasha!  -----------------------------------------18.01.96
+ 
+!   Here I send you the improved formal solver. Try to understand it
+!  and ask me any questions about.
+ 
+!   Javier
+ 
+!  P.S. I send also a Voigt routine just in case you need it.
+!
+!++++++++++++++++++++++++++++++++++++++++++++++++++++08.03.96 IAC
+!                           PARABO in is used SCRT1D
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++Natasha
+ 
+      FUNCTION PARABO(Trick,K,Dtm,Dtp,S0,Sm,Sp)
+!  Parabolic aproximation of S....analytical integration
+!
+      IMPLICIT NONE
+!*--PARABO403
+!*** Start of declarations inserted by SPAG
+      REAL*8 c0 , cm , cp , d2 , d3 , d4 , Dtm , Dtp , exu , PARABO ,   &
+           & S0 , Sm , Sp , Trick , u0 , u1 , u2
+      INTEGER K
+!*** End of declarations inserted by SPAG
+!
+      IF ( Dtm.GE.Trick ) THEN
+ 
+! Natasha:
+!           If DTM is too large (near low boundary)
+! If we want to avoid underflow in DEXP
+!
+         IF ( Dtm.GE.80.0 ) THEN
+            exu = DEXP(-80.0D0)
+         ELSE
+            exu = DEXP(-Dtm)
+         ENDIF
+ 
+         u0 = 1. - exu
+         u1 = Dtm - 1. + exu
+         u2 = Dtm*Dtm - 2.*Dtm + 2. - 2.*exu
+!
+      ELSE
+!
+         d2 = Dtm*Dtm
+         d3 = Dtm*d2
+         d4 = Dtm*d3
+         u0 = Dtm - (d2/2.D0)
+         u1 = (d2/2.D0) - (d3/6.D0)
+         u2 = (d3/3.D0) - (d4/12.D0)
+!
+      ENDIF
+!
+      cm = (u2-u1*(Dtp+2.*Dtm))/(Dtm*(Dtm+Dtp)) + u0
+      c0 = (u1*(Dtm+Dtp)-u2)/(Dtm*Dtp)
+      cp = (u2-Dtm*u1)/(Dtp*(Dtm+Dtp))
+!
+      PARABO = cm*Sm + c0*S0 + cp*Sp
+!
+!        if(k.eq.5) then
+!        print *,'s0 sm sp'
+!        print *,s0
+!        print *,sm
+!        print *,sp
+!        print *,'co cm cp'
+!        print *,c0
+!        print *,cm
+!        print *,cp
+!        print *,'parabo=',parabo
+!        end if
+!
+      END
+!*==PARCO5.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      SUBROUTINE PARCO5(X,Y,N,Nr)
+      IMPLICIT NONE
+!*--PARCO5459
+!*** Start of declarations inserted by SPAG
+      REAL A , B , C , d , wt , X , XX , Y , YY
+      INTEGER i , j , j1 , N , n1 , NN , Nr
+!*** End of declarations inserted by SPAG
+      DIMENSION X(Nr) , Y(Nr)
+      COMMON /PARABC/ A(10000) , B(10000) , C(10000) , XX(10000) ,      &
+                    & YY(10000) , NN
+      C(1) = 0.
+      B(1) = (Y(2)-Y(1))/(X(2)-X(1))
+      A(1) = Y(1) - X(1)*B(1)
+      IF ( N.EQ.2 ) RETURN
+      n1 = N - 1
+      C(N) = 0.0
+      B(N) = (Y(N)-Y(n1))/(X(N)-X(n1))
+      A(N) = Y(N) - X(N)*B(N)
+      DO j = 2 , n1
+         j1 = j - 1
+         d = (Y(j)-Y(j1))/(X(j)-X(j1))
+         C(j) = Y(j+1)/((X(j+1)-X(j))*(X(j+1)-X(j1))) - Y(j)            &
+              & /((X(j)-X(j1))*(X(j+1)-X(j))) + Y(j1)                   &
+              & /((X(j)-X(j1))*(X(j+1)-X(j1)))
+         B(j) = d - (X(j)+X(j1))*C(j)
+         A(j) = Y(j1) - X(j1)*(B(j)+C(j)*X(j1))
+      ENDDO
+      IF ( n1.NE.2 ) THEN
+         n1 = N - 2
+         DO j = 2 , n1
+            IF ( C(j).NE.0 ) THEN
+               j1 = j + 1
+               wt = ABS(C(j1))/(ABS(C(j1))+ABS(C(j)))
+               A(j) = A(j1) + wt*(A(j)-A(j1))
+               B(j) = B(j1) + wt*(B(j)-B(j1))
+               C(j) = C(j1) + wt*(C(j)-C(j1))
+            ENDIF
+         ENDDO
+      ENDIF
+      DO i = 1 , N
+         XX(i) = X(i)
+         YY(i) = Y(i)
+      ENDDO
+      NN = N
+      END
+!*==PARCOF.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      SUBROUTINE PARCOF(X,Y,N,Nr)
+      IMPLICIT NONE
+!*--PARCOF505
+!*** Start of declarations inserted by SPAG
+      REAL A , B , C , d , DUMmy , wt , X , XX , Y , YY
+      INTEGER i , j , j1 , N , n1 , NN , Nr
+!*** End of declarations inserted by SPAG
+      DIMENSION X(Nr) , Y(Nr)
+      COMMON A(100) , B(100) , C(100) , XX(100) , YY(100) , NN ,        &
+       & DUMmy(9799)
+      C(1) = 0.
+      B(1) = (Y(2)-Y(1))/(X(2)-X(1))
+      A(1) = Y(1) - X(1)*B(1)
+      IF ( N.EQ.2 ) RETURN
+      n1 = N - 1
+      C(N) = 0.0
+      B(N) = (Y(N)-Y(n1))/(X(N)-X(n1))
+      A(N) = Y(N) - X(N)*B(N)
+      DO j = 2 , n1
+         j1 = j - 1
+         d = (Y(j)-Y(j1))/(X(j)-X(j1))
+         C(j) = Y(j+1)/((X(j+1)-X(j))*(X(j+1)-X(j1))) - Y(j)            &
+              & /((X(j)-X(j1))*(X(j+1)-X(j))) + Y(j1)                   &
+              & /((X(j)-X(j1))*(X(j+1)-X(j1)))
+         B(j) = d - (X(j)+X(j1))*C(j)
+         A(j) = Y(j1) - X(j1)*(B(j)+C(j)*X(j1))
+      ENDDO
+      IF ( n1.NE.2 ) THEN
+         n1 = N - 2
+         DO j = 2 , n1
+            IF ( C(j).NE.0 ) THEN
+               j1 = j + 1
+               wt = ABS(C(j1))/(ABS(C(j1))+ABS(C(j)))
+               A(j) = A(j1) + wt*(A(j)-A(j1))
+               B(j) = B(j1) + wt*(B(j)-B(j1))
+               C(j) = C(j1) + wt*(C(j)-C(j1))
+            ENDIF
+         ENDDO
+      ENDIF
+      DO i = 1 , N
+         XX(i) = X(i)
+         YY(i) = Y(i)
+      ENDDO
+      NN = N
+      END
+!*==PLANCK.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+!****************************************************multi: mul20_sub.f
+!
+      FUNCTION PLANCK(U,T)
+      IMPLICIT NONE
+!*--PLANCK553
+!*** Start of declarations inserted by SPAG
+      REAL BK , CC , EE , EK , EM , HC2 , HCE , HCK , HH , PI , PLANCK ,&
+         & T , U , UU , x
+!*** End of declarations inserted by SPAG
+!
+!  CALCULATES PLANCK FUNCTION BNY AT FREQUENCY U, TEMP T
+!
+!
+      COMMON /CCONST/ EE , HH , CC , BK , EM , UU , HCE , HC2 , HCK ,   &
+                    & EK , PI
+!
+      x = HH*U/BK/T
+!      PRINT *,'BK=',BK
+ 
+!      PRINT *,'T=',T
+!      PRINT *,'U=',U
+!      PRINT *,'X=',X
+ 
+      IF ( x.LT.80. ) THEN
+         PLANCK = 2.0*HH*U/CC*U/CC*U/(EXP(x)-1.0)
+      ELSE
+         PLANCK = 2.0*HH*U/CC*U/CC*U*EXP(-x)
+      ENDIF
+!
+      END
+!*==PU.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+!
+!**********************************************************************
+      FUNCTION PU(Tt,Ion,Iel)
+      IMPLICIT NONE
+!*--PU584
+!*** Start of declarations inserted by SPAG
+      INTEGER ie , Iel , io , Ion , it , k , NBElo1 , nlm , nte , nto , &
+            & NTO1
+      REAL PU , t , to , TO1 , Tt , u , uo , UO1 , V
+!*** End of declarations inserted by SPAG
+      DIMENSION to(25) , uo(25)
+      DIMENSION NBElo1(2,25) , NTO1(2,25)
+      DIMENSION TO1(248) , UO1(248)
+      COMMON V(10300)
+      EQUIVALENCE (V(2101),NBElo1(1))
+      EQUIVALENCE (V(2151),NTO1(1))
+      EQUIVALENCE (V(2202),TO1(1))
+      EQUIVALENCE (V(2450),UO1(1))
+      t = Tt
+      k = 2
+      nlm = Iel
+      nto = 0
+      DO ie = 1 , nlm
+         IF ( ie.EQ.Iel ) k = Ion
+         DO io = 1 , k
+            nte = NTO1(io,ie)
+            nto = nto + nte
+         ENDDO
+      ENDDO
+      IF ( nte.EQ.1 ) THEN
+         PU = UO1(nto)
+         GOTO 99999
+      ENDIF
+      nto = nto - nte
+      DO it = 1 , nte
+         nto = nto + 1
+         to(it) = TO1(nto)
+         uo(it) = UO1(nto)
+      ENDDO
+      CALL LININT(to,uo,nte,25)
+      u = 0.0
+      CALL EVAL(t,u)
+      PU = u
+      RETURN
+99999 END
+!*==READION.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      SUBROUTINE READION(N_elements,Atom_char,At_abund,Ifile)
+      IMPLICIT NONE
+!*--READION628
+!*** Start of declarations inserted by SPAG
+      REAL ALFa , AS , ATW , belem , BK , BM , CC , CHIo , EE , EK ,    &
+         & ELMent , EM , EXO1 , GO1 , HC2 , HCE , HCK , HH , PI , SUMA
+      REAL TO1 , UO1 , UU , V , xmum
+      INTEGER i , ib , id , ie , ind , io , iu , j , kbo , KEL , KU ,   &
+            & MDEP , MFT , MK , nb , NBElo1 , nd , NELem , nlmm , nte
+      INTEGER nto , NTO1 , N_elements
+!*** End of declarations inserted by SPAG
+!
+!***********************************************************IAC, 08.06.97
+!                                                   Nataliya G. Shchukina
+!
+!   Read atomic data from file ION.DAT
+!
+!   Data are needed for solution of ionization equilibrium
+!
+!**********************************************************************
+!
+!  There are TWO choices for
+!  solution of ionization equilibrium equations:
+!----------
+! Choice 1:
+!----------
+!
+!  IHTOT > 0 - density RHO and total number of hydrogen atoms HTOT
+!              are known
+!              from gas pressure PG and electron pressure PE
+!
+!              subroutine STATP is called.
+!
+!  IHTOT = 1   without molecules
+!          2   with    molecules H2+ and H2.
+!
+!----------
+! Choice 2:
+!----------
+!
+!   IHTOT < 0 - density RHO and total number of hydrogen atoms HTOT
+!               are determined with new
+!               chemical composition.
+!
+!              subroutine STATM is called.
+!
+!  IHTOT =-1   without molecules
+!  IHTOT =-2   with    molecules H2+ and H2.
+!
+!
+ 
+!   Contributitors in in the electron density NE:
+!   H, Si, C, Mg, Al, Fe, He, N, O, Ne, Na, P, S, Ar, Ca, Cr, Mn.
+!
+ 
+!********************************************************************
+!
+!  PARAMAX contains dimensions of arrays
+!
+! MODIFIED BY HECTOR (DEC 99) TO TAKE EXTERNAL ABUNDANCES. THESE ARE
+! NO LONGER IN THE FILE ion.dat. OTHER PARAMETERS, HOWEVER
+! (PARTITION FUNCTIONS, ATOMIC WEIGHT, ETC), ARE STILL TAKEN FROM THE
+! FILE, BUT THESE ARE NORMALLY VALUES THAT CAN BE HARDWIRED WITHOUT
+! MUCH TROUBLE.
+ 
+!                INCLUDE 'PARAMAX'
+      PARAMETER (MDEP=1,MK=1,MFT=1)
+!
+      COMMON /CCONST/ EE , HH , CC , BK , EM , UU , HCE , HC2 , HCK ,   &
+                    & EK , PI
+!
+ 
+      DIMENSION NELem(1) , KU(1) , KEL(1)
+      DIMENSION ELMent(25) , ALFa(25) , AS(25) , CHIo(25)
+      DIMENSION NBElo1(2,25) , NTO1(2,25)
+      REAL*8 NLEvel
+      DIMENSION TO1(248) , UO1(248) , NLEvel(30) , EXO1(30) , GO1(30) , &
+              & belem(MDEP,30)
+      CHARACTER*2 Atom_char(N_elements) , tmpchar
+      REAL At_abund(N_elements) , tmpreal
+      LOGICAL found
+      INTEGER Ifile
+ 
+      COMMON V(10300)
+!
+      COMMON /BION  / BM(MDEP,30)
+!
+      COMMON /ATWT  / ATW , SUMA
+!
+      EQUIVALENCE (tmpchar,tmpreal)
+      EQUIVALENCE (V(2000),NELem(1))
+      EQUIVALENCE (V(2001),ELMent(1))
+      EQUIVALENCE (V(2026),ALFa(1))
+      EQUIVALENCE (V(2051),AS(1))
+      EQUIVALENCE (V(2076),CHIo(1))
+      EQUIVALENCE (V(2101),NBElo1(1))
+      EQUIVALENCE (V(2151),NTO1(1))
+      EQUIVALENCE (V(2201),KU(1))
+      EQUIVALENCE (V(2202),TO1(1))
+      EQUIVALENCE (V(2450),UO1(1))
+      EQUIVALENCE (V(2698),KEL(1))
+      EQUIVALENCE (V(2699),NLEvel(1))
+      EQUIVALENCE (V(2759),EXO1(1))
+      EQUIVALENCE (V(2789),GO1(1))
+!
+!         PRINT *,' READION read atomic data from file ION.DAT'
+ 
+ 
+      DO i = 1 , 30
+         DO j = 1 , MDEP
+            BM(j,i) = 1.0
+         ENDDO
+      ENDDO
+      DO i = 1 , 30
+         DO j = 1 , MDEP
+            belem(j,i) = 1.
+         ENDDO
+      ENDDO
+ 
+      READ (Ifile,99001) NELem(1) , KEL(1) , KU(1)
+!      PRINT *,NELEM(1),KEL(1),KU(1)
+ 
+99001 FORMAT (3I5)
+ 
+      IF ( NELem(1).GT.25 ) THEN
+         PRINT * , 'INPUT ERROR IN ATMOS: NELEM HAS TO BE < OR = 25'
+         STOP
+      ELSEIF ( KEL(1).GT.6 ) THEN
+         PRINT * , 'INPUT ERROR IN ATMOS: KEL HAS TO BE < OR = 6'
+         STOP
+      ELSEIF ( KU(1).LE.6 ) THEN
+ 
+         kbo = 0
+         nto = 0
+         nlmm = NELem(1)
+         xmum = 0.
+         SUMA = 0.
+         DO ie = 1 , nlmm
+!----------------------------------------------------------------
+! ELMENT is the name of chemical element in the Mendeleev's table
+! ALFA   is an abundance  relatively hydrogen
+! AS     is an atomic weight
+! CHIO   is ionization potential
+!
+! TO1 and UO1 are the temperature and partition function for neutral atom
+! NTO1 is tne number of the temperature points
+!
+! TO2, UO2, NTO2 are the same for ion
+!
+! NBELO1 = 0 for LTE case
+!
+! if NBELO1 NE 0 you have to read:
+!
+! NLEVEL - name of the level;
+! EXO1   - excitation potential of the level;
+! GO1    - statistical weight;
+! BELEM  - departure coefficients for the grid of depth points
+!
+! NB!!!
+! Natasha comments the NLTE case
+!----------------------------------------------------------------
+            READ (Ifile,99002) ELMent(ie) , ALFa(ie) , AS(ie) , CHIo(ie)
+ 
+99002       FORMAT (A4,3E10.3)
+!      PRINT *,ELMENT(IE),ALFA(IE),AS(IE),CHIO(IE)
+            found = .FALSE.
+            DO ind = 1 , N_elements
+               tmpreal = ELMent(ie)
+               IF ( Atom_char(ind).EQ.tmpchar ) THEN
+                  found = .TRUE.
+                  ALFa(ie) = 10.**(At_abund(ind)-12.)
+               ENDIF
+            ENDDO
+            IF ( .NOT.found ) THEN
+               PRINT * , 'Element ' , ELMent(ie) ,                      &
+                    &' in ion.dat not found in the'
+               PRINT * , 'atomic data table!! Aborting ...'
+               STOP
+            ENDIF
+            xmum = xmum + ALFa(ie)*AS(ie)
+            SUMA = SUMA + ALFa(ie)
+            DO io = 1 , 2
+               READ (Ifile,99003) NBElo1(io,ie) , NTO1(io,ie)
+!      PRINT *,NBELO1(IO,IE),NTO1(IO,IE)
+ 
+99003          FORMAT (2I5)
+               nb = NBElo1(io,ie) + kbo
+               nte = NTO1(io,ie) + nto
+               nto = nto + 1
+               DO iu = nto , nte
+                  READ (Ifile,99004) TO1(iu) , UO1(iu)
+!      PRINT *,TO1(IU),UO1(IU)
+ 
+99004             FORMAT (E6.0,E10.3)
+               ENDDO
+               nto = nte
+               IF ( NBElo1(io,ie).NE.0 ) THEN
+                  kbo = kbo + 1
+                  DO ib = kbo , nb
+                     READ (Ifile,99005) NLEvel(ib) , EXO1(ib) , GO1(ib)
+99005                FORMAT (A8,E10.3,F5.0)
+                     DO id = 1 , nd , 5
+                        READ (Ifile,99006) belem(id,ib)
+!       ,
+!      ,BELEM(ID+1,IB),BELEM(ID+2,IB),BELEM(ID+3,IB),BELEM(ID+4,IB)
+!
+99006                   FORMAT (5E15.7)
+                     ENDDO
+                  ENDDO
+                  kbo = nb
+               ENDIF
+            ENDDO
+         ENDDO
+ 
+!  ATW - mean atomic weight MU
+ 
+         ATW = xmum/SUMA
+         GOTO 99999
+      ENDIF
+      PRINT * , 'INPUT ERROR IN ATMOS: KU HAS TO BE < OR = 6'
+      STOP
+!         PRINT *,ATW,SUMA
+99999 END
+!*==SCATL.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SCATL(Freq)
+      IMPLICIT NONE
+!*--SCATL852
+!*** Start of declarations inserted by SPAG
+      REAL fr , Freq
+!*** End of declarations inserted by SPAG
+      REAL*8 lambda
+      REAL*8 l
+      fr = AMIN1(Freq,2.922E15)
+      lambda = 2.997925D18/fr
+      l = 1.0/lambda**2
+      SCATL = l*l*(5.799D-13+1.422D-6*l+2.784D0*l*l)
+      END
+!*==SIGAL.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SIGAL(Il,Ll,T)
+      IMPLICIT NONE
+!*--SIGAL866
+!*** Start of declarations inserted by SPAG
+      REAL aal , alls , gal , sal , T
+      INTEGER Il
+!*** End of declarations inserted by SPAG
+      REAL*8 hkc
+      REAL Ll
+      DIMENSION gal(8) , alls(8) , aal(8) , sal(8)
+      DATA gal/6. , 2. , 6. , 10. , 6. , 2. , 10. , 6./
+      DATA alls/0.2076 , 0.4360 , 0.5205 , 0.6311 , 0.6525 , 0.9442 ,    &
+         & 1.0698 , 1.2495/
+      DATA aal/65. , 10. , 10. , 47. , 14.5 , 56.7 , 50. , 50./
+      DATA sal/4.4 , 2. , 2. , 1.83 , 1. , 1.9 , 3. , 3./
+      hkc = 157896.D0*2.9979D14/3.2901D15
+      IF ( Ll.LE.alls(Il) ) THEN
+         SIGAL = aal(Il)*((Ll/alls(Il))**sal(Il))
+         SIGAL = SIGAL*gal(Il)*EXP(hkc/alls(Il)/T)
+         GOTO 99999
+      ENDIF
+      SIGAL = 0.0D0
+      RETURN
+99999 END
+!*==SIGCAR.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SIGCAR(Il,Ll,T)
+      IMPLICIT NONE
+!*--SIGCAR891
+!*** Start of declarations inserted by SPAG
+      REAL ac , bc , cl , gc , s1c , sc , T
+      INTEGER Il
+!*** End of declarations inserted by SPAG
+      REAL*8 hkc
+      REAL Ll
+      DIMENSION gc(8) , cl(8) , ac(8) , sc(8) , bc(3) , s1c(3)
+      DATA gc/9. , 5. , 1. , 5. , 9. , 3. , 15. , 27./
+      DATA cl/0.1100 , 0.1239 , 0.1444 , 0.1745 , 0.3257 , 0.3437 ,     &
+         & 0.3705 , 0.6316/
+      DATA ac/38.6 , 28.7 , 33.6 , 1. , 0.2 , 1.54 , 16. , 2.1/
+      DATA sc/2. , 1.5 , 1.5 , 3. , 1.2 , 1.2 , 3. , 1.5/
+      DATA bc/28.2 , 18.4 , 24.0/
+      DATA s1c/3. , 2.5 , 2.5/
+      hkc = 157896.D0*2.9979D14/3.2901D15
+      IF ( Ll.LE.cl(Il) ) THEN
+         IF ( Il.GT.3 ) THEN
+            SIGCAR = ac(Il)*((Ll/cl(Il))**sc(Il))
+         ELSE
+            SIGCAR = ac(Il)*((Ll/cl(Il))**sc(Il)) - bc(Il)              &
+                   & *((Ll/cl(Il))**s1c(Il))
+         ENDIF
+         SIGCAR = SIGCAR*gc(Il)*EXP(hkc/cl(Il)/T)
+      ELSE
+         SIGCAR = 0.0D0
+         RETURN
+      ENDIF
+      END
+!*==SIGFE.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SIGFE(Il,Ll,T)
+      IMPLICIT NONE
+!*--SIGFE923
+!*** Start of declarations inserted by SPAG
+      REAL afe , fel , gfe , sfe , T
+      INTEGER Il
+!*** End of declarations inserted by SPAG
+      REAL*8 hkc
+      REAL Ll
+      DIMENSION gfe(2) , fel(2) , afe(2) , sfe(2)
+      DATA gfe/9. , 11./
+      DATA fel/0.1570 , 0.1761/
+      DATA afe/6.3 , 5.04/
+      DATA sfe/3. , 3./
+      hkc = 157896.D0*2.9979D14/3.2901D15
+      IF ( Ll.LE.fel(Il) ) THEN
+         SIGFE = afe(Il)*((Ll/fel(Il))**sfe(Il))
+         SIGFE = SIGFE*gfe(Il)*EXP(hkc/fel(Il)/T)
+         GOTO 99999
+      ENDIF
+      SIGFE = 0.0E0
+      RETURN
+99999 END
+!*==SIGMA.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SIGMA(Ie,Il,Fr,Tt)
+      IMPLICIT NONE
+!*--SIGMA947
+!*** Start of declarations inserted by SPAG
+      REAL ename , Fr , Tt
+      INTEGER Il , nn
+!*** End of declarations inserted by SPAG
+      REAL*8 SIGSI , SIGCAR , SIGMG , SIGAL , SIGFE
+      REAL*8 ttt
+      REAL lambda
+      REAL Ie
+      DIMENSION ename(5)
+      DATA ename(1) , ename(2) , ename(3) , ename(4) , ename(5)/'SI  ' ,&
+          &'C   ' , 'MG  ' , 'AL  ' , 'FE  '/
+      ttt = Tt
+      lambda = 2.99791E14/Fr
+      DO nn = 1 , 5
+         IF ( Ie.EQ.ename(nn) ) GOTO 100
+      ENDDO
+      PRINT 99001 , Ie
+99001 FORMAT ('0  ERROR IN SIGMA: THERE IS NOT ',A4,' IN INPUT DATA')
+      STOP
+ 100  IF ( nn.EQ.2 ) THEN
+         SIGMA = SIGCAR(Il,lambda,Tt)*DEXP(-11.256D0/0.8616D-4/ttt)
+         RETURN
+      ELSEIF ( nn.EQ.3 ) THEN
+         SIGMA = SIGMG(Il,lambda,Tt)*DEXP(-7.644D0/0.8616D-4/ttt)
+         RETURN
+      ELSEIF ( nn.EQ.4 ) THEN
+         SIGMA = SIGAL(Il,lambda,Tt)*DEXP(-5.984D0/0.8616D-4/ttt)
+         RETURN
+      ELSEIF ( nn.EQ.5 ) THEN
+         SIGMA = SIGFE(Il,lambda,Tt)*DEXP(-7.900D0/0.8616D-4/ttt)
+         GOTO 99999
+      ENDIF
+      SIGMA = SIGSI(Il,lambda,Tt)*DEXP(-8.149D0/0.8616D-4/ttt)
+      RETURN
+99999 END
+!*==SIGMG.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SIGMG(Il,Ll,T)
+      IMPLICIT NONE
+!*--SIGMG986
+!*** Start of declarations inserted by SPAG
+      REAL amg , gmg , smg , T
+      INTEGER Il
+!*** End of declarations inserted by SPAG
+      REAL*8 hkc
+      REAL mgl , Ll
+      DIMENSION gmg(8) , mgl(8) , amg(8) , smg(8)
+      DATA gmg/1. , 9. , 3. , 3. , 1. , 5. , 9. , 15./
+      DATA mgl/0.1621 , 0.2513 , 0.3756 , 0.4884 , 0.5504 , 0.6549 ,    &
+         & 0.7236 , 0.7292/
+      DATA amg/1.1 , 20. , 16. , 2.1 , 0.43 , 45. , 25. , 33.8/
+      DATA smg/10. , 2.7 , 2.1 , 2.6 , 2.6 , 2.7 , 2.7 , 2.8/
+      hkc = 157896.D0*2.9979D14/3.2901D15
+      IF ( Ll.LE.mgl(Il) ) THEN
+         IF ( Il.NE.3 ) THEN
+            SIGMG = amg(Il)*((Ll/mgl(Il))**smg(Il))
+         ELSE
+            SIGMG = amg(3)*((Ll/mgl(3))**2.1) - 7.8*((Ll/mgl(3))**9.5)
+         ENDIF
+         SIGMG = SIGMG*gmg(Il)*EXP(hkc/mgl(Il)/T)
+      ELSE
+         SIGMG = 0.0D0
+         RETURN
+      ENDIF
+      END
+!*==SIGSI.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+      REAL*8 FUNCTION SIGSI(Il,Ll,T)
+      IMPLICIT NONE
+!*--SIGSI1015
+!*** Start of declarations inserted by SPAG
+      REAL asi , gsi , sil , ssi , T
+      INTEGER Il
+!*** End of declarations inserted by SPAG
+      REAL*8 hkc
+      DIMENSION gsi(8) , sil(8) , asi(8) , ssi(8)
+      REAL Ll
+      DATA gsi/9. , 5. , 1. , 5. , 9. , 3. , 15. , 27./
+      DATA sil/0.1525 , 0.1682 , 0.1986 , 0.3085 , 0.3864 , 0.4040 ,    &
+         & 0.4892 , 0.5840/
+      DATA asi/37. , 35. , 46. , 15. , 1.25 , 4.09 , 18. , 14.1/
+      DATA ssi/5. , 3. , 0.5 , 3. , 2. , 2. , 3. , 3./
+      hkc = 157896.E0*2.9979E14/3.2901E15
+      IF ( Il.EQ.1 ) THEN
+         IF ( Ll.LT.0.135E0 ) THEN
+            SIGSI = asi(1)*((Ll/0.135E0)**ssi(1))
+            SIGSI = SIGSI*gsi(Il)*EXP(hkc/sil(Il)/T)
+            GOTO 99999
+         ELSEIF ( Ll.LE.sil(1) ) THEN
+            SIGSI = asi(1)
+            SIGSI = SIGSI*gsi(Il)*EXP(hkc/sil(Il)/T)
+            GOTO 99999
+         ENDIF
+      ELSEIF ( Ll.LE.sil(Il) ) THEN
+         SIGSI = asi(Il)*((Ll/sil(Il))**ssi(Il))
+         SIGSI = SIGSI*gsi(Il)*EXP(hkc/sil(Il)/T)
+         GOTO 99999
+      ENDIF
+      SIGSI = 0.0D0
+      RETURN
+99999 END
+!*==SOPAS.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
+ 
+      SUBROUTINE SOPAS(Id,Ihtot,Freq,TotH, Pel,Tel,Pg,Chio,Chie,Eta)
+      IMPLICIT NONE
+!*--SOPAS1051
+!*** Start of declarations inserted by SPAG
+      REAL ATW , BK , BNU , CC , CHE , Chie , Chio , EE , EK , EM ,     &
          & Eta , Freq , FRQ , HC2 , HCE , HCK , HH , HTOt , PE , Pel
-   REAL Pg , PI , RHO , sf , SIG , SUMA , Tel , TEMp , UU , WT
+      REAL TOTH
+      REAL Pg , PI , RHO , sf , SIG , SUMA , Tel , TEMp , UU , WT
+      INTEGER Id , Ihtot , MDEP , MFT , MK , NXTion
+!*** End of declarations inserted by SPAG
+!
+!********************************************************IAC 08.06.97
+!
+! This routine gives possibility to use the OPACITY package of
+!         Nataliya G. Shchukina
+! e-mail:
+!         shchukin@mao.kiev.ua (Kiev Ukraine)
+!
+!         natasha@ll.iac.es
+!
+!****************************************************************
+! INPUT:
+!-------
+!        ID     is the depth point number
+!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!   Pen^a, please use    ID=1 !!!
+!                     IHTOT=2 !!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!       IHTOT   is the parameter used for the choice
+!                  of the type of the ionization equilibrium solution
+!
+!        FREQ   is a  frequency in [second-1]
+!         PEL   is an electron pressure
+!         TEL   is an electron emperature
+!          PG   is a  gas pressure
+!
+!      There is a parameter called IFUDGE passed to chigm in a common,
+!      in the form
+!               COMMON/FUDGE/IFUDGE
+!      IFUDGE=1 -> Consider fudge opacities
+!      IFUDGE=0 -> Do not consider fudge opacities
+!
+!      Hector: I have hardwired this value to 1 in  chigm.f
+! NB !!!
+!           You need real value PG only if IHTOT > 0
+!                                       if IHTOT < 0 you can put PG=0.
+!
+! OUTPUT: background opacity
+!--------
+!       CHIO   is   the continuum absorption coefficient due to
+!
+!                 - hydrogen negative H- (BF+FF);
+!                 - hydrogen neutral  H  (BF+FF);
+!                 - molecule H2+
+!
+!                 - metals (BF):
+!                   SI - BF from first 8 levels,
+!                   C  -               8 levels,
+!                   MG -               8 levels,
+!                   AL -               8 levels,
+!                   Fe                 2 levels.
+!
+!       CHIE   is the scattering coefficient for free electrons and
+!                                                neutral hydrogen
+!
+!         ETA  is  the continuum emission coefficient
+! NB!
+!         ETA    does NOT contain scattering part
+!
+! C!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!                          WARNING!
+!
+!  CHIG gives absorb. & emis. divided by density RHO!
+!             If Z - scale   in [cm],
+!                populations in [cm-3]
+!                            then
+!  CHIO, CHIE, ETA has to be in [cm-1]
+!
+!**********************************************************************
+!
+!  There are TWO choices for
+!  solution of ionization equilibrium equations:
+!----------
+! Choice 1:
+!----------
+!
+!  IHTOT > 0 - density RHO and total number of hydrogen atoms HTOT
+!              are known
+!              from gas pressure PG and electron pressure PEL
+!
+!
+!              subroutine STATP is called.
+!
+!  IHTOT = 1   the solution without molecules
+!          2                with    molecules H2+ and H2.
+!
+!----------
+! Choice 2:
+!----------
+!
+!   IHTOT < 0 - density RHO and total number of hydrogen atoms HTOT
+!               are determined with new
+!               chemical composition.
+!
+!              subroutine STATM is called.
+!
+!  IHTOT =-1   the solution without molecules
+!  IHTOT =-2                with    molecules H2+ and H2.
+!
+!
+ 
+!   Contributitors in in the electron density NE:
+!   H, Si, C, Mg, Al, Fe, He, N, O, Ne, Na, P, S, Ar, Ca, Cr, Mn.
+!
+ 
+!********************************************************************
+!
+!  PARAMAX contains dimensions of arrays
+!
+!                INCLUDE 'PARAMAX'
+      PARAMETER (MDEP=1,MK=1,MFT=1)
+      COMMON /CCONST/ EE , HH , CC , BK , EM , UU , HCE , HC2 , HCK ,   &
+                    & EK , PI
+ 
+      LOGICAL PHOto
+      REAL NP , M , NATom , NHYd , NE
+      REAL hydr(MDEP) , gas(MDEP)
+      LOGICAL , SAVE :: firsttime = .TRUE.
+ 
+      COMMON /ATWT  / ATW , SUMA
+!
+      COMMON /MODEL / NE(MDEP) , TEMp(MDEP) , PE(MDEP) , NATom(MDEP)
+!
+      COMMON /OPAC  / M(MDEP) , RHO(MDEP) , CHE(MFT) , SIG(MFT) ,       &
+                    & FRQ(MFT) , WT(MFT) , PHOto(MFT) , NXTion(MK) ,    &
+                    & BNU(MFT)
+!
+      COMMON /POPUL / HTOt(MDEP) , NHYd(5,MDEP) , NP(MDEP)
+!
+ 
+      IF ( firsttime ) THEN
+                          ! initializations
+         CALL INIT_SOPAS
+         firsttime = .FALSE.
+      ENDIF
+ 
+      PE(Id) = Pel
+!
+      NE(Id) = Pel/Tel/BK
+      TEMp(Id) = Tel
+      gas(Id) = Pg
+ 
+      IF ( Ihtot.GT.0 ) THEN
+ 
+ 
+!***************************************************************
+!
+! calculate HTOT if IHTOT > 0
+! and
+! call ionization equilibrium routine
+!       STATP (IHTOT > 0)
+!       STATM (IHTOT < 0)
+!
+         hydr(Id) = TotH/TEMp(Id)/BK
+ 
+         RHO(Id) = 1.66E-24*hydr(Id)*ATW
+!         PRINT *,'sopas RHO=',RHO(ID)
+ 
+!         hydr(Id) = hydr(Id)/SUMA
+         HTOt(Id) = hydr(Id)
+!            PRINT *,HTOT(ID)
+ 
+         CALL STATP(Id,Ihtot)
+ 
+      ELSEIF ( Ihtot.LT.0 ) THEN
+ 
+         CALL STATM(Id,Ihtot)
+      ELSE
+ 
+         STOP
+      ENDIF
+ 
+ 
+!****************************************************************
+!
+!   call opacity routine CHIG
+ 
+ 
+      CALL CHIG(Id,Freq,Chio,Chie,Eta)
+!          PRINT *,'absorb. cont. coef. CHIO = ',CHIO
+!          PRINT *,'scat.   cont. coef. CHIE = ',CHIE
+!          PRINT *,'emis.   cont. coef. ETA  = ',ETA
+ 
+      sf = Eta/Chio
+!          PRINT *,'ETA/CHIO = ',SF
+ 
+!          PRINT *,'Planck =',PLANCK(FREQ,TEL)
 
-   Print *,'This build of NICOLE has not been compiled with support for the SOPA opacities'
-   Print *,'Change opacities to the default option in your input file'
-   Print *,'or compile with SOPA support by using the --sopa switch in create_makefile.py'
-   Stop
+! Convert Chio and Chie to cm^2/cm^3
+      Chio=Chio*RHO(1)
+      Chie=Chie*RHO(1)
+ 
+    END SUBROUTINE SOPAS
 
-End Subroutine SOPAS
-      
+!*==STATP.spg  processed by SPAG 6.70Dc at 22:47 on 11 Apr 2013
+      SUBROUTINE STATP(Idep,Ihtot)
+      IMPLICIT NONE
+!*--STATP4
+!*** Start of declarations inserted by SPAG
+      REAL ai2 , alf , ALFa , AS , BM , bn , BNU , CHIe , CHIo , db ,   &
+         & DH , DH2p , DHM , DQ , DQI , ELMent , elpres , EXO1 , FREq , &
+         & HTOt, d, e, r1, hnum, hpnum
+      INTEGER i , ib , id , Idep , ie , Ihtot , ij , io , it , j , kbo ,&
+            & KEL , KU , MDEP , MFT , MK , nb , NBElo1 , NELem , nlh
+      INTEGER nte , nto , NTO1 , NXTion, il
+      REAL*8 g2, g3, g4, g5
+      REAL*8 GO1 , q , qa , qh , qhm , qhn , qi, qh2, qh2p
+      REAL PE , prlog , RHO , SIG , t , TEMp , theta , to , TO1 , u ,   &
+         & uo , UO1 , uu , V , WT , xk , z, yge , yhnum
+!*** End of declarations inserted by SPAG
+      PARAMETER (MDEP=1,MK=1,MFT=1)
+      DOUBLE PRECISION sum , xmu , aa , bb , uhyd , y
+      DOUBLE PRECISION fh , fze , f1 , f2 , f3 , f4 , f5 , c1 , c2 , c3
+      LOGICAL PHOto
+      REAL NHYd , NP , NE , NATom , M
+      REAL*8 NLEvel
+      DIMENSION V(10300) , BM(MDEP,30) , DQI(30,MDEP) , DQ(MDEP) ,      &
+              & DH2p(MDEP) , DH(MDEP) , DHM(MDEP) , NE(MDEP) ,          &
+              & TEMp(MDEP) , PE(MDEP) , NATom(MDEP) , M(MDEP) ,         &
+              & RHO(MDEP) , CHIe(MFT) , SIG(MFT) , FREq(MFT) , WT(MFT) ,&
+              & PHOto(MFT) , NXTion(MK) , BNU(MFT) , HTOt(MDEP) ,       &
+              & NHYd(5,MDEP) , NP(MDEP)
+      DIMENSION NELem(1) , KU(1) , KEL(1)
+      DIMENSION qa(25) , to(25) , uo(25) , u(2)
+      DIMENSION ELMent(25) , ALFa(25) , AS(25) , CHIo(25)
+      DIMENSION NBElo1(2,25) , NTO1(2,25) , TO1(248) , UO1(248)
+      DIMENSION NLEvel(30) , EXO1(30) , GO1(30)
+      DIMENSION qi(30)
+      COMMON V
+      COMMON /BION  / BM
+      COMMON /EQION / DQI , DQ , DH2p , DH , DHM
+      COMMON /MODEL / NE , TEMp , PE , NATom
+      COMMON /OPAC  / M , RHO , CHIe , SIG , FREq , WT , PHOto ,        &
+                    & NXTion , BNU
+      COMMON /POPUL / HTOt , NHYd , NP
+      EQUIVALENCE (V(2000),NELem(1))
+      EQUIVALENCE (V(2001),ELMent(1))
+      EQUIVALENCE (V(2026),ALFa(1))
+      EQUIVALENCE (V(2051),AS(1))
+      EQUIVALENCE (V(2076),CHIo(1))
+      EQUIVALENCE (V(2101),NBElo1(1))
+      EQUIVALENCE (V(2151),NTO1(1))
+      EQUIVALENCE (V(2201),KU(1))
+      EQUIVALENCE (V(2202),TO1(1))
+      EQUIVALENCE (V(2450),UO1(1))
+      EQUIVALENCE (V(2698),KEL(1))
+      EQUIVALENCE (V(2699),NLEvel(1))
+      EQUIVALENCE (V(2759),EXO1(1))
+      EQUIVALENCE (V(2789),GO1(1))
+      DATA nlh/5/ , xk/1.38054E-16/
+      kbo = 0
+      id = Idep
+      elpres = PE(id)
+      t = TEMp(id)
+      theta = 5040./t
+      z = 2.5*ALOG10(t)
+      q = 0.0
+      sum = 0.0
+      alf = 0.0
+      xmu = 0.0
+      nto = 0
+      DO ie = 1 , NELem(1)
+         qi(ie) = 0.0
+         xmu = AS(ie)*ALFa(ie) + xmu
+         alf = alf + ALFa(ie)
+         DO io = 1 , 2
+            nte = NTO1(io,ie)
+            nb = NBElo1(io,ie) + kbo
+            IF ( nte.GT.1 ) THEN
+               DO it = 1 , nte
+                  nto = nto + 1
+                  to(it) = TO1(nto)
+                  uo(it) = UO1(nto)
+               ENDDO
+               CALL LININT(to,uo,nte,25)
+               CALL EVAL(t,u(io))
+               uu = u(io)
+            ELSE
+               nto = nto + 1
+               u(io) = UO1(nto)
+            ENDIF
+            IF ( NBElo1(io,ie).NE.0 ) THEN
+               db = 0.0
+               kbo = kbo + 1
+               DO ib = kbo , nb
+                  db = (BM(id,ib)-1.0)*GO1(ib)                          &
+                     & *EXP(-EXO1(ib)/0.8616E-4/t) + db
+               ENDDO
+               u(io) = u(io) + db
+               kbo = nb
+            ENDIF
+         ENDDO
+         IF ( ie.EQ.1 ) THEN
+            prlog = 2.0*u(1)/u(2)
+            prlog = ALOG10(prlog)
+            qhm = -0.7552*theta + z + 0.1249 - prlog
+            IF ( NBElo1(2,1).EQ.0 ) THEN
+               prlog = 2.0/u(2)
+            ELSE
+               j = NBElo1(1,1) + 1
+               prlog = 2.0*BM(id,j)/u(2)
+            ENDIF
+            prlog = ALOG10(prlog)
+            QH2=12.533505+(-4.9251644+5.6191273E-02*THETA-                  &
+            3.268766E-03*THETA**2)*THETA-2.0*PRLOG                         
+            QH2P=11.206998+(-2.7942767-7.9196803E-02*THETA+                   &
+            2.4790744E-02*THETA**2)*THETA-PRLOG                             
+            QHM=10.0**QHM                                                    
+            QH2=10.0**QH2                                                   
+            QH2P=10.0**QH2P                                                 
+            QH=0.0           
+            DO i = 1 , 16
+               IF ( i.GT.NBElo1(2,1) ) THEN
+                  bn = 1.0
+               ELSE
+                  ij = i + NBElo1(1,1)
+                  bn = BM(id,ij)
+               ENDIF
+               ai2 = FLOAT(i*i)
+               QHN=ALOG10(BN)+ALOG10(AI2)+0.4772-Z+13.595*                   &
+               THETA/AI2                                                      
+               QHN=10.0**QHN                                                   
+               QH=QH+QHN 
+               IF ( i.LE.nlh ) NHYd(i,id) = elpres*qhn
+            ENDDO
+            uhyd = elpres*qh
+         ELSE
+            prlog = 2.0*u(2)/u(1)
+            PRLOG=ALOG10(PRLOG)                                              
+            QA(IE)=-CHIO(IE)*THETA+Z-0.4772+PRLOG                           
+            QA(IE)=10.0**QA(IE)/ELPRES                                      
+            QI(IE)=ALFA(IE)*QA(IE)/(1.0+QA(IE))                              
+            Q=Q+QI(IE)                                                 
+            SUM=SUM+ALFA(IE)
+         ENDIF
+      ENDDO
+!
+      xmu = xmu/AS(1)
+      g2 = 1.0/uhyd
+      g3 = elpres/qhm
+      f1 = 1.0/(1.+g2+g3)
+      f4 = 0.0
+      f5 = 0.0
+      IF ( Ihtot.NE.1 ) THEN
+         IF ( Ihtot.NE.2 ) WRITE (6,99003) Ihtot
+         g4 = elpres/qh2p
+         g5 = elpres/qh2
+         aa = 1.0 + g2 + g3
+         d = g2 - g3
+         e = g2*(g4/g5)
+         bb = 2.0*(1.0+e)
+         c1 = g5*bb**2 + aa*d*bb - e*aa**2
+         c2 = 2.0*aa*e - d*bb + aa*bb*q
+         c3 = -(e+bb*q)
+         f1 = (-c2+DSQRT(c2*c2-4.0*c3*c1))/(2.0*c1)
+         f5 = (1.0-aa*f1)/bb
+         f4 = e*f5
+      ENDIF
+      f3 = g3*f1
+      f2 = g2*f1
+      fze = f2 - f3 + f4 + q
+      DH(id) = f2/fze
+      DHM(id) = -1.*f3/fze
+      DH2p(id) = f4/fze
+      yge = 1.0 + (f1+f2+f3+f4+f5+sum)/fze
+      fh = f1
+      r1 = f1/fze
+      y = 1. + g2 + g3
+      IF ( Ihtot.NE.1 ) THEN
+         IF ( Ihtot.NE.2 ) WRITE (6,99003) Ihtot
+         y = 1.0 + g2 + g3 + 2.0*g5*r1 + 2.0*g2*g4*r1
+      ENDIF
+      hnum = HTOt(id)/y
+      hpnum = hnum*g2
+      NP(id) = hpnum
+      yhnum = HTOt(id)
+      NE(id) = elpres/(xk*t)
+      DO il = 1 , nlh
+         NHYd(il,id) = hpnum*NHYd(il,id)
+      ENDDO
+      y = xk*t/elpres
+99001 FORMAT ('0 ALFA=',F15.5)
+99002 FORMAT (I5,F8.1,E15.7,6E10.3)
+      DO ie = 2 , NELem(1)
+         DQI(ie,id) = qi(ie)/fze
+      ENDDO
+      DQ(id) = q/fze
+99003 FORMAT ('0 WRONG IHTOT=',I5)
+    END SUBROUTINE STATP
+
+!*==CHIG.spg  processed by SPAG 6.70Dc at 22:41 on 11 Apr 2013
+      SUBROUTINE CHIG(Id,Freq,Chiold,Chie,Etaold)
+      IMPLICIT NONE
+!*--CHIG4
+!*** Start of declarations inserted by SPAG
+      REAL BM , BNU , chff , Chie , Chiold , DLOate , DLOich , EIHc ,   &
+         & Etaold , fedge , ff , fh , fm , Freq , frqo , GIS , HTOt ,   &
+         & PE , PHOto , QERf
+      REAL RHO , TEMp , theta , V , w , WT , x
+      INTEGER Id , il, IFUDGE , MDEP , MFT , MK , NBElo1 , nlh , nn , NXTion
+!*** End of declarations inserted by SPAG
+      PARAMETER (MDEP=1,MK=1,MFT=1)
+      PARAMETER (IFUDGE=1)
+      REAL*8 H2PKUR , AHMFF , GFREE , GAUNT
+      REAL*8 sigkk , sigh , cont , sm , gf , cff , stim, cneg, opmet, scatl
+      REAL*8 hkt , srt , ex , bco1 , bco , xx , exf , b, AHMBF, cmet
+      REAL NE , NATom , NHYd , NP , M
+      DIMENSION NBElo1(2,25)
+      COMMON V(10300)
+      COMMON /BION  / BM(MDEP,30)
+      COMMON /CKOEF / DLOich(MDEP) , DLOate(MDEP)
+      COMMON /OPAC  / M(MDEP) , RHO(MDEP) , EIHc(MFT) , GIS(MFT) ,      &
+                    & QERf(MFT) , WT(MFT) , PHOto(MFT) , NXTion(MK) ,   &
+                    & BNU(MFT)
+      COMMON /MODEL / NE(MDEP) , TEMp(MDEP) , PE(MDEP) , NATom(MDEP)
+      COMMON /POPUL / HTOt(MDEP) , NHYd(5,MDEP) , NP(MDEP)
+      EQUIVALENCE (V(2101),NBElo1(1))
+      DATA nlh/5/
+      fh = 1.0
+      fm = 1.0
+      w = 2.99792458E18/Freq
+      IF ( w.LT.2080. ) fh = 1.
+      IF ( w.GE.2080. .AND. w.LT.2300. ) fh = 7.5 - (7.5-3.5)*(w-2080.) &
+         & /(2300.-2080.)
+      IF ( w.GE.2300. .AND. w.LT.2500. ) fh = 3.5 - (3.5-2.5)*(w-2300.) &
+         & /(2500.-2300.)
+      IF ( w.GE.2500. .AND. w.LT.2650. ) fh = 5.4 - (5.4-5.)*(w-2500.)  &
+         & /(2650.-2500.)
+      IF ( w.GE.2650. .AND. w.LT.3000. ) fh = 2.5 - (2.5-1.5)*(w-2650.) &
+         & /(3000.-2650.)
+      IF ( w.GE.3000. .AND. w.LT.4200. ) fh = 1.5 - (1.5-1.)*(w-3000.)  &
+         & /(4200.-3000.)
+      IF ( w.GE.4200. ) fh = 1.
+      IF ( w.LT.1536. ) fm = 1.
+      IF ( w.GE.1536. .AND. w.LT.1679. ) fm = 2.
+      IF ( w.GE.1679. .AND. w.LT.1850. ) fm = 21. - (21.-11.)*(w-1679.) &
+         & /(1850.-1679.)
+      IF ( w.GE.1850. .AND. w.LT.1964. ) fm = 2.2 - (2.2-2.)*(w-1850.)  &
+         & /(1964.-1850.)
+      IF ( w.GE.1964. .AND. w.LT.2080. ) fm = 2.5 - (2.5-2.)*(w-1964.)  &
+         & /(2080.-1964.)
+      IF ( w.GE.2080. ) fm = 1.
+      sm = 0.0
+      cont = 0.0
+      hkt = 157896./3.2901D15/TEMp(Id)
+      srt = 1.0/SQRT(TEMp(Id))
+      theta = 5040./TEMp(Id)
+      xx = hkt*Freq
+      ex = DEXP(xx)
+      bco1 = 1.474527D-2*(1.0D-15*Freq)**3
+      bco = bco1/(ex-1.0)
+      Chiold = NHYd(1,Id)*(AHMFF(theta,Freq)*1.0E-26*PE(Id)*fh+NP(Id)   &
+             & *H2PKUR(TEMp(Id),Freq))/RHO(Id)
+      chff = Chiold
+      frqo = 3.29E15/36.0
+      ff = AMIN1(frqo,Freq)
+      sigkk = 3.6919D8/Freq/Freq**2
+      gf = GFREE(Freq,TEMp(Id))
+      xx = hkt*ff
+      exf = DEXP(xx)
+      ex = 1.0/ex
+      cff = sigkk*srt*(gf-1.0+exf)*NE(Id)*NP(Id)*(1.0-ex)/RHO(Id)
+      Chiold = Chiold + cff
+      Etaold = bco*Chiold
+      sigh = 0.0
+      DO il = 1 , nlh
+         fedge = 3.29E15/FLOAT(il*il)
+         IF ( Freq.GE.fedge ) THEN
+            x = il**5
+            IF ( il.LE.NBElo1(2,1) ) THEN
+               nn = NBElo1(1,1) + il
+               b = BM(Id,nn)
+            ELSE
+               b = 1.0
+            ENDIF
+            sigh = (2.815D29/Freq**2)*GAUNT(il,Freq)/x/Freq
+            stim = 1.0 - ex/b
+            cont = sigh*NHYd(il,Id)*stim/RHO(Id)
+            sm = cont + sm
+            Chiold = Chiold + cont
+            Etaold = Etaold + sigh*NHYd(il,Id)*bco1*ex/b/RHO(Id)
+         ENDIF
+      ENDDO
+      cont = sm
+      IF ( NBElo1(1,1).EQ.0 ) THEN
+         b = 1.0
+      ELSE
+         b = BM(Id,1)
+      ENDIF
+      stim = (b-ex)*1.0D-26
+!
+      cneg = NHYd(1,Id)*PE(Id)*AHMBF(theta,Freq)*stim*fh/RHO(Id)
+      Chiold = Chiold + cneg
+      Etaold = Etaold + cneg*bco1*ex/(b-ex)
+      cmet = HTOt(Id)*1.0D-18*fm*OPMET(Id,Freq,.FALSE.)/RHO(Id)
+      Chiold = Chiold + cmet
+      Etaold = Etaold + HTOt(Id)                                        &
+             & *1.0D-18*ex*bco1*fm*OPMET(Id,Freq,.TRUE.)/RHO(Id)
+      Chie = (6.65D-25*NE(Id)+SCATL(Freq)*NHYd(1,Id))/RHO(Id)
+      DLOich(Id) = Chiold + Chie
+      DLOate(Id) = Etaold
+    END SUBROUTINE CHIG
+!*==EVAL.spg  processed by SPAG 6.70Dc at 22:42 on 11 Apr 2013
+ 
+      SUBROUTINE EVAL(Xo,Yo)
+      IMPLICIT NONE
+!*--EVAL46
+!*** Start of declarations inserted by SPAG
+      REAL A , B , DUMmy , X , Xo , Y , Yo
+      INTEGER i , il , N
+!*** End of declarations inserted by SPAG
+      COMMON A(250) , B(250) , X(250) , Y(250) , N , DUMmy(9299)
+      il = 1
+      IF ( Xo.LT.X(il) ) il = 1
+      IF ( Xo.GE.X(1) ) THEN
+         IF ( Xo.GE.X(il+1) ) THEN
+            il = il + 1
+            DO i = il , N
+               IF ( X(i).GE.Xo ) GOTO 20
+            ENDDO
+            i = N
+ 20         il = i - 1
+         ENDIF
+      ENDIF
+      Yo = A(il)*Xo + B(il)
+    END SUBROUTINE EVAL
+!*==GAUNT.spg  processed by SPAG 6.70Dc at 22:42 on 11 Apr 2013
+      REAL*8 FUNCTION GAUNT(Nn,Qf)
+      IMPLICIT NONE
+!*--GAUNT69
+!*** Start of declarations inserted by SPAG
+      INTEGER n , Nn
+      REAL Qf , x
+!*** End of declarations inserted by SPAG
+      n = Nn
+      x = Qf/2.99793E14
+      IF ( n.GT.10 ) THEN
+         GAUNT = 1.0
+      ELSEIF ( n.EQ.1 ) THEN
+         GAUNT = 1.2302628 +                                            &
+               & x*(-2.9094219E-3+x*(7.3993579E-6-8.7356966E-9*x))      &
+               & + (12.803223/x-5.5759888)/x
+      ELSEIF ( n.EQ.2 ) THEN
+         GAUNT = 1.1595421 + x*(-2.0735860E-3+2.7033384E-6*x)           &
+               & + (-1.2709045+(-2.0244141/x+2.1325684)/x)/x
+      ELSEIF ( n.EQ.3 ) THEN
+         GAUNT = 1.1450949 + x*(-1.9366592E-3+2.3572356E-6*x)           &
+               & + (-0.55936432+(-0.23387146/x+0.52471924)/x)/x
+      ELSEIF ( n.EQ.4 ) THEN
+         GAUNT = 1.1306695 +                                            &
+               & x*(-1.3482273E-3+x*(-4.6949424E-6+2.3548636E-8*x))     &
+               & + (-0.31190730+(0.19683564-5.4418565E-2/x)/x)/x
+      ELSEIF ( n.EQ.5 ) THEN
+         GAUNT = 1.1190904 +                                            &
+               & x*(-1.0401085E-3+x*(-6.9943488E-6+2.8496742E-8*x))     &
+               & + (-0.16051018+(5.5545091E-2-8.9182854E-3/x)/x)/x
+      ELSEIF ( n.EQ.6 ) THEN
+         GAUNT = 1.1168376 +                                            &
+               & x*(-8.9466573E-4+x*(-8.8393133E-6+3.4696768E-8*x))     &
+               & + (-0.13075417+(4.1921183E-2-5.5303574E-3/x)/x)/x
+      ELSEIF ( n.EQ.7 ) THEN
+         GAUNT = 1.1128632 +                                            &
+               & x*(-7.4833260E-4+x*(-1.0244504E-5+3.8595771E-8*x))     &
+               & + (-9.5441161E-2+(2.3350812E-2-2.2752881E-3/x)/x)/x
+      ELSEIF ( n.EQ.8 ) THEN
+         GAUNT = 1.1093137 +                                            &
+               & x*(-6.2619148E-4+x*(-1.1342068E-5+4.1477731E-8*x))     &
+               & + (-7.1010560E-2+(1.3298411E-2-9.7200274E-4/x)/x)/x
+      ELSEIF ( n.EQ.9 ) THEN
+         GAUNT = 1.1078717 +                                            &
+               & x*(-5.4837392E-4+x*(-1.2157943E-5+4.3796716E-8*x))     &
+               & + (-5.6046560E-2+(8.5139736E-3-4.9576163E-4/x)/x)/x
+      ELSEIF ( n.EQ.10 ) THEN
+         GAUNT = 1.1052734 +                                            &
+               & x*(-4.4341570E-4+x*(-1.3235905E-5+4.7003140E-8*x))     &
+               & + (-4.7326370E-2+(6.1516856E-3-2.9467046E-4/x)/x)/x
+         GOTO 99999
+      ELSE
+         GAUNT = 1.0
+      ENDIF
+      RETURN
+99999 END FUNCTION GAUNT
+!*==GFREE.spg  processed by SPAG 6.70Dc at 22:42 on 11 Apr 2013
+      REAL*8 FUNCTION GFREE(Frq,T)
+      IMPLICIT NONE
+!*--GFREE125
+!*** Start of declarations inserted by SPAG
+      REAL c1 , c2 , c3 , c4 , Frq , T , thet , x
+!*** End of declarations inserted by SPAG
+      thet = 5.040E3/T
+      IF ( thet.LT.4.0E-2 ) thet = 4.0E-2
+      x = Frq/2.99793E14
+      IF ( x.GT.1.0E0 ) THEN
+         c1 = (3.9999187E-3-7.8622889E-5/thet)/thet + 1.070192E0
+         c2 = (6.4628601E-2-6.1953813E-4/thet)/thet + 2.6061249E-1
+         c3 = (1.3983474E-5/thet+3.7542343E-2)/thet + 5.7917786E-1
+         c4 = 3.4169006E-1 + 1.1852264E-2/thet
+         GFREE = ((c4/x-c3)/x+c2)/x + c1
+         GOTO 99999
+      ENDIF
+      IF ( x.LT.0.2E0 ) x = 0.20E0
+      GFREE = (1.0823E0+2.98E-2/thet) + (6.7E-3+1.12E-2/thet)/x
+      RETURN
+99999 END FUNCTION GFREE
+!*==LININT.spg  processed by SPAG 6.70Dc at 22:42 on 11 Apr 2013
+      SUBROUTINE LININT(X,Y,N,Nr)
+      IMPLICIT NONE
+!*--LININT177
+!*** Start of declarations inserted by SPAG
+      REAL A , B , DUMmy , X , XX , Y , YY
+      INTEGER i , N , nm1 , NN , Nr
+!*** End of declarations inserted by SPAG
+      DIMENSION X(Nr) , Y(Nr)
+      COMMON A(250) , B(250) , XX(250) , YY(250) , NN , DUMmy(9299)
+      nm1 = N - 1
+      DO i = 1 , nm1
+         A(i) = (Y(i+1)-Y(i))/(X(i+1)-X(i))
+         B(i) = Y(i) - A(i)*X(i)
+      ENDDO
+      DO i = 1 , N
+         XX(i) = X(i)
+         YY(i) = Y(i)
+      ENDDO
+      NN = N
+    END SUBROUTINE LININT
+
+!*==STATM.spg  processed by SPAG 6.70Dc at 23:24 on 11 Apr 2013
+      SUBROUTINE STATM(Idep,Ihtot)
+        IMPLICIT NONE
+        INTEGER, PARAMETER :: MDEP=1,MK=1,MFT=1
+!*--STATM5
+!*** Start of declarations inserted by SPAG
+      REAL ai2 , alf , ALFa , AS , BM , bn , BNU , CHIe , CHIo , db ,   &
+         & DH , DH2p , DHM , DQ , DQI , ELMent , elpres , EXO1 , FREq , &
+         & HTOt
+      INTEGER i , ib , id , Idep , ie , Ihtot , ij , io , it , j , kbo ,&
+            & KEL , KU , nb , NBElo1 , NELem , nlh
+      INTEGER nte , nto , NTO1 , NXTion, il
+      REAL*8 GO1 , q , qh , qhm , qhn , qi, qh2, qh2p, qa, g2, g3, g4, g5
+      REAL PE , prlog , RHO , SIG , t , TEMp , theta , to , TO1 , u ,   &
+         & uo , UO1 , uu , V , WT , xk , z, d, e, bb, yge, r1
+      REAL hnum, hpnum, yhnum, etot
+!*** End of declarations inserted by SPAG
+      DOUBLE PRECISION sum , xmu , uhyd, f1, f2, f3, f4, f5, c1, c2, c3
+      DOUBLE PRECISION aa, fh, fze, y
+      LOGICAL PHOto
+      REAL NHYd , NP , NE , NATom , M
+      REAL*8 NLEvel
+      DIMENSION NELem(1) , KU(1) , KEL(1)
+      DIMENSION qa(25) , to(25) , uo(25) , u(2)
+      DIMENSION ELMent(25) , ALFa(25) , AS(25) , CHIo(25)
+      DIMENSION NBElo1(2,25) , NTO1(2,25) , TO1(248) , UO1(248)
+      DIMENSION NLEvel(30) , EXO1(30) , GO1(30)
+      DIMENSION qi(30)
+      COMMON V(10300)
+      COMMON /BION  / BM(MDEP,30)
+      COMMON /EQION / DQI(30,MDEP) , DQ(MDEP) , DH2p(MDEP) , DH(MDEP) , &
+                    & DHM(MDEP)
+      COMMON /MODEL / NE(MDEP) , TEMp(MDEP) , PE(MDEP) , NATom(MDEP)
+      COMMON /OPAC  / M(MDEP) , RHO(MDEP) , CHIe(MFT) , SIG(MFT) ,      &
+                    & FREq(MFT) , WT(MFT) , PHOto(MFT) , NXTion(MK) ,   &
+                    & BNU(MFT)
+      COMMON /POPUL / HTOt(MDEP) , NHYd(5,MDEP) , NP(MDEP)
+      EQUIVALENCE (V(2000),NELem(1))
+      EQUIVALENCE (V(2001),ELMent(1))
+      EQUIVALENCE (V(2026),ALFa(1))
+      EQUIVALENCE (V(2051),AS(1))
+      EQUIVALENCE (V(2076),CHIo(1))
+      EQUIVALENCE (V(2101),NBElo1(1))
+      EQUIVALENCE (V(2151),NTO1(1))
+      EQUIVALENCE (V(2201),KU(1))
+      EQUIVALENCE (V(2202),TO1(1))
+      EQUIVALENCE (V(2450),UO1(1))
+      EQUIVALENCE (V(2698),KEL(1))
+      EQUIVALENCE (V(2699),NLEvel(1))
+      EQUIVALENCE (V(2759),EXO1(1))
+      EQUIVALENCE (V(2789),GO1(1))
+      DATA nlh/5/ , xk/1.38054E-16/
+      kbo = 0
+      id = Idep
+      elpres = PE(id)
+      t = TEMp(id)
+      theta = 5040./t
+      z = 2.5*ALOG10(t)
+      q = 0.0
+      sum = 0.0
+      alf = 0.0
+      xmu = 0.0
+      nto = 0
+      DO ie = 1 , NELem(1)
+         qi(ie) = 0.0
+         xmu = AS(ie)*ALFa(ie) + xmu
+         alf = alf + ALFa(ie)
+         DO io = 1 , 2
+            nte = NTO1(io,ie)
+            nb = NBElo1(io,ie) + kbo
+            IF ( nte.GT.1 ) THEN
+               DO it = 1 , nte
+                  nto = nto + 1
+                  to(it) = TO1(nto)
+                  uo(it) = UO1(nto)
+               ENDDO
+               CALL LININT(to,uo,nte,25)
+               CALL EVAL(t,u(io))
+               uu = u(io)
+            ELSE
+               nto = nto + 1
+               u(io) = UO1(nto)
+            ENDIF
+            IF ( NBElo1(io,ie).NE.0 ) THEN
+               db = 0.0
+               kbo = kbo + 1
+               DO ib = kbo , nb
+                  db = (BM(id,ib)-1.0)*GO1(ib)                          &
+                     & *EXP(-EXO1(ib)/0.8616E-4/t) + db
+               ENDDO
+               u(io) = u(io) + db
+               kbo = nb
+            ENDIF
+         ENDDO
+         IF ( ie.EQ.1 ) THEN
+            prlog = 2.0*u(1)/u(2)
+            prlog = ALOG10(prlog)
+            qhm = -0.7552*theta + z + 0.1249 - prlog
+            IF ( NBElo1(2,1).EQ.0 ) THEN
+               prlog = 2.0/u(2)
+            ELSE
+               j = NBElo1(1,1) + 1
+               prlog = 2.0*BM(id,j)/u(2)
+            ENDIF
+            prlog = ALOG10(prlog) ! From 995 to DO 15 I=1, 16
+            QH2=12.533505+(-4.9251644+5.6191273E-02*THETA-                 &
+            3.268766E-03*THETA**2)*THETA-2.0*PRLOG                            
+            QH2P=11.206998+(-2.7942767-7.9196803E-02*THETA+                 &
+            2.4790744E-02*THETA**2)*THETA-PRLOG                            
+            QHM=10.0**QHM                                                  
+            QH2=10.0**QH2                                                  
+            QH2P=10.0**QH2P                                               
+            QH=0.0     
+            DO i = 1 , 16
+               IF ( i.GT.NBElo1(2,1) ) THEN
+                  bn = 1.0
+               ELSE
+                  ij = i + NBElo1(1,1)
+                  bn = BM(id,ij)
+               ENDIF
+               ai2 = FLOAT(i*i)
+               qhn = ALOG10(bn) + ALOG10(ai2) + 0.4772 - z +            &
+                   & 13.595*theta/ai2
+               qhn = 10.0**qhn
+               qh = qh + qhn
+               IF ( i.LE.nlh ) NHYd(i,id) = elpres*qhn
+            ENDDO
+            uhyd = elpres*qh
+         ELSE
+            prlog = 2.0*u(2)/u(1) ! From 60 to GO TO 16
+            PRLOG=ALOG10(PRLOG)                                            
+            QA(IE)=-CHIO(IE)*THETA+Z-0.4772+PRLOG                          
+            QA(IE)=10.0**QA(IE)/ELPRES                                     
+            QI(IE)=ALFA(IE)*QA(IE)/(1.0+QA(IE))                           
+            Q=Q+QI(IE)                                                
+            SUM=SUM+ALFA(IE)   
+         ENDIF
+      ENDDO
+ !
+    xmu = xmu/AS(1)
+      g2 = 1.0/uhyd
+      g3 = elpres/qhm
+      f1 = 1.0/(1.+g2+g3)
+      f4 = 0.0
+      f5 = 0.0
+      IF ( Ihtot.NE.-1 ) THEN
+         IF ( Ihtot.NE.-2 ) WRITE (6,99003) Ihtot
+         g4 = elpres/qh2p
+         g5 = elpres/qh2
+         aa = 1.0 + g2 + g3
+         d = g2 - g3
+         e = g2*(g4/g5)
+         bb = 2.0*(1.0+e)
+         c1 = g5*bb**2 + aa*d*bb - e*aa**2
+         c2 = 2.0*aa*e - d*bb + aa*bb*q
+         c3 = -(e+bb*q)
+         f1 = (-c2+DSQRT(c2*c2-4.0*c3*c1))/(2.0*c1)
+         f5 = (1.0-aa*f1)/bb
+         f4 = e*f5
+      ENDIF
+      f3 = g3*f1
+      f2 = g2*f1
+      fze = f2 - f3 + f4 + q
+      DH(id) = f2/fze
+      DHM(id) = -1.*f3/fze
+      DH2p(id) = f4/fze
+      yge = 1.0 + (f1+f2+f3+f4+f5+sum)/fze
+      fh = f1
+      r1 = f1/fze
+      y = 1. + g2 + g3
+      IF ( Ihtot.NE.-1 ) THEN
+         IF ( Ihtot.NE.-2 ) WRITE (6,99003) Ihtot
+         y = 1.0 + g2 + g3 + 2.0*g5*r1 + 2.0*g2*g4*r1
+      ENDIF
+      hnum = elpres*r1/(xk*t)
+      hpnum = hnum*g2
+      NP(id) = hpnum
+      yhnum = y*hnum
+      HTOt(id) = yhnum
+      etot = yhnum*fze
+      NE(id) = etot
+      DO il = 1 , nlh
+         NHYd(il,id) = hpnum*NHYd(il,id)
+      ENDDO
+      y = xk*t/elpres
+      RHO(id) = 1.67333E-24*xmu/(y*fze)
+99001 FORMAT ('0 ALFA=',F15.5)
+99002 FORMAT (I5,F8.1,7E10.3)
+      DO ie = 2 , NELem(1)
+         DQI(ie,id) = qi(ie)/fze
+      ENDDO
+      DQ(id) = q/fze
+99003 FORMAT ('0 WRONG IHTOT=',I5)
+    END SUBROUTINE STATM
+
+
+
+
+

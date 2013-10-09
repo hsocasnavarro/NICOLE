@@ -8,23 +8,27 @@ module background_opacity_module
 Contains
   Function Background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
     Real :: T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4    
-    Real :: Scat, Background_opacity
+    Real :: Scat, Background_opacity, TotH
     Real :: nu, chi_0, chi_e, eta
-    
+
     If (Opacity_Package .eq. 1) then ! Use Wittmann'
        Background_opacity=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
-       Return
+!       Return
     Else if (Opacity_Package .eq. 2) then ! Use Asensio's
        Background_opacity=Asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
-       Return
+!       Return
     Else if (Opacity_Package .eq. 3) then ! Use SOPAS
+       TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
        nu=cc/(lambda_in4*1e-8) ! s^-1
-       Call Sopas(1, 2, nu, Pe4, T4, Pg4, chi_0, chi_e, eta)
-       Background_opacity=chi_0+chi_e
+       Call Sopas(1, 2, nu, TotH, Pe4, T4, Pg4, chi_0, chi_e, eta)
+      Background_opacity=chi_0+chi_e
        Scat=chi_e
-       Return
+!       Return
     endif
 
+    if (int(T4) .eq. 4690 .or. int(T4) .eq. 5300) then
+       print *,opacity_package,lambda_in4,T4,background_opacity,scat
+    endif
 
   End Function Background_opacity
 

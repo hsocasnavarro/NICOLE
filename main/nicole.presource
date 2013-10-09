@@ -21,6 +21,7 @@ Program Nicole
   Use debug_module
   Use Profiling
   Use Background_opacity_module, Only: Opacity_package
+  Use Eq_state, Only: choice_others
   Implicit None
   Type (Parameters) :: Params
   Type (Line_data), dimension (:), allocatable :: Line
@@ -167,6 +168,7 @@ Program Nicole
   Read (headerunit, *) KeepVars(1:8)
   Read (headerunit, '(A)') Input%hscale
   Read (headerunit, *) Opacity_package
+  Read (headerunit, *) choice_others
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
   Read (headerunit, *) Input%depcoef_mode
   Read (headerunit, *) Params%n_lines
@@ -660,7 +662,7 @@ Program Nicole
               If (Starting_at_abund(1) .gt. 0) &
                    TmpModel2(SizeModel-N_elements+1:SizeModel)=Starting_At_Abund(1:N_elements)
            End if
-           Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, 1)
+           Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars, 1)
            If (.not. Params%TwoComp) then
               Guess_model%Comp2=Guess_model%Comp1
               Guess_model%Comp1%ffactor=1.0
@@ -868,7 +870,7 @@ Program Nicole
 
 Contains
   Subroutine Do_Task
-    Call Record_to_Model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, 1) ! Extract model from array
+    Call Record_to_Model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars, 1) ! Extract model from array
     ix=(irec-1)/nPix_y +1
     iy=Modulo(irec-1,nPix_y) +1  
     BestChisq=ChisqinFile(irec)
@@ -969,7 +971,7 @@ Contains
        End if
 
        If (Input%mode .eq. 'c') then ! Convert mode
-          Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2,-1)
+          Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2,KeepVars,-1)
           DidInvert=.True.
           Return
        End if
@@ -1107,7 +1109,7 @@ Contains
           Guess_Model=Best_Model
           Call Forward(Params, Line, Region, Guess_model, Syn_profile, &
                .TRUE.)
-          Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, -1)
+          Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2,KeepVars, -1)
        End Do ! End while
 
        ! }}}
@@ -1187,7 +1189,7 @@ Contains
              ! }}}
           End if
           Call Forward(Params, Line, Region, Guess_model, Syn_profile, Input%set_hydro)
-          Call Record_to_Model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, -1) 
+          Call Record_to_Model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars,-1) 
           If (debug_level .ge. 1) then
              Write (Debug_FileUnit,*) ' Profile:'
              Write (Debug_FileUnit,*) Syn_profile

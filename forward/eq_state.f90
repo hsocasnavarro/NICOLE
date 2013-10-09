@@ -23,6 +23,10 @@ Module Variables
   ! x0_sol(21) : the abundance of every species at the beggining of the iteration
   
   real(kind=8), SAVE :: equil(9,273)
+  integer :: choice_others=0 ! Choice for calculation of H,H+,H-,H2,H2+
+                             ! 0=Use ANN trained with Andres code (273 molec)
+                             ! 1=Use Andres code (2 molec)
+                             ! 2=Use Andres code (273 molec)
   integer, SAVE  :: print_abund
   character(len=16), SAVE  :: molec(273), nombre_mol(273)
   character(len=2), SAVE :: elements(21)
@@ -1444,27 +1448,34 @@ Contains
   !-------------------------------------------------------------------
   ! Read the elements included in the molecules
   !-------------------------------------------------------------------   
-  subroutine read_elements
+ subroutine read_elements
     Use Atomic_data 
     Use Variables
     Implicit None
     integer :: i, j
-    Do i = 1, 21
-       Abund_atom(i)=-1
-       Do j=1, N_elements
-          If (Elements(i) .eq. Atom_char(j)) then
-             Abund_atom(i)=10.**(At_abund(j)-12.0)
-             Pot_ion(i)=At_ioniz1(j)
+    Integer, Dimension(21) :: idx
+    Logical, Save :: FirstTime=.True.
+
+    If (FirstTime) then
+       Do i = 1, 21
+          idx(i)=-1
+          Do j=1, N_elements
+             If (Elements(i) .eq. Atom_char(j)) then
+                idx(i)=j
+             End if
+          End do
+          If (idx(i) .eq. -1) then
+             Print *,'Error. Unidentified element in chemical.f90'
+             Print *,elements(i), i
+             Stop
           End if
        End do
-       If (Abund_atom(i) .eq. -1) then
-          Print *,'Error. Unidentified element in chemical.f90'
-          Print *,elements(i), i
-          Stop
-       End if
+    Endif
+    Do i=1, 21
+       Abund_atom(i)=10.**(At_abund(idx(i))-12.0)
+       Pot_ion(i)=At_ioniz1(idx(i))
     End do
   end subroutine read_elements
-  
   !-------------------------------------------------------------------
   ! Parse all the molecules with the stequiometric coefficients
   !-------------------------------------------------------------------   
@@ -1869,6 +1880,7 @@ Contains
     Use Variables
     Use Atomic_data
     Use LTE
+    Use HatomicfromPe
     Implicit None
     integer :: n_grid
     real , dimension(n_grid) :: temp4, Pg4, PH4, PHminus4,PHplus4, PH24, &
@@ -1879,153 +1891,244 @@ Contains
     real(kind=8), dimension(n_grid) :: PH_out, PHminus_out, PHplus_out, PH2_out, PH2plus_out
     real(kind=8) :: mole(273), minim_ioniz
     real(kind=8), dimension(22), save :: initial_values
-    integer :: i, ind, l, loop , minim, niters, iter
+    Real :: logPe, T, AtomicFraction, Ne, Ptot, NHtot, Met2, DU1, DU2, DU3
+    Real :: n0overn, nHmolec, Ioniz
+    Real, Dimension(1) :: U1, U2, U3, n1overn0, n2overn1, nminusovern0, T1, Ne1
+    integer :: i, ind, l, loop , minim, niters, iter, iel
     Logical, Save :: FirstTime=.True.
     Logical :: Warning=.False.
-    Real(Kind=8), Parameter :: Precision=1e-4
+    Real(Kind=8), Parameter :: eV_to_cgs =  1.602189D-12, Precision=1e-4, HLimit=0.90
     Integer, Parameter :: Maxniters=100
     Character (Len=256) :: String
 
     Call Time_routine('compute_others_from_T_Pe_Pg',.True.)
+
+    If (LogPe .gt. 4) then
+       Debug_warningflags(flag_computeopac)=1
+       Call Debug_Log('Log10 (Pe) .gt. 4. Clipping it',2)
+       LogPe=4
+    End if
+    If (LogPe .lt. -3) then
+       Debug_warningflags(flag_computeopac)=1
+       Call Debug_Log('Log10 (Pe) .lt. -3. Clipping it',2)
+       LogPe=-3
+    End if
+
+    If (choice_others .eq. 0) then ! Use ANN 
+       Do loop = 1, n_grid
+          T=Temp4(loop)
+          If (T .lt. 1500) then
+             Debug_warningflags(flag_computeopac)=1
+             Call Debug_Log('T .lt. 1500. Clipping it',2)
+             T=1500
+          End if
+          LogPe=Log10(Pe4(loop))
+          Ne=Pe4(loop)/BK/T
+          PTot=Pg4(loop)-Pe4(loop)
+          nHtot=PTot*Hlimit/BK/T
+          AtomicFraction=-1
+          ! First check if we're in trivial T-Pe zone where all H is atomic
+          If (LogPe .gt. 1.5) then ! Pe too high
+             AtomicFraction=HLimit
+          Else If (T .gt. 5800) then ! T > 5800
+             AtomicFraction=HLimit
+          Else 
+             If (T .gt. 3700) then ! 3700 < T < 5800
+                If (LogPe .gt. (T+3500.)/2000.*1.5-5.3 .or. &
+                     LogPe .lt. (T+3500.)/2000.*3.-12.3 ) AtomicFraction=HLimit
+             Else ! T < 3700
+                If (LogPe .gt. (T+3500.)/2000.*1.5-5.3 .or. &
+                     LogPe .lt. (T+3500.)/2000.*7.5-28.5 ) AtomicFraction=HLimit
+             End if
+          End if
+          If (AtomicFraction .lt. -0.10) then ! Need to use ANN
+             Met2=At_abund(26)-7.5 ! Metalicity
+             If (Met2 .gt. .5) then
+                Debug_warningflags(flag_computeopac)=1
+                Call Debug_Log('Metalicity .gt. 0.5. Clipping it',2)
+                Met2=.5
+             End if
+             If (Met2 .lt. -1.5) then
+                Debug_warningflags(flag_computeopac)=1
+                Call Debug_Log('Metalicity .lt. -1.5. Clipping it',2)
+                Met2=-1.5
+             End if
+             inputs(1)=(T-xmean(1))/xnorm(1)
+             inputs(2)=(LogPe-xmean(2))/xnorm(2)
+             inputs(3)=(Met2-xmean(3))/xnorm(3)
+             
+             Call ANN_Forward(W, Beta, Nonlin, inputs, outputs, nlayers, &
+                  nmaxperlayer, nperlayer, ninputs, noutputs, y)
+             
+             AtomicFraction=outputs(1)*ynorm(1)+ymean(1)
+             AtomicFraction=Max(AtomicFraction,0.)
+             AtomicFraction=Min(AtomicFraction,HLimit)
+          End if
+          T1(1)=T
+          Ne1(1)=Ne
+          iel=1 ! Saha for atomic H
+          Call Partition_f(iel, Temp4(1), U1(1), U2(1), U3(1), DU1, DU2, DU3)
+          Ioniz=At_ioniz1(iel)*eV_to_cgs
+          n1overn0=1./saha(1, T1, Ne1, U1, U2, Ioniz)
+          n0overn= 1.d0 / (1.d0 + n1overn0(1))
+          nH4(loop)=nHTot*AtomicFraction*n0overn
+          If (nH4(loop) .gt. 1e-4*nHTot*AtomicFraction) then 
+             nHplus4(loop)=nH4(loop)*n1overn0(1)
+          Else
+             nHplus4(loop)=nHTot*AtomicFraction
+          End if
+          U2(1)=1.0
+          Ioniz=0.754*eV_to_cgs ! ionization energy for Hminus
+          nminusovern0=saha(1, T1, Ne1, U2, U1, Ioniz) ! For Hminus
+          nHminus4(loop)=nH4(loop)*nminusovern0(1)
+          ! Molecular Hydrogen
+          nHmolec=nHTot*(1.-AtomicFraction)
+          ! Set all molecular H to H2
+          nH24(loop)=nHmolec
+          nH2plus4(loop)=0.
+       End do
+       Return
+    End if ! End use ANN
     
-    temper_in=temp4
-    Pe_in=Pe4
-    Pt_in=Pg4
-    Debug_errorflags(flag_computepg)=0
-    Debug_warningflags(flag_computepg)=0
+       If (choice_others .eq. 1 .or. choice_others .eq. 2) then ! Use Andres
+! Do the actual calculation
+       temper_in=temp4
+       Pe_in=Pe4
+       Pt_in=Pg4
+       Debug_errorflags(flag_computepg)=0
+       Debug_warningflags(flag_computepg)=0
+       
+       Do loop = 1, n_grid
+          If (temper_in(loop) .lt. Min_T) then
+             temper_in(loop)=Min_T
+             Call Debug_Log('T .lt. Min_T in Compute_others_from_T_Pe_Pg', 2)
+          End if
+          If (temper_in(loop) .gt. Max_T) then
+             temper_in(loop)=Max_T
+             Call Debug_Log('T .gt. Max_T in Compute_others_from_T_Pe_Pg', 2)
+          End if
+          If (Pe_in(loop) .lt. Min_Pe) then
+             Pe_in(loop)=Min_Pe
+             Call Debug_Log('Pe .lt. Min_Pe in Compute_others_from_T_Pe_Pg', 2)
+          End if
+          If (Pe_in(loop) .gt. Max_Pe) then
+             Pe_in(loop)=Max_Pe
+             Call Debug_Log('Pe .gt. Max_Pe in Compute_others_from_T_Pe_Pg', 2)
+          End if
+          If (Pt_in(loop) .lt. Min_Pg) then
+             Pt_in(loop)=Min_Pe
+             Call Debug_Log('Pg .lt. Min_Pg in Compute_others_from_T_Pe_Pg', 2)
+          End if
+          If (Pt_in(loop) .gt. Max_Pg) then
+             Pt_in(loop)=Max_Pg
+             Call Debug_Log('Pg .gt. Max_Pg in Compute_others_from_T_Pe_Pg', 2)
+          End if
+       End do
 
-    Do loop = 1, n_grid
-       If (temper_in(loop) .lt. Min_T) then
-          temper_in(loop)=Min_T
-          Call Debug_Log('T .lt. Min_T in Compute_others_from_T_Pe_Pg', 2)
-       End if
-       If (temper_in(loop) .gt. Max_T) then
-          temper_in(loop)=Max_T
-          Call Debug_Log('T .gt. Max_T in Compute_others_from_T_Pe_Pg', 2)
-       End if
-       If (Pe_in(loop) .lt. Min_Pe) then
-          Pe_in(loop)=Min_Pe
-          Call Debug_Log('Pe .lt. Min_Pe in Compute_others_from_T_Pe_Pg', 2)
-       End if
-       If (Pe_in(loop) .gt. Max_Pe) then
-          Pe_in(loop)=Max_Pe
-          Call Debug_Log('Pe .gt. Max_Pe in Compute_others_from_T_Pe_Pg', 2)
-       End if
-       If (Pt_in(loop) .lt. Min_Pg) then
-          Pt_in(loop)=Min_Pe
-          Call Debug_Log('Pg .lt. Min_Pg in Compute_others_from_T_Pe_Pg', 2)
-       End if
-       If (Pt_in(loop) .gt. Max_Pg) then
-          Pt_in(loop)=Max_Pg
-          Call Debug_Log('Pg .gt. Max_Pg in Compute_others_from_T_Pe_Pg', 2)
-       End if
-    End do
-
-    If (FirstTime) then
-       ! Reading equilibrium constants of the 273 molecules included
-       call read_equil_cte
-       ! Reading equilibrium constants of atomic and ionic species
-       call read_partition_cte_atomic
        ! Reading 21 elements
        call read_elements
-       ! Reading estequiometer values
-       call read_estequio
-       ! Reading composition of the 273 molecules
-       call read_composition
-       ! Reading what molecules are included
-       call read_what_species
-       FirstTime=.False.
-    End if
-    
-    do loop = 1, n_grid
-       ! Initial conditions
-       ! Initialize assuming that the total gas pressure is given by H
-!       x_sol(1:21) = Pe_in(1) * abund_atom* 1.d1
-       x_sol(1:21)=1d-3
-       initial_values = x_sol
-
-  
-       temper = temper_in(loop)
-       P_elec = Pe_in(loop)
-       P_total = Pt_in(loop)
+       If (FirstTime) then
+          ! Reading equilibrium constants of the 273 molecules included
+          call read_equil_cte
+          ! Reading equilibrium constants of atomic and ionic species
+          call read_partition_cte_atomic
+          ! Reading estequiometer values
+          call read_estequio
+          ! Reading composition of the 273 molecules
+          call read_composition
+          ! Reading what molecules are included
+          call read_what_species
+          FirstTime=.False.
+       End if
        
-       ! Calculating molecular equilibrium constants
-       ! 			call calc_equil(temper)
-       call calc_equil(temper)
-       ! Calculating ionic equilibrium constants
-       call calc_equil_atomic(temper)
-       
-       ! Initial conditions
-       ! Initialize assuming that the total gas pressure is given by H
-       x_sol(1:21) = 1.d-3
-
-       niters=Maxniters
-       call mnewt(3,niters,x_sol(1:21),21,1.e-5,1.e-5)
-       
-       iter=1
-       do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .le. 10)
-!       do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .lt. 15)
-          iter=iter+1
-          Write (String,*) 'ipoint, T, Pe, Pg=',loop,temper, P_elec, P_total
-          Debug_warningflags(flag_computeothers)=1
-          Call Debug_Log('Solving compute_others_from_T_Pe_Pg again, '//String, 2)
-          if (iter .eq. 1) then
-             x_sol(1:21) = PT_in(loop) * abund_atom*.9
-             x_sol(21)=PT_in(loop)*.01
-          else if (iter .lt. 4) then
-             x_sol = initial_values / (10**iter)
-          else if (iter .lt. 7) then
-             x_sol = initial_values * (10**iter)
-          else if (iter .lt. 0) then
-             x_sol(1)=PT_in(loop)
-             Do i=2,21
-                x_sol(i)=0.
-             End do
-          else
-             do i=1,21
-                Call Random_number(x_sol(i))
-                x_sol(i)=10**(7.*(x_sol(i)-.5))
-             end do
-          end if
-
+       do loop = 1, n_grid
+          ! Initial conditions
+          ! Initialize assuming that the total gas pressure is given by H
+          !       x_sol(1:21) = Pe_in(1) * abund_atom* 1.d1
+          x_sol(1:21)=1d-3
+          initial_values = x_sol
+          
+          
+          temper = temper_in(loop)
+          P_elec = Pe_in(loop)
+          P_total = Pt_in(loop)
+          
+          ! Calculating molecular equilibrium constants
+          ! 			call calc_equil(temper)
+          call calc_equil(temper)
+          ! Calculating ionic equilibrium constants
+          call calc_equil_atomic(temper)
+          
+          ! Initial conditions
+          ! Initialize assuming that the total gas pressure is given by H
+          x_sol(1:21) = 1.d-3
+          
           niters=Maxniters
           call mnewt(3,niters,x_sol(1:21),21,1.e-5,1.e-5)
-          If (iter .ge. 10) then
-             Write (String,*) 'ipoint, T, Pe, Pg, PH=',loop,temper, P_elec, P_total,x_sol(1)
-             Debug_errorflags(flag_computeothers)=1
-             Call Debug_Log('In Compute_others_from_T_Pg, reached max iters. Taking the following PH: '//String, 2)
-             Warning=.True.
-          End if  
-
+          
+          iter=1
+          do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .le. 10)
+             !       do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .lt. 15)
+             iter=iter+1
+             Write (String,*) 'ipoint, T, Pe, Pg=',loop,temper, P_elec, P_total
+             Debug_warningflags(flag_computeothers)=1
+             Call Debug_Log('Solving compute_others_from_T_Pe_Pg again, '//String, 2)
+             if (iter .eq. 1) then
+                x_sol(1:21) = PT_in(loop) * abund_atom*.9
+                x_sol(21)=PT_in(loop)*.01
+             else if (iter .lt. 4) then
+                x_sol = initial_values / (10**iter)
+             else if (iter .lt. 7) then
+                x_sol = initial_values * (10**iter)
+             else if (iter .lt. 0) then
+                x_sol(1)=PT_in(loop)
+                Do i=2,21
+                   x_sol(i)=0.
+                End do
+             else
+                do i=1,21
+                   Call Random_number(x_sol(i))
+                   x_sol(i)=10**(7.*(x_sol(i)-.5))
+                end do
+             end if
+             
+             niters=Maxniters
+             call mnewt(3,niters,x_sol(1:21),21,1.e-5,1.e-5)
+             If (iter .ge. 10) then
+                Write (String,*) 'ipoint, T, Pe, Pg, PH=',loop,temper, P_elec, P_total,x_sol(1)
+                Debug_errorflags(flag_computeothers)=1
+                Call Debug_Log('In Compute_others_from_T_Pg, reached max iters. Taking the following PH: '//String, 2)
+                Warning=.True.
+             End if
+             
+          enddo
+          
+          if (x_sol(1) .lt. 0) x_sol(1)=PT_in(loop)
+          
+          PH_out(loop) = x_sol(1)
+          PHminus_out(loop) = x_sol(1) * Pe_in(loop) / equilibrium_atomic(2,1)
+          PHplus_out(loop) = x_sol(1) / Pe_in(loop) * equilibrium_atomic(1,1)
+          if (temper < 1.d5) then
+             PH2_out(loop) = x_sol(1)**2 / equilibrium(1)
+             PH2plus_out(loop) = x_sol(1)**2 / Pe_in(loop) * (equilibrium_atomic(1,1) / equilibrium(2))
+          else
+             PH2_out(loop) = 0.d0
+             PH2plus_out(loop) = 0.d0
+          endif
+          
+          if (int(Temp4(loop)) .eq. 4690 .or. int(Temp4(loop)) .eq. 5300) then
+             print *,'pg=',pg4(loop)-pe4(loop),' sum=',ph_out(loop)+phminus_out(loop)+phplus_out(loop)+2*ph2_out(loop)+2*ph2plus_out(loop)
+          endif
        enddo
+       nH4=PH_out/BK/Temp4
+       nHminus4=PHminus_out/BK/Temp4
+       nHplus4=PHplus_out/BK/Temp4
+       nH24=PH2_out/BK/Temp4
+       nH2plus4=PH2plus_out/BK/Temp4
+       ne4=Pe_in/BK/Temp4
+       Return
+    End if
 
-       if (x_sol(1) .lt. 0) x_sol(1)=PT_in(loop)
-            
-       PH_out(loop) = x_sol(1)
-       PHminus_out(loop) = x_sol(1) * Pe_in(loop) / equilibrium_atomic(2,1)
-       PHplus_out(loop) = x_sol(1) / Pe_in(loop) * equilibrium_atomic(1,1)
-       if (temper < 1.d5) then
-          PH2_out(loop) = x_sol(1)**2 / equilibrium(1)
-          PH2plus_out(loop) = x_sol(1)**2 / Pe_in(loop) * (equilibrium_atomic(1,1) / equilibrium(2))
-       else
-          PH2_out(loop) = 0.d0
-          PH2plus_out(loop) = 0.d0
-       endif
-    enddo
-       
-!    If (Warning) then
-!       Do loop=1, n_grid
-!          Print *,loop,'T, Pe, Pg=',Temper_in(loop), Pe_in(loop), Pt_in(loop)
-!       End do
-!       pause
-!    End if
-
-    nH4=PH_out/BK/Temp4
-    nHminus4=PHminus_out/BK/Temp4
-    nHplus4=PHplus_out/BK/Temp4
-    nH24=PH2_out/BK/Temp4
-    nH2plus4=PH2plus_out/BK/Temp4
-    ne4=Pe_in/BK/Temp4
 
     Call Time_routine('compute_others_from_T_Pe_Pg',.False.)
 
@@ -2144,10 +2247,10 @@ Contains
     Do loop = 1, n_grid
        Call ann_pgfrompe(T4(loop), P4(loop), metalicity, Pg4(loop))
     End do
-
 !    Call Compute_others_from_T_Pe_Pg(n_grid, T4, P4, Pg4, nH4, nHminus4, nHplus4, nH24, nH2plus4)
     Call Time_routine('compute_pg',.False.)
     
   End Subroutine Compute_Pg
-  
+
+
 End Module Eq_state

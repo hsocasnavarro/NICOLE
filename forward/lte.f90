@@ -24,6 +24,7 @@ Function Saha(npoints, T, Ne, U1, U2, E_ioniz)
   Where(Sahad .gt. 1.e30) 
      Sahad=1.e30
   End Where
+
   Saha=Sahad
   Return
 End Function Saha
