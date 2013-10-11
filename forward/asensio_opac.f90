@@ -371,7 +371,7 @@ contains
     
     cte = 8.d0*PI/3.d0 * (PE/PC)**4 / PME**2
     thomson = cte * (Pel/PH)
-    
+
   end function thomson
   
   !-----------------------------------------------------------------
@@ -640,7 +640,7 @@ contains
          (contrib1 + contrib2 + contrib3 + contrib4 + contrib5 + contrib6 + contrib7)
     
     Scat=(contrib4+contrib5+contrib6)*PH/(PK*T)
-    
+
 !    if (flag .eq. 1) print *,'andr=',asensio_background_opacity,scat
 
     If (Scat .lt. 0) then

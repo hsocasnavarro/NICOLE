@@ -765,6 +765,7 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
   Type (NLTE_Atom) :: Atom
   Type (Model) :: Atmo
   Real, Dimension (NLTE%NDEP) :: XCONT, SC, SCAT
+  Real, Dimension (1) :: Dummy
   Real, Dimension (:), Allocatable, Save :: Cont_op_5000_2
   Logical, Save :: FirstTime=.True.
   Real :: Freq, P_el, T_el, Theta, P_g, n2P, ScatCoef, metal, lambda
@@ -781,8 +782,9 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
   Atmo=NLTE%Atmo
   Do idepth=1, NLTE%NDEP
      n2P=BK*NLTE%Atmo%Temp(idepth)
-     Call Ann_background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth),Atmo%Gas_p(idepth),metal,5000., &
-          NLTE%Xnorm(idepth))
+     NLTE%Xnorm(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
+          Atmo%Gas_p(idepth), Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, &
+          Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, 5000., Dummy(1))
   End do
 !
 ! Calculate background opacities at central wavelength of each line transition
@@ -790,42 +792,25 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
   Call RewindVirtualFile('OPC')
   Do itran=1, Atom%NLIN
      freq=2.99792458e18/Atom%Alamb(itran)
-     If (Atom%Alamb(itran) .lt. 3800) then
-        Call Compute_others_from_T_Pe_Pg(NLTE%NDEP, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
-             Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)     
-        Do idepth=1, NLTE%NDEP
-           n2P=BK*Atmo%Temp(idepth)
-           XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, &
-                Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, 0., Atom%Alamb(itran), Scat(idepth))
-           XCONT(idepth)=XCONT(idepth)+Scat(idepth)
-           If (Cont_op_5000_2(idepth) .lt. 0) then
-              Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth),&
-                   Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, &
-                   Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, 0., 5000., ScatCoef)
-              Cont_op_5000_2(idepth)=Cont_op_5000_2(idepth)+ScatCoef
-           End if
-           XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
-           NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
-           SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
-                NLTE%BPlanck(idepth,itran)
-           SCAT(idepth)=SCAT(idepth)/XCONT(idepth)
-           if (xcont(idepth) .lt. 0) &
-                Call Debug_Log('Error!! Negative NLTE continuum opaicity',1)
-        End do
-     Else
-        Do idepth=1, NLTE%NDEP
-           Call Ann_background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
-                Atmo%Gas_p(idepth), metal, Atom%Alamb(itran), XCONT(idepth))
-           ScatCoef=0.
-!           Call Ann_background_opacity_scat(Atmo%Temp(idepth), Atmo%El_p(idepth), metal, Atom%Alamb(itran), ScatCoef)
-           ScatCoef=ScatCoef*XCONT(idepth)
-           XCONT(idepth)=XCONT(idepth)/NLTE%XNORM(idepth)
-           NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
-           SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
-                NLTE%BPlanck(idepth,itran)
-           SCAT(idepth)=ScatCoef/XCONT(idepth)
-        End do
-     Endif
+     Do idepth=1, NLTE%NDEP
+        n2P=BK*Atmo%Temp(idepth)
+        XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, &
+             Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth), &
+             Atom%Alamb(itran), Scat(idepth))
+        If (Cont_op_5000_2(idepth) .lt. 0) then
+           Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth),&
+                Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, &
+                Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, &
+                5000., Scat(idepth))
+        End if
+        XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+        NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
+        SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
+             NLTE%BPlanck(idepth,itran)
+        SCAT(idepth)=SCAT(idepth)/XCONT(idepth)
+        if (xcont(idepth) .lt. 0) &
+             Call Debug_Log('Error!! Negative NLTE continuum opaicity',1)
+     End do
      Call WriteX(XCONT, SCAT, SC)
   End do
 !
@@ -835,32 +820,17 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
      Do inu=1, Atom%NQ(itran)
         freq=Atom%FRQ(inu, itran)
         lambda=2.99792458e18/freq
-        If (Atom%Alamb(itran) .lt. 3800) then
-           Call Compute_others_from_T_Pe_Pg(NLTE%NDEP, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
-                Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)     
-           Do idepth=1, NLTE%NDEP
-              n2P=BK*Atmo%Temp(idepth)
-              XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), Atmo%nH(idepth)*n2P, &
-                   Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, 0., lambda, Scat(idepth))
-              XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
-              NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
-              SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
-                   NLTE%BPlanck(idepth,itran)
-              SCAT(idepth)=ScatCoef/XCONT(idepth)
-           End do
-        Else
-           Do idepth=1, NLTE%NDEP
-              Call Ann_background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), metal, lambda, XCONT(idepth))
-              ScatCoef=0.
-!              Call Ann_background_opacity_scat(Atmo%Temp(idepth), Atmo%El_p(idepth), metal, lambda, ScatCoef)
-              ScatCoef=ScatCoef*XCONT(idepth)
-              XCONT(idepth)=XCONT(idepth)/NLTE%XNORM(idepth)
-              NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
-              SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
-                   NLTE%BPlanck(idepth,itran)
-              SCAT(idepth)=ScatCoef/XCONT(idepth)
-           End do
-        Endif
+        Do idepth=1, NLTE%NDEP
+           n2P=BK*Atmo%Temp(idepth)
+           XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), &
+                Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, &
+                Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, lambda, Dummy(1))
+           XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+           NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
+           SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
+                NLTE%BPlanck(idepth,itran)
+           SCAT(idepth)=Dummy(1)/XCONT(idepth)
+        End do
         Call WriteX(XCONT, SCAT, SC)
      End do
   End do

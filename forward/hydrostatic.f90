@@ -19,12 +19,11 @@ Subroutine Hydrostatic(Params, Atmo)
   Integer :: ipoint, npoints, iatom, iters
   Integer, Dimension(1) :: imin
   Real, Parameter :: niters=30, Precision=1e-3
-  Real, Dimension (Params%n_points) :: Kappa, Tau
+  Real, Dimension (Params%n_points) :: Kappa, Tau, temp
   Real, Dimension (10) :: Pp
   Real, Parameter :: nu500 = cc/(5000.*1.e-8), Min_temp = 2500., &
        Mu=12.566370614 ! Vacuum permeability (G^2 cm^3/erg)=4*Pi, P_m=B^2/2/Mu
   Real :: dtau, dif, n2P, Scat, chi_0, chi_e, eta
-  Real, Dimension(1) :: temp
   Real :: Avmolweight, Asum, Wsum, Pg_Old, OldKappa, metal
   Logical :: Warning1, Warning2
   Logical, Save :: FirstTime=.True.
@@ -87,9 +86,11 @@ Subroutine Hydrostatic(Params, Atmo)
   Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%nH(1), Atmo%nHminus(1), &
        Atmo%nHplus(1), Atmo%nH2(1), Atmo%nH2plus(1), Atmo%Gas_p(1))
   n2P=BK*temp(1)
-!  Kappa(1)=Background_opacity(temp(1), Atmo%El_p(1), Atmo%nH(1)*n2P, &
-!       Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, 0., 5000., Scat)
-  Call Ann_background_opacity(Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), metal, 5000., Kappa(1))
+  Call Compute_others_from_T_Pe_Pg(1,Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
+       Atmo%nHminus(1), Atmo%nHplus(1), Atmo%nH2(1), Atmo%nH2plus(1))
+  Kappa(1)=Background_opacity(Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1)*n2P, &
+       Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, Atmo%nH2plus(1)*n2P,&
+       5000., Scat)
   Avmolweight=Wsum/(Asum+ &
        Atmo%El_P(1)/Atmo%Gas_P(1))
   Atmo%Rho(1)=Atmo%Gas_p(1)*Avmolweight/Avog/bk/temp(1) ! Gas density
@@ -97,9 +98,9 @@ Subroutine Hydrostatic(Params, Atmo)
   Atmo%Z_scale(1)=0. ! Boundary condition for the height scale
   Do ipoint=2, npoints
      dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
-     temp(1)=Atmo%Temp(ipoint)
-     If (temp(1) .lt. Min_temp) then ! Check temperature so that gasc won't crash
-        temp(1)=Min_temp
+     temp(ipoint)=Atmo%Temp(ipoint)
+     If (temp(ipoint) .lt. Min_temp) then ! Check temperature so that gasc won't crash
+        temp(ipoint)=Min_temp
         Warning1=.TRUE.
      End if
 ! Initialization
@@ -113,17 +114,18 @@ Subroutine Hydrostatic(Params, Atmo)
              Gravity*dtau/(.5*(Kappa(ipoint-1)+Kappa(ipoint))) ! + & 
 !            (Atmo%B_str(ipoint-1)**2  - &
 !             Atmo%B_str(ipoint)**2) /8./Pi ! Magnetic pressure term
-        Call Compute_Pe(1, Temp(1), Atmo%Gas_p(ipoint), &
+        Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), &
              Atmo%nH(ipoint), Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), &
              Atmo%nH2(ipoint), Atmo%nH2plus(ipoint), Atmo%El_p(ipoint))
         OldKappa=Kappa(ipoint)
-        Call Ann_background_opacity(Temp(1), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), metal, 5000., Kappa(ipoint))
-!        Kappa(ipoint)=Background_opacity(temp(1), Atmo%El_p(ipoint), &
-!             Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, &
-!             Atmo%nHplus(ipoint)*n2P, Atmo%nH2(ipoint)*n2P, 0., 5000., Scat)
+        Call Compute_others_from_T_Pe_Pg(1,Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
+             Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
+        Kappa(ipoint)=Background_opacity(Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint)*n2P, &
+             Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(1)*n2P,&
+             5000., Scat)
         Avmolweight=Wsum/(Asum+ &
              Atmo%El_p(ipoint)/Atmo%Gas_p(ipoint))
-        Atmo%Rho(ipoint)=Atmo%Gas_p(ipoint)*Avmolweight/Avog/bk/temp(1) ! Gas density
+        Atmo%Rho(ipoint)=Atmo%Gas_p(ipoint)*Avmolweight/Avog/bk/temp(ipoint) ! Gas density
         Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
         Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
              dtau/2./1.e5* &
@@ -131,7 +133,7 @@ Subroutine Hydrostatic(Params, Atmo)
         dif=Abs(OldKappa-Kappa(ipoint))/(OldKappa+Kappa(ipoint))
         iters=iters+1
      End do
-     Call Compute_Pe(1, Temp(1), Atmo%Gas_p(ipoint), &
+     Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), &
           Atmo%nH(ipoint), Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), &
           Atmo%nH2(ipoint), Atmo%nH2plus(ipoint), Atmo%El_p(ipoint))
   End Do ! ipoint

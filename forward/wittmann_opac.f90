@@ -18,44 +18,60 @@ Contains
 ! pp(8)=  p(e)/p(h')
 ! pp(9)=  ne, that is pe/kt
 ! pp(10)= p(h-)/p(h)
-
+!
+! lambda is in cm
+! output is in cm/g
+!
        real :: wittmann_opac
        real :: T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, &
             lambda_in4, Scat                                                 
        real :: kac, tt1, t2
        real :: p(10)
        real :: dz3(12) 
-       real, dimension(1) :: T1, Ne1, U1, U2, U3, n1overn0, n2overn1, n0overn
-       integer :: ivar(10) ,iel
+       real, dimension(1) :: T1, Ne1, n0overn, n1overn, n2overn
+       integer :: iel
                                                                         
       real :: mgatom,nair 
       real :: dfreq,lnfreq,dobtheta,dobdtheta,lambda 
       logical wrepet 
       dimension z3(12) 
-      real ghel(12)/1.,3.,1.,9.,9.,3.,3.,3.,1.,9.,20.,3./,              &
-     &chihel(12)/0.,19.819,20.615,20.964,20.964,21.217,21.217,22.718,22.&
-     &920,23.007,23.073,23.087/,g(12),tcatom(27)/3.9999e3,5e3,6e3,7e3,8e&
+      real, dimension(12) :: ghel, chihel, g
+      real, dimension(27) :: tcatom, fcatom, fsodiu, fmatom
+      real, dimension(15) :: wcatom
+      real, dimension(20) :: wmatom
+      real, dimension(21) :: wsodiu
+      real, dimension(15,9) :: ccatom
+      real, dimension(20,8) :: cmatom
+      real, dimension(21,8) :: csodiu
+
+      data ghel/1.,3.,1.,9.,9.,3.,3.,3.,1.,9.,20.,3./
+      data chihel/0.,19.819,20.615,20.964,20.964,21.217,21.217, &
+           22.718,22.920,23.007,23.073,23.087/
+      data tcatom/3.9999e3,5e3,6e3,7e3,8e&
      &3,9e3,1e4,1.1e4,1.2e4,1.3e4,1.4e4,1.5e4,1.6e4,1.7e4,1.8e4,1.9e4,2e&
-     &4,2.1e4,2.2e4,2.3e4,2.4e4,2.5e4,2.6e4,2.7e4,2.8e4,2.9e4,3.00001e4/&
-     &,fcatom(27)/1.728,6.660,9.964,12.340,14.134,15.540,16.676,17.614,1&
+     &4,2.1e4,2.2e4,2.3e4,2.4e4,2.5e4,2.6e4,2.7e4,2.8e4,2.9e4,3.00001e4/
+      data fcatom/1.728,6.660,9.964,12.340,14.134,15.540,16.676,17.614,1&
      &8.402,19.076,19.662,20.172,20.626,21.030,21.394,21.722,22.022,22.2&
-     &96,22.548,22.78,22.996,23.196,23.384,23.56,23.724,23.878,24.024/, &
-     &fsodiu(27)/1.638,3.914,5.461,6.586,7.448,8.130,8.686,9.152,9.546, &
+     &96,22.548,22.78,22.996,23.196,23.384,23.56,23.724,23.878,24.024/
+      data fsodiu/1.638,3.914,5.461,6.586,7.448,8.130,8.686,9.152,9.546, &
      &9.887,10.184,10.448,10.682,10.894,11.084,11.258,11.418,11.566,11.7&
      &04,11.830,11.950,12.062,12.166,12.264,12.358,12.448,12.532/       
-      real fmatom(27)/1.784,5.268,7.618,9.318,10.61,11.628,12.452,    &
+      data fmatom/1.784,5.268,7.618,9.318,10.61,11.628,12.452,    &
      &13.134,13.71,14.204,14.632,15.008,15.342,15.64,15.906,16.15,16.37,1&
      &6.574,16.76,16.934,17.094,17.244,17.384,17.514,17.638,17.754,17.86&
-     &6/,wcatom(15)/0.,1.1005e-5,1.1005e-5,1.2395e-5,1.2395e-5,1.4445e-5&
+     &6/
+      data wcatom/0.,1.1005e-5,1.1005e-5,1.2395e-5,1.2395e-5,1.4445e-5&
      &,1.4445e-5,2.178e-5,2.912e-5,3.4625e-5,3.4625e-5,4.7295e-5,       &
-     &4.7295e-5,5.4785e-5,7.1e-5/,wsodiu(21)/0.,1.2e-5,1.5e-5,1.6e-5,1.7&
+     &4.7295e-5,5.4785e-5,7.1e-5/
+      data wsodiu/0.,1.2e-5,1.5e-5,1.6e-5,1.7&
      &e-5,1.8e-5,1.95e-5,2.1e-5,2.2e-5,2.3e-5,2.4125e-5,2.4125e-5,2.75e-&
      &5,4.0845e-5,4.0845e-5,6.366e-5,8.1455e-5,8.1455e-5,8.9455e-5,8.945&
-     &5e-5,9.85e-5/,wmatom(20)/1.3999e-5,1.5e-5,1.6215e-5,1.6215e-5,    &
+     &5e-5,9.85e-5/
+      data wmatom/1.3999e-5,1.5e-5,1.6215e-5,1.6215e-5,    &
      &2.5135e-5,2.5135e-5,2.75e-5,3.7565e-5,3.7565e-5,4.8845e-5,        &
      &4.8845e-5,6.5495e-5,6.5495e-5,7.2345e-5,7.2345e-5,7.2915e-5,      &
      &7.2915e-5,8.1135e-5,8.1135e-5,9.e-5/                              
-      real ccatom(15,9)/                                                &
+      data ccatom/                                                &
      &-2.75,-3.02,-1.16,-1.17,1.33,1.32,8.05,7.79,7.66,7.68,8.12,8.07,  &
      &8.28,8.44,8.14,-2.75,-3.02,-1.48,-1.49,0.66,0.65,5.99,5.73,5.61,  &
      &5.63,5.86,5.79,5.95,5.97,5.67,-2.75,-3.02,-1.68,-1.69,0.22,0.20,  &
@@ -69,7 +85,7 @@ Contains
      &,-1.70,-2.01, -2.75,-3.02,-2.51,-2.53,-1.88,-1.91,-1.70,-1.91,-2.1&
      &0,-2.24,-2.24,-2.55,-2.54,-2.70,-3.01/                            
                                              ! -(log(kappa)+20)         
-      real cmatom(20,8)/                                                &
+      data cmatom/                                                &
      &-0.57,-1.55,-2.08,-0.20,-0.75,2.14,2.01,2.02,3.03,2.74,2.79,2.49,2&
      &.71,2.59,2.75,2.74,3.75,3.67,3.78,3.61,-0.87,-1.61,-2.10,-0.89,-1.&
      &44,1.01,0.88,0.88,1.56,1.26,1.30,1.00,1.19,1.08,1.23,1.22,2.05,1.9&
@@ -85,7 +101,7 @@ Contains
      &-3.69,-3.18,-3.26,-3.36,-3.33,-3.85,-3.26,-3.36,-3.67,-3.63,-3.94,&
      &-3.93,-4.28,-4.22,-4.34,-4.29,-4.30,-4.17,-4.30,-4.30,-4.43/      
                                                                    ! -lo
-      real csodiu(21,8)/8.70,                                           &
+      data csodiu/8.70,                                           &
      &8.78,8.99,9.13,9.41,10.11,10.62,9.95,9.31,9.00,8.87,10.22,9.96,9.2&
      &6,11.45,10.76,10.43,10.95,10.82,11.32,11.18,8.70,8.78,8.99,9.13,9.&
      &37,9.93,10.10,9.72,9.23,8.96,8.82,9.67,9.43,8.73,10.52,9.83,9.48, &
@@ -106,7 +122,7 @@ Contains
 !    *-1.59590407e+01,2.34426531e+00/,dcl(4)/-1.77615290e+02,-5.63832483
 !    *e+01,2.48188080e+01,-3.35147209e+00/                              
                  
-      lambda=lambda_in4
+      lambda=lambda_in4*1e-8
       tt=T4
       ppe=Pe4
 
@@ -117,31 +133,19 @@ Contains
       Ne1(1)=p(9)
 ! Neutral He
       iel=2
-      Call Partition_f(iel, T4, U1(1), U2(1), U3(1), DU1, DU2, DU3)
-      n1overn0=saha(1, T1, Ne1, U1, U2, At_ioniz1(iel))
-      n2overn1=saha(1, T1, Ne1, U2, U3, At_ioniz2(iel))
-      n0overn= 1.d0 / (1.d0 + n1overn0 + n2overn1 * n1overn0)
+      Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(2)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Neutral C
       iel=6
-      Call Partition_f(iel, T4, U1(1), U2(1), U3(1), DU1, DU2, DU3)
-      n1overn0=saha(1, T1, Ne1, U1, U2, At_ioniz1(iel))
-      n2overn1=saha(1, T1, Ne1, U2, U3, At_ioniz2(iel))
-      n0overn= 1.d0 / (1.d0 + n1overn0 + n2overn1 * n1overn0)
+      Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(3)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Neutral Na
       iel=11
-      Call Partition_f(iel, T4, U1(1), U2(1), U3(1), DU1, DU2, DU3)
-      n1overn0=saha(1, T1, Ne1, U1, U2, At_ioniz1(iel))
-      n2overn1=saha(1, T1, Ne1, U2, U3, At_ioniz2(iel))
-      n0overn= 1.d0 / (1.d0 + n1overn0 + n2overn1 * n1overn0)
+      Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(4)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Neutral Mg
       iel=12
-      Call Partition_f(iel, T4, U1(1), U2(1), U3(1), DU1, DU2, DU3)
-      n1overn0=saha(1, T1, Ne1, U1, U2, At_ioniz1(iel))
-      n2overn1=saha(1, T1, Ne1, U2, U3, At_ioniz2(iel))
-      n0overn= 1.d0 / (1.d0 + n1overn0 + n2overn1 * n1overn0)
+      Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(5)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Others
       p(6)=PHPlus4/PHtot
@@ -149,16 +153,6 @@ Contains
       p(8)=Pe4/PHtot
       p(10)=PHminus4/PHtot
 !
-       ivar(1)=1 
-       ivar(2)=2 
-       ivar(3)=6 
-       ivar(4)=11 
-       ivar(5)=12 
-       ivar(6)=86 
-        ivar(7)=89 
-       ivar(8)=90 
-       ivar(9)=91 
-       ivar(10)=93 
 
        t=tt 
        pe=ppe 
@@ -433,6 +427,7 @@ Contains
    35 escatt=6.653e-25*p(8) 
        kac=kac+escatt+scatt1+scatt2+scatt3 
        Scat=escatt+scatt1+scatt2+scatt3
+
        kat=kat+descatt+dscatt1+dscatt2+dscatt3 
        kap=kap+ddescatt+ddscatt1+ddscatt2+ddscatt3 
 !-----------------------------------------------------------------------
@@ -601,9 +596,11 @@ Contains
 !*** Start of declarations inserted by SPAG
       REAL FKNY , X
       INTEGER I
+      Real, dimension(12) :: f1, f2
 !*** End of declarations inserted by SPAG
-      REAL f1(12)/14.47 , -169.385 , 11.65 , 26.57 , 31.059 , 35.31 ,   &
-         & 35.487 , 5.51 , 10.36 , 21.41 , 37. , 25.54/ , f2(12)/ - 2. ,&
+      Data f1/14.47 , -169.385 , 11.65 , 26.57 , 31.059 , 35.31 ,   &
+         & 35.487 , 5.51 , 10.36 , 21.41 , 37. , 25.54/ 
+      Data f2/ - 2. ,&
          & 21.035 , -1.91 , -2.9 , -3.3 , -3.5 , -3.6 , -1.54 , -1.86 , &
          & -2.6 , -3.69 , -2.89/
       FKNY = f1(I) + X*f2(I)

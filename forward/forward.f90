@@ -848,23 +848,15 @@ Real function syn_hsra(lambda, theta)
        (exp(hh*nu/bk/Temp(1:npoints))-1.) ! Planck function (c.g.s.)
   nu500=cc/(5000*1e-8)! s^-1
 !
-  If (lambda .lt. 3800) then
-     Call Compute_others_from_T_Pe_Pg(npoints, Temp, El_p, Gas_p, &
-          nH, nHminus, nHplus, nH2, nH2plus)     
-     Do idepth=1, npoints
-        n2P=BK*Temp(idepth)
-        Cont_op(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
-             nHminus(idepth)*n2P, nHplus(idepth)*n2P, nH2(idepth)*n2P, 0., lambda, Scat)
-        Cont_op_500(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
-             nHminus(idepth)*n2P, nHplus(idepth)*n2P, nH2(idepth)*n2P, 0., 5000., Scat)
-     End do
-  Else
-     metal=at_abund(26)-7.5
-     Do idepth=1, npoints
-        Call Ann_background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), metal, lambda, Cont_op(idepth))
-        Call Ann_background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), metal, 5000., Cont_op_500(idepth))
-     End do
-  End if
+!  Call Compute_others_from_T_Pe_Pg(npoints, Temp, El_p, Gas_p, &
+!       nH, nHminus, nHplus, nH2, nH2plus)     
+  Do idepth=1, npoints
+     n2P=BK*Temp(idepth)
+     Cont_op(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
+          nHminus(idepth)*n2P, nHplus(idepth)*n2P, nH2(idepth)*n2P, 0., lambda, Scat)
+     Cont_op_500(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
+          nHminus(idepth)*n2P, nHplus(idepth)*n2P, nH2(idepth)*n2P, 0., 5000., Scat)
+  End do
   Cont_op=Cont_op/Cont_op_500
 !
 ! Construct the tau_nu (monochromatic optical depth)
@@ -2104,11 +2096,11 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 ! Now let's put the model in hydrostatic equilibrium and fill in
 ! the columns Gas_P, El_p, Rho and Z_scale of the model.
 !
- If (Hydro) then     
+  Saved=Atmo
+  If (Hydro) then     
      Call Hydrostatic(Params, Atmo)
   Else ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
        !       nH2 columns of the model
-     Saved=Atmo
 
 !     Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
 !          Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)
@@ -2125,11 +2117,9 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   End if
 !
   metal=at_abund(26)-7.5
-  If (Atmo%Keep_nh .lt. .1) then
-     Do idepth=1, Params%n_points
-        Call ann_nhfrompe(Atmo%Temp(idepth), Atmo%el_p(idepth), Metal, Atmo%nH(idepth))
-     End do
-  End if
+  Call compute_others_from_T_Pe_Pg(Params%n_points,Atmo%Temp, Atmo%el_p, Atmo%Gas_p,&
+       Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
+  Call Reset_densities(Atmo, Saved)
 !
   nformal(1:nformalsolutions)=0. ! Initialize the f. s. counter
   idata=1 ! Index for Syn_profile
@@ -2137,8 +2127,11 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 !
 ! Calculate line- and wavelength-independent data.
 !
-  Do idepth=1, npoints !$$ PARALLEL LOOP START
-     Call Ann_background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), metal, 5000., Cont_op_5000(idepth))
+  Do idepth=1, npoints !$$ PARALLEL LOOP START 
+     n2P=BK*Atmo%Temp(idepth)
+     Cont_op_5000(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), &
+     Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, &
+          Atmo%nH2plus(idepth)*n2P, 5000., Scat)
   End do !$$ PARALLEL LOOP ENDe
   Cont_op_5000=Cont_op_5000/Atmo%Rho ! Convert to cm^2/g  
 !
@@ -2406,29 +2399,21 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         If (abs(last_update-Wave(iwave)) .gt. Params%Update_opac) then !Update background opacities
            nu=cc/(Wave(iwave)*1e-8) ! s^-1
            Wave_cm=cc/nu
-           If (Wave(iwave) .lt. 3800) then
-              Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
-                   Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)     
-              Call Reset_densities(Atmo, Atmo_pre)
-              Do idepth=1, npoints
-                 n2P=BK*Atmo%Temp(idepth)
-                 Cont_op(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
-                      Atmo%Gas_p(idepth), Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
-                      Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, 0., Wave(iwave), Scat)
-                 If (Cont_op_5000_2(1) .lt. 0) &
-                      Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), &
-                      Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
-                      Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, 0., 5000., Scat)
-              End do
-              Cont_op=Cont_op/Cont_op_5000_2
-           Else
-              Do idepth=1, npoints
-                 Call Ann_background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
-                      Atmo%Gas_p(idepth), metal, Wave(iwave), Cont_op(idepth))
-              End do
-              Cont_op=Cont_op/Atmo%Rho ! Convert to cm^2/g
-              last_update=Wave(iwave)
-           End If ! If (Wave(iwave) .lt. 3800)
+           Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
+                Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)     
+           Call Reset_densities(Atmo, Atmo_pre)
+           Do idepth=1, npoints
+              n2P=BK*Atmo%Temp(idepth)
+              Cont_op(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
+                   Atmo%Gas_p(idepth), Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
+                   Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth), &
+                   Wave(iwave), Scat)
+              If (Cont_op_5000_2(1) .lt. 0) &
+                   Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), &
+                   Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
+                   Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, 5000., Scat)
+           End do
+           Cont_op=Cont_op/Cont_op_5000_2
         End if
  ! Add continuum opacity and emission at this wlength
         Do i=1, 4

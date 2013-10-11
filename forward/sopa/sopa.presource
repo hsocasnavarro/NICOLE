@@ -1,6 +1,7 @@
 ! Initialization for the SOPA opacity package. This routine is only
 ! needed once per execution, in order to store some proper values in
-! the SOPA common blocks.
+! the SOPA common blocks. If abundances are changed, this routine
+! needs to be called again
 !
 Subroutine Init_sopas
   Use Atomic_data
@@ -9,8 +10,11 @@ Subroutine Init_sopas
   Logical :: exists
   Integer :: lun, Get_lun
 !
-  If (.not.First_time) Return
 !  Print *,'Initialzing sopa'
+  If (.not. First_time) then
+     Call readion(N_elements, Atom_char, At_abund, lun)
+     Return
+  Endif
   First_time=.FALSE.
   lun=Get_lun()
   Inquire(File='ion.dat', exist=exists)
@@ -537,6 +541,7 @@ End Subroutine Init_sopas
       INTEGER i , ib , id , ie , ind , io , iu , j , kbo , KEL , KU ,   &
             & MDEP , MFT , MK , nb , NBElo1 , nd , NELem , nlmm , nte
       INTEGER nto , NTO1 , N_elements
+      Logical, Save :: FirstTime=.True.
 !*** End of declarations inserted by SPAG
 !
 !***********************************************************IAC, 08.06.97
@@ -633,7 +638,26 @@ End Subroutine Init_sopas
       EQUIVALENCE (V(2789),GO1(1))
 !
 !         PRINT *,' READION read atomic data from file ION.DAT'
- 
+
+      If (.not. FirstTime) then ! Get abundances and exit
+         found = .FALSE.
+         DO ind = 1 , N_elements
+            tmpreal = ELMent(ie)
+            IF ( Atom_char(ind).EQ.tmpchar ) THEN
+               found = .TRUE.
+               ALFa(ie) = 10.**(At_abund(ind)-12.)
+            ENDIF
+         ENDDO
+         IF ( .NOT.found ) THEN
+            PRINT * , 'Element ' , ELMent(ie) ,                      &
+                 &' in ion.dat not found in the'
+            PRINT * , 'atomic data table!! Aborting ...'
+            STOP
+         ENDIF
+         Return
+      End if
+
+      FirstTime=.False.
  
       DO i = 1 , 30
          DO j = 1 , MDEP
@@ -950,7 +974,7 @@ End Subroutine Init_sopas
 99999 END
 !*==SOPAS.spg  processed by SPAG 6.70Dc at 13:39 on  9 Apr 2013
  
-      SUBROUTINE SOPAS(Id,Ihtot,Freq,Pel,Tel,Pg,Chio,Chie,Eta)
+      SUBROUTINE SOPAS(Id,Ihtot,Freq,TotH,Pel,Tel,Pg,Chio,Chie,Eta)
       IMPLICIT NONE
 !*--SOPAS1051
 !*** Start of declarations inserted by SPAG
@@ -1077,7 +1101,7 @@ End Subroutine Init_sopas
                     & EK , PI
  
       LOGICAL PHOto
-      REAL NP , M , NATom , NHYd , NE
+      REAL NP , M , NATom , NHYd , NE, TotH
       REAL hydr(MDEP) , gas(MDEP)
       LOGICAL , SAVE :: firsttime = .TRUE.
  
@@ -1090,10 +1114,9 @@ End Subroutine Init_sopas
                     & BNU(MFT)
 !
       COMMON /POPUL / HTOt(MDEP) , NHYd(5,MDEP) , NP(MDEP)
-!
- 
+! 
       IF ( firsttime ) THEN
-                          ! initializations
+         ! initializations
          CALL INIT_SOPAS
          firsttime = .FALSE.
       ENDIF
@@ -1115,7 +1138,8 @@ End Subroutine Init_sopas
 !       STATP (IHTOT > 0)
 !       STATM (IHTOT < 0)
 !
-         hydr(Id) = (gas(Id)-PE(Id))/TEMp(Id)/BK
+         hydr(Id) = (gas(ID)-PE(ID))/TEMp(Id)/BK
+!         hydr(Id) = TotH/TEMp(Id)/BK
  
          RHO(Id) = 1.66E-24*hydr(Id)*ATW
 !         PRINT *,'sopas RHO=',RHO(ID)
@@ -1123,7 +1147,6 @@ End Subroutine Init_sopas
          hydr(Id) = hydr(Id)/SUMA
          HTOt(Id) = hydr(Id)
 !            PRINT *,HTOT(ID)
- 
  
          CALL STATP(Id,Ihtot)
  

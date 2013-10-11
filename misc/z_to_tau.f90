@@ -82,9 +82,8 @@ Subroutine Z_to_tau(Params, Atmo)
 !
   n2P=BK*Atmo%Temp(1)
   metal=Atmo%Abundance(26)-7.5
-!  Kappa(1)=Background_opacity(Atmo%Temp(1), Atmo%El_p(1), Atmo%nH(1)*n2P, &
-!       Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, 0., 5000., Scat)
-  Call Ann_background_opacity(Atmo%Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), metal, 5000., Kappa(1))
+  Kappa(1)=Background_opacity(Atmo%Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1)*n2P, &
+       Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, Atmo%nH2plus(1), 5000., Scat)
   Kappa(1)=Kappa(1)/Atmo%Rho(1) ! Convert to cm^2/g
 
 !
@@ -95,10 +94,9 @@ Subroutine Z_to_tau(Params, Atmo)
 !
   Do ipoint=2, Params%n_points
      n2P=BK*Atmo%Temp(ipoint)
-     Call Ann_background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), metal, 5000., Kappa(ipoint))
-!     Kappa(ipoint)=Background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), &
-!          Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P,&
-!          Atmo%nH2(ipoint)*n2P, 0., 5000., Scat)
+     Kappa(ipoint)=Background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), &
+          Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P,&
+          Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint), 5000., Scat)
      Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
      dtau=.5*(Kappa(ipoint-1)*Atmo%Rho(ipoint-1) + &
           Kappa(ipoint)*Atmo%Rho(ipoint))* &

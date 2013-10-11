@@ -92,7 +92,7 @@ Subroutine damping(Line, Temp, El_p, Pg, Dldop, Damp, GA, GQ)
   Real :: Temp, El_p, Dldop, Damp, C6, ioniz, chi_l, a, b, metal
   Real :: gamma_r, gamma_vdw, gamma_s, Pg, dldopHz, GA, GQ
   Real :: Sigma, Alpha, X, GX, GAMMAF, GVW, K, A0, M0, H1FRC, HE1FRC, VBAR
-  Real :: tmp1, tmp2, tmp3, tmp4, tmp5, T1, ElP1, Pg1
+  Real, Dimension(1) :: tmp1, tmp2, tmp3, tmp4, tmp5, T1, ElP1, Pg1
   Real, Dimension (10) :: Pp
   Logical, Save :: Warning
   Data Warning/.FALSE./
@@ -163,12 +163,14 @@ Subroutine damping(Line, Temp, El_p, Pg, Dldop, Damp, GA, GQ)
      VBAR=SQRT(8.*K*Temp/PI/M0*(1./1.008+1./Line%Atomic_weight))
      GVW=GVW*((VBAR/1.E4)**(1.-ALPHA))
     ! Get H and He partial pressures
-     metal=at_abund(26)-7.5
-     Call ann_nhfrompe(Temp, El_p, Metal, Tmp1)
+     T1=Temp
+     ElP1=El_p
+     Pg1=Pg
+     Call compute_others_from_T_Pe_Pg(1,T1,Elp1, Pg1, tmp1,tmp2,tmp3,tmp4,tmp5)
     ! Fullwidth given H1FRC perturbers per cm^3 with approx He I broadening
     ! The factor of 2 comes from converting to the full width.
     ! The factor of 1.E6 converts from SI to cgs
-     H1FRC=tmp1 ! nH=neutral H
+     H1FRC=tmp1(1) ! nH=neutral H
      HE1FRC=0.1*H1FRC ! Approx neutral He by 0.10*neutral H
 
      GVW=GVW*(H1FRC+ 0.42*HE1FRC)*1.E6*2.
@@ -179,10 +181,13 @@ Subroutine damping(Line, Temp, El_p, Pg, Dldop, Damp, GA, GQ)
      Stop
   Endif
   If (Line%collisions .eq. 3) then ! Explicit vdW coefficient
-     metal=at_abund(26)-7.5
-     Call ann_nhfrompe(Temp, El_p, Metal, Tmp1)
+    ! Get H partial pressures
+     T1=Temp
+     ElP1=El_p
+     Pg1=Pg
+     Call compute_others_from_T_Pe_Pg(1,T1,Elp1, Pg1, tmp1,tmp2,tmp3,tmp4,tmp5)
      If (Line%Gamma_vdW_16 .gt. 0) then
-        gamma_vdw=Line%Gamma_vdW_16*(tmp1/1D16)/(1D4**0.38)*(Temp**0.38)
+        gamma_vdw=Line%Gamma_vdW_16*(tmp1(1)/1D16)/(1D4**0.38)*(Temp**0.38)
         gamma_vdw = gamma_vdw * 1D8
      End if
      gamma_vdw=gamma_vdw*Line%VDW_enh ! Empirical Van der Waals enhancement!
