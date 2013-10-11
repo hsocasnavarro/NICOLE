@@ -52,40 +52,42 @@ Subroutine Saha123(npoints,iel,T,Ne,n0overn,n1overn,n2overn)
      Ioniz=At_ioniz2(iel)*eV_to_cgs
      n2overn1=1./saha(npoints, T, Ne, U2, U3, Ioniz)
   Else ! H-
-     U2(ip)=1.0
+     U2(:)=1.0
      Ioniz=0.754*eV_to_cgs ! ionization energy for Hminus
      nminusovern0=saha(npoints, T, Ne, U2, U1, Ioniz) ! For Hminus
   End if
   Do ip=1, npoints
      If (iel .eq. 1) then ! H, H+ and H-
         If (nminusovern0(ip) .gt. 1e20) then ! It's all H-
-           n2overn=1.
-           n1overn=0.
-           n0overn=0.
+           n2overn(ip)=1.
+           n1overn(ip)=0.
+           n0overn(ip)=0.
         Else if (n1overn0(ip) .gt. 1e20) then ! H is negligible (and so is H-), it's all H+
-           n1overn=1.
-           n2overn=0.
-           n0overn=0.
+           n1overn(ip)=1.
+           n2overn(ip)=0.
+           n0overn(ip)=0.
         Else ! Consider them all
-           n0overn=1./(1+nminusovern0(ip)+n1overn0(ip))
-           n1overn=n1overn0(ip)*n0overn
-           n2overn=nminusovern0(ip)*n0overn
+           n0overn(ip)=1./(1+nminusovern0(ip)+n1overn0(ip))
+           n1overn(ip)=n1overn0(ip)*n0overn(ip)
+           n2overn(ip)=nminusovern0(ip)*n0overn(ip)
         End if
      Else ! generic atom (say Fe)
         If (n2overn1(ip) .gt. 1e20) then ! It's all Fe++
-           n2overn=1.
-           n1overn=0.
-           n0overn=0.
+           n2overn(ip)=1.
+           n1overn(ip)=0.
+           n0overn(ip)=0.
         Else if (n1overn0(ip) .gt. 1e20) then ! Fe is negligible, it's all Fe+ and Fe++
-           n0overn=0.
-           n2overn=1./(1+n2overn1(ip))
-           n1overn=1.-n2overn
+           n0overn(ip)=0.
+           n2overn(ip)=1./(1+n2overn1(ip))
+           n1overn(ip)=1.-n2overn(ip)
         Else ! Consider them all
-           n0overn=1./(1.+n2overn1(ip)*n1overn0(ip)+n1overn0(ip))
-           n1overn=n0overn*n1overn0(ip)
-           n2overn=n1overn*n2overn1(ip)
+           n0overn(ip)=1./(1.+n2overn1(ip)*n1overn0(ip)+n1overn0(ip))
+           n1overn(ip)=n0overn(ip)*n1overn0(ip)
+           n2overn(ip)=n1overn(ip)*n2overn1(ip)
         End if
      End if
+     print *,'t,h=',t(60),n0overn(60),n1overn(60),n2overn(60)
+     pause
   End do
 
 End Subroutine Saha123
