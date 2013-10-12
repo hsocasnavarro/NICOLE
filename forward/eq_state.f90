@@ -1729,10 +1729,18 @@ Contains
     character(len=16) :: name
     Character (len=16), Dimension(:), Allocatable :: names
     
-    n_included=2
-    If (.not. Allocated(names)) Allocate(names(n_included))
-    names=(/'H 2/00','H 2/10'/)
-    
+    print *,'choice=',choice_others
+    stop
+    if (choice_others .eq. 1) then
+       n_included=2
+       If (.not. Allocated(names)) Allocate(names(n_included))
+       names=(/'H 2/00','H 2/10'/)
+    Else if (choice_others .eq. 2) then 
+       n_included=273
+       If (.not. Allocated(names)) Allocate(names(n_included))
+       names=molec
+    End if
+
     includ = 0
     If (.not. Allocated(which_included)) allocate (which_included(n_included))
     
