@@ -275,7 +275,8 @@ for icycle in range(int(ncycles)):
     hscale=hscale.lower()
     opacities=get_value(config,'Opacity package','Wittmann','NICOLE.input')
     opacities=opacities.lower()
-    eqstateH=get_value(config,'Eq state, H','0','NICOLE.input')
+    eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
+    eqstate=get_value(config,'Eq state','0','NICOLE.input')
     debug=get_value(config,'Debug mode','0','NICOLE.input')
     interp=get_value(config,'Optimize grid','-','NICOLE.input')
     outputpop=get_value(config,'Output populations','0','NICOLE.input')
@@ -319,14 +320,17 @@ for icycle in range(int(ncycles)):
     if hscale != 't' and hscale != 'z':
         print 'Error in NICOLE.input. Input density must be either tau or z'
         sys.exit(1)
-    if opacities == 'natasha' or opacities == 'sopas' or opacities == 'shchukina': opacities == 'sopa'
-    if opacities == 'andres' or opacities == 'asensio': opacities == 'andres'
+    if opacities == 'natasha' or opacities == 'sopas' or opacities == 'shchukina': opacities = 'sopa'
+    if opacities == 'andres' or opacities == 'asensio': opacities = 'andres'
     if opacities != 'andres' and opacities != 'sopa' and opacities != 'wittmann':
         print 'Error in NICOLE.input. Unknown opacity package:',opacities
         sys.exit(1)
     if opacities == 'wittmann': opacities = '1'
     if opacities == 'andres': opacities = '2'
     if opacities == 'sopa': opacities = '3'
+    if eqstate != '0' and eqstate !='1' and eqstate != '2':
+        print 'Eq state must be between 0 and 2'
+        sys.exit(1)
     if eqstateH != '0' and eqstateH !='1' and eqstateH != '2':
         print 'Eq state, H must be between 0 and 2'
         sys.exit(1)
@@ -1095,7 +1099,7 @@ for icycle in range(int(ncycles)):
             '       ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ \n')
     f.write(hscale+'          ! hscale \n')
     f.write(opacities+'          ! opac \n')
-    f.write(eqstateH+'          ! Eq state, H \n')
+    f.write(eqstate+'  '+eqstateH+'          ! Eq state and Eq state, H \n')
     f.write(sethydro+'     '+setnH+'   '+restart+'   ! sethydro, setnH, restart \n')
     f.write(depcoef+'   ! depcoef \n')
     f.write(nlines+'   ! nlines \n')

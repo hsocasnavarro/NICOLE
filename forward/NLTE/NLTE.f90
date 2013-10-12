@@ -795,8 +795,8 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
      Do idepth=1, NLTE%NDEP
         n2P=BK*Atmo%Temp(idepth)
         XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, &
-             Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth), &
-             Atom%Alamb(itran), Scat(idepth))
+             Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, &
+             Atmo%nH2plus(idepth)*n2P, Atom%Alamb(itran), Scat(idepth))
         If (Cont_op_5000_2(idepth) .lt. 0) then
            Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth),&
                 Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, &

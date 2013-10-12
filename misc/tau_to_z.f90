@@ -81,7 +81,8 @@ Subroutine Tau_to_z(Params, Atmo)
        Atmo%nHminus(1), Atmo%nHplus(1), &
        Atmo%nH2(1), Atmo%nH2plus(1))
   Kappa(1)=Background_opacity(Atmo%Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1)*n2P, &
-       Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, Atmo%nH2plus(1), 5000., Scat)
+       Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, &
+       Atmo%nH2plus(1)*n2P, 5000., Scat)
   Kappa(1)=Kappa(1)/Atmo%Rho(1)
 
   Do ipoint=2, Params%n_points
@@ -93,7 +94,7 @@ Subroutine Tau_to_z(Params, Atmo)
           Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
      Kappa(ipoint)=Background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), &
           Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, &
-          Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint), 5000., Scat)
+          Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint)*n2P, 5000., Scat)
      Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
      Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
           dtau/2./1.e5* &

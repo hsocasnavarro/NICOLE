@@ -852,6 +852,7 @@ Real function syn_hsra(lambda, theta)
 !       nH, nHminus, nHplus, nH2, nH2plus)     
   Do idepth=1, npoints
      n2P=BK*Temp(idepth)
+     print *,'synhsra' ! debug
      Cont_op(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
           nHminus(idepth)*n2P, nHplus(idepth)*n2P, nH2(idepth)*n2P, 0., lambda, Scat)
      Cont_op_500(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
@@ -2119,7 +2120,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   metal=at_abund(26)-7.5
   Call compute_others_from_T_Pe_Pg(Params%n_points,Atmo%Temp, Atmo%el_p, Atmo%Gas_p,&
        Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
-  Call Reset_densities(Atmo, Saved)
+    Call Reset_densities(Atmo, Saved)
 !
   nformal(1:nformalsolutions)=0. ! Initialize the f. s. counter
   idata=1 ! Index for Syn_profile
@@ -2406,7 +2407,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               n2P=BK*Atmo%Temp(idepth)
               Cont_op(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
                    Atmo%Gas_p(idepth), Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
-                   Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth), &
+                   Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2p, &
                    Wave(iwave), Scat)
               If (Cont_op_5000_2(1) .lt. 0) &
                    Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), &

@@ -86,8 +86,6 @@ Subroutine Saha123(npoints,iel,T,Ne,n0overn,n1overn,n2overn)
            n2overn(ip)=n1overn(ip)*n2overn1(ip)
         End if
      End if
-     print *,'t,h=',t(60),n0overn(60),n1overn(60),n2overn(60)
-     pause
   End do
 
 End Subroutine Saha123

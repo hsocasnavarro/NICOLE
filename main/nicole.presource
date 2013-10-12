@@ -21,7 +21,7 @@ Program Nicole
   Use debug_module
   Use Profiling
   Use Background_opacity_module, Only: Opacity_package
-  Use Eq_state, Only: choice_others
+  Use Eq_state, Only: choice_others, choice_pe_pg
   Implicit None
   Type (Parameters) :: Params
   Type (Line_data), dimension (:), allocatable :: Line
@@ -168,7 +168,7 @@ Program Nicole
   Read (headerunit, *) KeepVars(1:8)
   Read (headerunit, '(A)') Input%hscale
   Read (headerunit, *) Opacity_package
-  Read (headerunit, *) choice_others
+  Read (headerunit, *) choice_pe_pg, choice_others
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
   Read (headerunit, *) Input%depcoef_mode
   Read (headerunit, *) Params%n_lines

@@ -353,7 +353,7 @@ contains
     else
        result = 0.d0
     endif
-    
+
     hminus_bf = result * Pe
     
   end function hminus_bf
@@ -584,7 +584,7 @@ contains
     real, Parameter :: Min_Lambda=2000., Max_Lambda=16000
 !    Integer :: flag
     Logical, Save :: FirstTime=.True.
-    Character (Len=256) :: String
+    Character (Len=512) :: String
     ! Convert default Real to kind=8	
 
 !    flag=0

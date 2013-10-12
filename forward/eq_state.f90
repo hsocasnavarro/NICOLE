@@ -23,11 +23,11 @@ Module Variables
   ! x0_sol(21) : the abundance of every species at the beggining of the iteration
   
   real(kind=8), SAVE :: equil(9,273)
-  integer :: choice_pe_pg=0 ! Choice for calculation of Pe and Pg
+  integer :: choice_pe_pg=1 ! Choice for calculation of Pe and Pg
                             ! 0=Use NICOLE approach
                             ! 1=Use simple ANNs
                             ! 2=Use Wittmann's
-  integer :: choice_others=0 ! Choice for calculation of H,H+,H-,H2,H2+
+  integer :: choice_others=1 ! Choice for calculation of H,H+,H-,H2,H2+
                              ! 0=Use ANN trained with Andres code (273 molec)
                              ! 1=Use Andres code (2 molec)
                              ! 2=Use Andres code (273 molec)
@@ -1896,41 +1896,52 @@ Contains
     real(kind=8) :: mole(273), minim_ioniz
     real(kind=8), dimension(22), save :: initial_values
     Real :: logPe, T, AtomicFraction, Ne, Ptot, NHtot, Met2, DU1, DU2, DU3
-    Real :: nHmolec, Ioniz, HLimit=0.90
+    Real :: nHmolec, Ioniz, HLimit, n2p
     Real, Dimension(n_grid) :: n0overn, n1overn, n2overn
     Real, Dimension(1) :: T1, Ne1
     integer :: i, ind, l, loop , minim, niters, iter, iel
     Logical, Save :: FirstTime=.True.
     Logical :: Warning=.False.
-    Real(Kind=8), Parameter :: Precision=1e-4
+    Real, Parameter :: Precision=1e-4
     Integer, Parameter :: Maxniters=100
     Character (Len=256) :: String
 
     Call Time_routine('compute_others_from_T_Pe_Pg',.True.)
     
     HLimit=1.-10**(At_abund(2)-At_abund(1))
-    If (LogPe .gt. 4) then
-       Debug_warningflags(flag_computeopac)=1
-       Call Debug_Log('Log10 (Pe) .gt. 4. Clipping it',2)
-       LogPe=4
-    End if
-    If (LogPe .lt. -3) then
-       Debug_warningflags(flag_computeopac)=1
-       Call Debug_Log('Log10 (Pe) .lt. -3. Clipping it',2)
-       LogPe=-3
-    End if
 
     If (choice_others .eq. 0) then ! Use ANN 
        Ne4(1:n_grid)=Pe4(1:n_grid)/BK/Temp4(1:n_grid)
        Call Saha123(n_grid, 1, Temp4, Ne4, n0overn, n1overn, n2overn)
+       Met2=At_abund(26)-7.5 ! Metalicity
+       If (Met2 .gt. .5) then
+          Debug_warningflags(flag_computeopac)=1
+          Call Debug_Log('Metalicity .gt. 0.5. Clipping it',2)
+          Met2=.5
+       End if
+       If (Met2 .lt. -1.5) then
+          Debug_warningflags(flag_computeopac)=1
+          Call Debug_Log('Metalicity .lt. -1.5. Clipping it',2)
+          Met2=-1.5
+       End if
        Do loop = 1, n_grid
+          LogPe=log10(Pe4(loop))
+          If (LogPe .gt. 4) then
+             Debug_warningflags(flag_computeopac)=1
+             Call Debug_Log('Log10 (Pe) .gt. 4. Clipping it',2)
+             LogPe=4
+          End if
+          If (LogPe .lt. -3) then
+             Debug_warningflags(flag_computeopac)=1
+             Call Debug_Log('Log10 (Pe) .lt. -3. Clipping it',2)
+             LogPe=-3
+          End if
           T=Temp4(loop)
           If (T .lt. 1500) then
              Debug_warningflags(flag_computeopac)=1
              Call Debug_Log('T .lt. 1500. Clipping it',2)
              T=1500
           End if
-          LogPe=Log10(Pe4(loop))
           PTot=Pg4(loop)-Pe4(loop)
           nHtot=PTot*Hlimit/BK/T
           AtomicFraction=-1
@@ -1949,17 +1960,6 @@ Contains
              End if
           End if
           If (AtomicFraction .lt. -0.10) then ! Need to use ANN
-             Met2=At_abund(26)-7.5 ! Metalicity
-             If (Met2 .gt. .5) then
-                Debug_warningflags(flag_computeopac)=1
-                Call Debug_Log('Metalicity .gt. 0.5. Clipping it',2)
-                Met2=.5
-             End if
-             If (Met2 .lt. -1.5) then
-                Debug_warningflags(flag_computeopac)=1
-                Call Debug_Log('Metalicity .lt. -1.5. Clipping it',2)
-                Met2=-1.5
-             End if
              inputs(1)=(T-xmean(1))/xnorm(1)
              inputs(2)=(LogPe-xmean(2))/xnorm(2)
              inputs(3)=(Met2-xmean(3))/xnorm(3)
@@ -1971,9 +1971,9 @@ Contains
              AtomicFraction=Max(AtomicFraction,0.)
              AtomicFraction=Min(AtomicFraction,HLimit)
           End if
-          nH4(loop)=nHTot*AtomicFraction*n0overn(1)
-          nHplus4(loop)=nHTot*AtomicFraction*n1overn(1)
-          nHminus4(loop)=nHTot*AtomicFraction*n2overn(1)
+          nH4(loop)=nHTot*AtomicFraction*n0overn(loop)
+          nHplus4(loop)=nHTot*AtomicFraction*n1overn(loop)
+          nHminus4(loop)=nHTot*AtomicFraction*n2overn(loop)
           ! Molecular Hydrogen
           nHmolec=nHTot*(1.-AtomicFraction)
           ! Set all molecular H to H2 (neglect H2+)
@@ -2108,11 +2108,7 @@ Contains
              PH2_out(loop) = 0.d0
              PH2plus_out(loop) = 0.d0
           endif
-          
-          if (int(Temp4(loop)) .eq. 4690 .or. int(Temp4(loop)) .eq. 5300) then
-             print *,'pg=',pg4(loop)-pe4(loop),' sum=',ph_out(loop)+phminus_out(loop)+phplus_out(loop)+2*ph2_out(loop)+2*ph2plus_out(loop)
-          endif
-       enddo
+                 enddo
        nH4=PH_out/BK/Temp4
        nHminus4=PHminus_out/BK/Temp4
        nHplus4=PHplus_out/BK/Temp4
@@ -2320,6 +2316,7 @@ Contains
              donornuclei=donornuclei+AtomicFraction*n1overn(1) ! P(Fe+)/(Pg-Pe)
              donornuclei=donornuclei+2.*AtomicFraction*n2overn(1) ! P(Fe++)/(Pg-Pe)
           End do ! Do in elements iel
+          donornuclei=max(donornuclei,1e-3)
           Pg4(loop)=(totalnuclei/donornuclei)*Pe4(loop)
           Pg4(loop)=Pg4(loop)+Pe4(loop) ! Add electron contribution to gas pressure
        End do ! Do in depth points loop
