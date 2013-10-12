@@ -14,17 +14,6 @@ Contains
 
     If (Opacity_Package .eq. 1) then ! Use Wittmann'
        Background_opacity=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
-       num=0.
-       den=0.
-       Do i=1,n_elements
-          num=num+10**(at_abund(i)-12.)*At_weight(i)
-          den=den+10**(at_abund(i)-12.)
-       End do
-       den=den+Pe4/Pg4
-       Rho=Pg4*(num/den)/6.023d23/BK/T4
-!       scat=scat/Rho
-!       Background_opacity=Background_opacity/Rho
-!       Return
     Else if (Opacity_Package .eq. 2) then ! Use Asensio's
        TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
        Background_opacity=Asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
@@ -37,11 +26,6 @@ Contains
        Scat=chi_e
 !       Return
     endif
-
-    if (int(T4) .eq. 4690 .or. int(T4) .eq. 5300) then
-       print *,opacity_package,lambda_in4,T4,background_opacity,scat
-    endif
-
   End Function Background_opacity
 
 End module background_opacity_module
