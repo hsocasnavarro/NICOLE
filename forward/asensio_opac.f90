@@ -1,4 +1,5 @@
 ! HSN: Modifications to Andres' routines
+! Background opacity and scattering coefficient in cm^2/cm^3
 !
 !  Include atomic_data module in general_routines_mod and in 
 !    background_opacity_module to supply Mg abundances consistent with
@@ -369,7 +370,7 @@ contains
     real(kind=8) :: thomson, Pel, PH
     real(kind=8) :: cte
     
-    cte = 8.d0*PI/3.d0 * (PE/PC)**4 / PME**2
+    cte = 8.d0*PI/3.d0 * (PE/PC)**4 / PME**2 ! cte=6.65243527767e987e-25
     thomson = cte * (Pel/PH)
 
   end function thomson

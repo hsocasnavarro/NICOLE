@@ -1947,16 +1947,16 @@ Contains
           AtomicFraction=-1
           ! First check if we're in trivial T-Pe zone where all H is atomic
           If (LogPe .gt. 1.5) then ! Pe too high
-             AtomicFraction=HLimit
+             AtomicFraction=1.
           Else If (T .gt. 5800) then ! T > 5800
-             AtomicFraction=HLimit
+             AtomicFraction=1.
           Else 
              If (T .gt. 3700) then ! 3700 < T < 5800
                 If (LogPe .gt. (T+3500.)/2000.*1.5-5.3 .or. &
-                     LogPe .lt. (T+3500.)/2000.*3.-12.3 ) AtomicFraction=HLimit
+                     LogPe .lt. (T+3500.)/2000.*3.-12.3 ) AtomicFraction=1.
              Else ! T < 3700
                 If (LogPe .gt. (T+3500.)/2000.*1.5-5.3 .or. &
-                     LogPe .lt. (T+3500.)/2000.*7.5-28.5 ) AtomicFraction=HLimit
+                     LogPe .lt. (T+3500.)/2000.*7.5-28.5 ) AtomicFraction=1.
              End if
           End if
           If (AtomicFraction .lt. -0.10) then ! Need to use ANN
@@ -1970,6 +1970,7 @@ Contains
              AtomicFraction=outputs(1)*ynorm(1)+ymean(1)
              AtomicFraction=Max(AtomicFraction,0.)
              AtomicFraction=Min(AtomicFraction,HLimit)
+             AtomicFraction=AtomicFraction/HLimit ! Renormalize to 0-1 range
           End if
           nH4(loop)=nHTot*AtomicFraction*n0overn(loop)
           nHplus4(loop)=nHTot*AtomicFraction*n1overn(loop)
@@ -2230,7 +2231,7 @@ Contains
     integer :: i, ind, l, loop, minim, iter, niters, iel
     Logical, Save :: FirstTime=.True.
     Real :: metalicity, HLimit, AtomicFraction, LogPe, Met2, T
-    Real :: totalnuclei, donornuclei, Ioniz, Ne
+    Real :: totalnuclei, donornuclei, Ioniz, Ne, scale
     Real, Dimension(1) :: n0overn, n1overn, n2overn, nminusovern, T1, Ne1
     Real(Kind=8) :: TotAbund
 !    Real(Kind=8), Parameter :: BK = 1.38066D-16, Precision=1e-4
@@ -2247,6 +2248,17 @@ Contains
     Debug_warningflags(flag_computepg)=0
 
     If (choice_pe_pg .eq. 0) then ! Use NICOLE approach (with ANNs and elements)
+       Met2=At_abund(26)-7.5 ! Metalicity
+       If (Met2 .gt. .5) then
+          Debug_warningflags(flag_computeopac)=1
+          Call Debug_Log('Metalicity .gt. 0.5. Clipping it',2)
+          Met2=.5
+       End if
+       If (Met2 .lt. -1.5) then
+          Debug_warningflags(flag_computeopac)=1
+          Call Debug_Log('Metalicity .lt. -1.5. Clipping it',2)
+          Met2=-1.5
+       End if
        Do loop=1, n_grid
           T=temp4(loop)
           totalnuclei=0.
@@ -2275,17 +2287,6 @@ Contains
              End if
           End if
           If (AtomicFraction .lt. -0.10) then ! Need to use ANN
-             Met2=At_abund(26)-7.5 ! Metalicity
-             If (Met2 .gt. .5) then
-                Debug_warningflags(flag_computeopac)=1
-                Call Debug_Log('Metalicity .gt. 0.5. Clipping it',2)
-                Met2=.5
-             End if
-             If (Met2 .lt. -1.5) then
-                Debug_warningflags(flag_computeopac)=1
-                Call Debug_Log('Metalicity .lt. -1.5. Clipping it',2)
-                Met2=-1.5
-             End if
              inputs(1)=(T-xmean(1))/xnorm(1)
              inputs(2)=(LogPe-xmean(2))/xnorm(2)
              inputs(3)=(Met2-xmean(3))/xnorm(3)
@@ -2303,20 +2304,20 @@ Contains
           Call Saha123(1, iel, T1(1), Ne1(1),n0overn(1),n1overn(1),n2overn(1))
           totalnuclei=totalnuclei+AtomicFraction*n0overn(1) ! P(H)/(Pg-Pe)
           totalnuclei=totalnuclei+AtomicFraction*n1overn(1) ! P(H+)/(Pg-Pe)
-          totalnuclei=totalnuclei+(1.-AtomicFraction) ! P(H2)
+          totalnuclei=totalnuclei+AtomicFraction*n2overn(1) ! P(H-)/(Pg-Pe)
+          totalnuclei=totalnuclei+(HLimit-AtomicFraction) ! P(H2, neglect H2+)
           donornuclei=donornuclei+AtomicFraction*n1overn(1) ! P(H+)/(Pg-Pe)
           donornuclei=donornuclei-AtomicFraction*n2overn(1) ! P(H-)/(Pg-Pe)
           Do iel=2, n_elements ! For other elements (neglect molecules)
-             AtomicFraction=1. ! Neglect molecules
-             AtomicFraction=AtomicFraction*10**(at_abund(iel)-12) ! Scale to H
+             scale=10**(at_abund(iel)-12) ! Scale to H
              Call Saha123(1, iel, T1(1), Ne1(1),n0overn(1),n1overn(1),n2overn(1))
-             totalnuclei=totalnuclei+AtomicFraction*n0overn(1) ! P(Fe)/(Pg-Pe)
-             totalnuclei=totalnuclei+AtomicFraction*n1overn(1) ! P(Fe+)/(Pg-Pe)
-             totalnuclei=totalnuclei+AtomicFraction*n2overn(1) ! P(Fe++)/(Pg-Pe)
-             donornuclei=donornuclei+AtomicFraction*n1overn(1) ! P(Fe+)/(Pg-Pe)
-             donornuclei=donornuclei+2.*AtomicFraction*n2overn(1) ! P(Fe++)/(Pg-Pe)
+             totalnuclei=totalnuclei+scale*n0overn(1) ! P(Fe)/(Pg-Pe)
+             totalnuclei=totalnuclei+scale*n1overn(1) ! P(Fe+)/(Pg-Pe)
+             totalnuclei=totalnuclei+scale*n2overn(1) ! P(Fe++)/(Pg-Pe)
+             donornuclei=donornuclei+scale*n1overn(1) ! P(Fe+)/(Pg-Pe)
+             donornuclei=donornuclei+2.*scale*n2overn(1) ! P(Fe++)/(Pg-Pe)
           End do ! Do in elements iel
-          donornuclei=max(donornuclei,1e-3)
+          donornuclei=max(donornuclei,1e-20*totalnuclei)
           Pg4(loop)=(totalnuclei/donornuclei)*Pe4(loop)
           Pg4(loop)=Pg4(loop)+Pe4(loop) ! Add electron contribution to gas pressure
        End do ! Do in depth points loop

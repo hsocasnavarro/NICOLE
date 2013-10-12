@@ -1,4 +1,6 @@
 Module Wittmann_opac_module
+! Background opacity and scattering coefficient in cm^2/cm^3
+
  Use Atomic_data
  Use LTE
 
@@ -34,6 +36,7 @@ Contains
       real :: mgatom,nair 
       real :: dfreq,lnfreq,dobtheta,dobdtheta,lambda 
       logical wrepet 
+      real, parameter :: bk= 1.3806503d-16
       dimension z3(12) 
       real, dimension(12) :: ghel, chihel, g
       real, dimension(27) :: tcatom, fcatom, fsodiu, fmatom
@@ -126,27 +129,28 @@ Contains
       tt=T4
       ppe=Pe4
 
-      pHtot=PH4+PHminus4+PHplus4+ 2*PH24 + 2*PH2plus4
-      p(9)=Pe4/(1.38054e-16*t)
-      p(1)=PH4
+      pHtot=PH4+PHminus4+PHplus4+PH24+PH2plus4
+      p(9)=Pe4/(1.38054e-16*tt)
+      p(1)=PH4/PHtot
       T1(1)=T4
       Ne1(1)=p(9)
+
 ! Neutral He
       iel=2
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
-      p(2)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
+      p(2)=(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Neutral C
       iel=6
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
-      p(3)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
+      p(3)=(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Neutral Na
       iel=11
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
-      p(4)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
+      p(4)=(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Neutral Mg
       iel=12
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
-      p(5)=PHtot*(10.**(At_abund(iel)-12.))*n0overn(1)
+      p(5)=(10.**(At_abund(iel)-12.))*n0overn(1)
 ! Others
       p(6)=PHPlus4/PHtot
       p(7)=PH24/PHtot
@@ -156,7 +160,7 @@ Contains
 
        t=tt 
        pe=ppe 
-                       !lo introduzco nuevo                             
+
        wavelt=0. 
       theta=5040./t 
        dtheta=-5040./(t*t) 
@@ -346,15 +350,17 @@ Contains
 !-----------------------------------------------------------------------
                 ! *** h2+ ***                                           
    20 h2plus=0. 
-                                                                        
+
       if(lambda.lt.3.8e-5.or.lambda.gt.3e-4) goto 70 
+
       h2plus=sngl(dexp(2.30258509d0*dobtheta*(7.342d-3-(-2.409d-15+(1.02&
-     &-30+(-4.23d-46+(1.224d-61-1.351d-77*dfreq)*dfreq)*dfreq)*dfreq)*df&
+     &d-30+(-4.23d-46+(1.224d-61-1.351d-77*dfreq)*dfreq)*dfreq)*dfreq)*df&
      &req)-3.0233d3+(3.7797d2+(-1.82496d1+(3.9207d-1-3.1672d-3*lnfreq)*l&
      &nfreq)*lnfreq)*lnfreq)*1.d16)*z1*(p(1)*pe)*(p(6)/p(8))/(1.380&
      &54*t)                                                             
              ! factor 1.d16 from boltzmann constant                     
-                                                                        
+               
+
             d1=sngl(2.30258509d0*dobdtheta*(7.342d-3-(-2.409d-15+(1.028d&
      &-30+(-4.23d-46+(1.224d-61-1.351d-77*dfreq)*dfreq)*dfreq)*dfreq)*df&
      &req))                                                             
@@ -407,8 +413,6 @@ Contains
                                            !correcto                    
 !-----------------------------------------------------------------------
         kac=hminus+helmin+hneutr+h2min+heneut+h2plus 
-             kat=dhminus+dhelmin+dhneutr+dh2min+dheneut+dh2plus 
-             kap=ddhminus+ddhelmin+ddhneutr+ddh2min+ddheneut+ddh2plus 
 !-----------------------------------------------------------------------
       scatt1=0. 
       scatt2=0. 
@@ -425,11 +429,15 @@ Contains
       scatt2=scat2*p(7) 
       scatt3=scat3*p(2) 
    35 escatt=6.653e-25*p(8) 
+
+!      if (int(t+.5) .eq. 4690) then
+!         print *,'pe,scat=',p(8),escatt
+!         read (*,*)
+!      endif
+
        kac=kac+escatt+scatt1+scatt2+scatt3 
        Scat=escatt+scatt1+scatt2+scatt3
 
-       kat=kat+descatt+dscatt1+dscatt2+dscatt3 
-       kap=kap+ddescatt+ddscatt1+ddscatt2+ddscatt3 
 !-----------------------------------------------------------------------
                 ! *** c ***                                             
       carbon=0. 
@@ -575,12 +583,12 @@ Contains
 !.......................................................................
                                                                         
    52        kac=kac+carbon+sodium+mgatom 
-       kat=kat+dcarbon+dsodium+dmgatom 
-       kap=kap+ddcarbon+ddsodium+ddmgatom 
                                     ! antes ponia wavelt=lambda         
 99999 wavelt=0. 
 
-       wittmann_opac=kac
+! Values above are divided by phtot. Multiply to convert to cm^2/g
+       wittmann_opac=kac*phtot/(bk*t)
+       scat=scat*phtot/(bk*t)
 
        return
 

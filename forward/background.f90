@@ -13,7 +13,6 @@ Contains
     Integer :: i
 
     If (Opacity_Package .eq. 1) then ! Use Wittmann'
-       
        Background_opacity=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
        num=0.
        den=0.
@@ -21,12 +20,10 @@ Contains
           num=num+10**(at_abund(i)-12.)*At_weight(i)
           den=den+10**(at_abund(i)-12.)
        End do
-       TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
-       den=den+Pe4/TotH
-       Rho=1.66e-24*TotH/T4/BK*num/den
-       scat=scat*6.023e23/num
-       Background_opacity=Background_opacity/Rho
-       background_opacity=1.e-13
+       den=den+Pe4/Pg4
+       Rho=Pg4*(num/den)/6.023d23/BK/T4
+!       scat=scat/Rho
+!       Background_opacity=Background_opacity/Rho
 !       Return
     Else if (Opacity_Package .eq. 2) then ! Use Asensio's
        TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
