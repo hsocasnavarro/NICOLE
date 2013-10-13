@@ -277,7 +277,7 @@ for icycle in range(int(ncycles)):
     opacities=opacities.lower()
     eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
     eqstate=get_value(config,'Eq state','0','NICOLE.input')
-    peconsistency=get_value(config,'Pe consistency','1e10','NICOLE.input')
+    peconsistency=get_value(config,'Pe consistency','1e-3','NICOLE.input')
     debug=get_value(config,'Debug mode','0','NICOLE.input')
     interp=get_value(config,'Optimize grid','-','NICOLE.input')
     outputpop=get_value(config,'Output populations','0','NICOLE.input')

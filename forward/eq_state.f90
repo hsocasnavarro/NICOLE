@@ -1991,6 +1991,7 @@ Contains
           nH24(loop)=nHmolec
           nH2plus4(loop)=0.
        End do
+       Call Time_routine('compute_others_from_T_Pe_Pg',.False.)
        Return
     End if ! End use ANN
     
@@ -2126,6 +2127,7 @@ Contains
        nH24=PH2_out/BK/Temp4
        nH2plus4=PH2plus_out/BK/Temp4
        ne4=Pe_in/BK/Temp4
+       Call Time_routine('compute_others_from_T_Pe_Pg',.False.)
        Return
     End if
 
@@ -2207,7 +2209,6 @@ Contains
                niters .lt. 10)
              Pgold=Pg4(loop)
              Peold=Pe4(loop)
-!             Pe4(loop)=Pe4(loop)+(Pe4(loop)-Peold)/(Pg4(loop)-Pgold)*(Pt_in(loop)-Pgold)
              Pe4(loop)=Pe4(loop)*Pt_in(loop)/Pg4(loop)
              Call Compute_Pg(1, T4(loop), Pe4(loop), nH4(loop), nHminus4(loop), &
                   nHplus4(loop), nH24(loop), nH2plus4(loop), Pg4(loop))
@@ -2218,9 +2219,9 @@ Contains
        End do
     End if
 
+    Call Time_routine('compute_pe',.False.)
     Return
     
-    Call Time_routine('compute_pe',.False.)
     
   End Subroutine Compute_Pe
   
@@ -2348,6 +2349,7 @@ Contains
           Pg4(loop)=(totalnuclei/donornuclei)*Pe4(loop)
           Pg4(loop)=Pg4(loop)+Pe4(loop) ! Add electron contribution to gas pressure
        End do ! Do in depth points loop
+       Call Time_routine('compute_pg',.False.)
        Return
     End if ! End use ANN
 
@@ -2358,6 +2360,7 @@ Contains
        Do loop = 1, n_grid
           Call ann_pgfrompe(T4(loop), P4(loop), metalicity, Pg4(loop))
        End do
+       Call Time_routine('compute_pg',.False.)
        Return
     End if
 
@@ -2365,8 +2368,6 @@ Contains
        Print *,'Error in eq_state.f90, compute_pe. Option not yet implemented'
        Stop
     End if
-
-    Call Time_routine('compute_pg',.False.)
     
   End Subroutine Compute_Pg
 
