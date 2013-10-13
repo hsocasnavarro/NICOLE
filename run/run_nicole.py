@@ -273,7 +273,7 @@ for icycle in range(int(ncycles)):
     hscale=get_value(config,'Height scale','t','NICOLE.input')
     hscale=hscale[0]
     hscale=hscale.lower()
-    opacities=get_value(config,'Opacity package','Wittmann','NICOLE.input')
+    opacities=get_value(config,'Opacity package','asensio','NICOLE.input')
     opacities=opacities.lower()
     eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
     eqstate=get_value(config,'Eq state','0','NICOLE.input')
