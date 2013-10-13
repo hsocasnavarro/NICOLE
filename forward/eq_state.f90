@@ -23,15 +23,17 @@ Module Variables
   ! x0_sol(21) : the abundance of every species at the beggining of the iteration
   
   real(kind=8), SAVE :: equil(9,273)
-  integer :: choice_pe_pg=1 ! Choice for calculation of Pe and Pg
+  integer :: choice_pe_pg=0 ! Choice for calculation of Pe and Pg
                             ! 0=Use NICOLE approach
                             ! 1=Use simple ANNs
                             ! 2=Use Wittmann's
-  integer :: choice_others=1 ! Choice for calculation of H,H+,H-,H2,H2+
-                             ! 0=Use ANN trained with Andres code (273 molec)
+  integer :: choice_others=0 ! Choice for calculation of H,H+,H-,H2,H2+
+                             ! 0=Use NICOLE approach, with
+                             !     ANN trained with Andres code (273 molec)
                              ! 1=Use Andres code (2 molec)
                              ! 2=Use Andres code (273 molec)
   integer, SAVE  :: print_abund
+  real :: pe_consistency
   character(len=16), SAVE  :: molec(273), nombre_mol(273)
   character(len=2), SAVE :: elements(21)
   real(kind=8), SAVE :: abund_atom(21), pot_ion(21), afinidad(21)
@@ -2165,8 +2167,7 @@ Contains
     real(kind=8), dimension(22), save :: initial_values
     integer :: i, ind, l, loop, minim, iter, niters
     logical, Save :: FirstTime=.True.
-!    Real(Kind=8), Parameter :: BK = 1.38066D-16
-    Real :: metalicity
+    Real :: metalicity, Pgold, Peold, Diff1, Diff2
     Real(Kind=8) :: TotAbund
     Real, Dimension(1) :: U12, U23, U1, U2, U3, DU1, DU2, DU3, Ne, P4
     Character (Len=256) :: String
@@ -2178,28 +2179,46 @@ Contains
     Debug_errorflags(flag_computepe)=0
     Debug_warningflags(flag_computepe)=0
 
-    If (choice_pe_pg .eq. 0) then ! Use ANNs only ! debug
+    If (choice_pe_pg .eq. 0 .or. choice_pe_pg .eq. 1) then ! Use ANNs only
        metalicity=At_abund(26)-7.5
        T4=temper_in
        Pg4=Pt_in
        Do loop = 1, n_grid
           Call ann_pefrompg(T4(loop), Pg4(loop), metalicity, Pe4(loop))
        End do
-       Return
     End if
 
-    If (choice_pe_pg .eq. 1) then ! Use ANNs only
-       metalicity=At_abund(26)-7.5
-       T4=temper_in
-       Pg4=Pt_in
+    If (choice_pe_pg .eq. 2) then ! Use ANNs only
+       Print *,'Error in eq_state.f90, compute_pe. Option not yet implemented'
+       Stop
+    End if
+
+    If (pe_consistency .lt. 10) then
+       ! Use Pe as initial guess and iterate
        Do loop = 1, n_grid
-          Call ann_pefrompg(T4(loop), Pg4(loop), metalicity, Pe4(loop))
+          Pgold=1e15
+          Peold=1e15
+          Call Compute_Pg(1, T4(loop), Pe4(loop), nH4(loop), nHminus4(loop), &
+               nHplus4(loop), nH24(loop), nH2plus4(loop), Pg4(loop))
+          niters=0
+          Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
+          Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
+          Do While ( Diff1  .gt. pe_consistency .and. Diff2 .gt. pe_consistency .and.  &
+               niters .lt. 10)
+             Pgold=Pg4(loop)
+             Peold=Pe4(loop)
+!             Pe4(loop)=Pe4(loop)+(Pe4(loop)-Peold)/(Pg4(loop)-Pgold)*(Pt_in(loop)-Pgold)
+             Pe4(loop)=Pe4(loop)*Pt_in(loop)/Pg4(loop)
+             Call Compute_Pg(1, T4(loop), Pe4(loop), nH4(loop), nHminus4(loop), &
+                  nHplus4(loop), nH24(loop), nH2plus4(loop), Pg4(loop))
+             niters=niters+1
+             Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
+             Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
+          End do
        End do
-       Return
     End if
 
-    print *,'Error in Eq_state.f90, compute_pe'
-    Stop
+    Return
     
     Call Time_routine('compute_pe',.False.)
     
@@ -2342,10 +2361,13 @@ Contains
        Return
     End if
 
+    If (choice_pe_pg .eq. 2) then ! Use ANNs only
+       Print *,'Error in eq_state.f90, compute_pe. Option not yet implemented'
+       Stop
+    End if
+
     Call Time_routine('compute_pg',.False.)
     
-    print *,'Error in Eq_state.f90, compute_pg'
-    Stop
   End Subroutine Compute_Pg
 
 
