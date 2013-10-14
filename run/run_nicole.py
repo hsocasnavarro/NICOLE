@@ -275,8 +275,33 @@ for icycle in range(int(ncycles)):
     hscale=hscale.lower()
     opacities=get_value(config,'Opacity package','asensio','NICOLE.input')
     opacities=opacities.lower()
-    eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
     eqstate=get_value(config,'Eq state','0','NICOLE.input')
+    eqstate.lower()
+    if (eqstate == '0' or eqstate == 'nicole'):
+        eqstate = '0'
+    elif (eqstate == '1' or eqstate == 'ann' or eqstate == 'simpleann'):
+        eqstate = '1'
+    elif (eqstate == '2' or eqstate == 'wittmann' or eqstate == 'wittman'):
+        eqstate = '2'
+    else:
+        print 'Unknown value for "Eq state"'
+        print 'Must be NICOLE, ANN or Wittmann'
+        sys.exit(1)
+    eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
+    eqstateH.lower()
+    if (eqstateH == '0' or eqstateH == 'nicole'):
+        eqstateH = '0'
+    elif (eqstateH == '1' or eqstateH == 'asensio' or eqstateH == 'andres' or 
+          eqstateH == 'asensio2' or eqstateH == 'andres2'):
+        eqstateH = '1'
+    elif (eqstateH == '2' or eqstateH == 'asensio273' or eqstateH == 'andres273'):
+        eqstateH = '2'
+    elif (eqstateH == '3' or eqstateH == 'wittmann' or eqstateH == 'wittman'):
+        eqstateH = '3'
+    else:
+        print 'Unknown value for "Eq state for H"'
+        print 'Must be NICOLE, Asensio, Asensio273 or Wittmann'
+        sys.exit(1)
     peconsistency=get_value(config,'Pe consistency','1e-3','NICOLE.input')
     debug=get_value(config,'Debug mode','0','NICOLE.input')
     interp=get_value(config,'Optimize grid','-','NICOLE.input')
@@ -329,12 +354,6 @@ for icycle in range(int(ncycles)):
     if opacities == 'wittmann': opacities = '1'
     if opacities == 'andres': opacities = '2'
     if opacities == 'sopa': opacities = '3'
-    if eqstate != '0' and eqstate !='1' and eqstate != '2':
-        print 'Eq state must be between 0 and 2'
-        sys.exit(1)
-    if eqstateH != '0' and eqstateH !='1' and eqstateH != '2':
-        print 'Eq state, H must be between 0 and 2'
-        sys.exit(1)
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':

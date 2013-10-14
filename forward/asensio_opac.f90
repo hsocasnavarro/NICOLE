@@ -225,6 +225,8 @@ module asensio_background_opacity_module
   use atomic_data
   use debug_module
   implicit none
+  Private
+  Public :: asensio_background_opacity
 contains
   
   !-----------------------------------------------------------------

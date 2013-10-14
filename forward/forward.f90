@@ -15,7 +15,7 @@ Module Forward_module
   Use Line_data_structure
   Use Bezier_math
   Use Bezier_solvers
-  Use Background_opacity_module, Only: Background_opacity
+  Use Background_opacity_module
   Use nr
   Use File_operations
   Use Profiling

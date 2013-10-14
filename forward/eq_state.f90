@@ -23,17 +23,18 @@ Module Variables
   ! x0_sol(21) : the abundance of every species at the beggining of the iteration
   
   real(kind=8), SAVE :: equil(9,273)
-  integer :: choice_pe_pg=0 ! Choice for calculation of Pe and Pg
+  integer :: eqstate_switch=0 ! Choice for calculation of Pe and Pg
                             ! 0=Use NICOLE approach
                             ! 1=Use simple ANNs
                             ! 2=Use Wittmann's
-  integer :: choice_others=0 ! Choice for calculation of H,H+,H-,H2,H2+
+  integer :: eqstate_switch_others=0 ! Choice for calculation of H,H+,H-,H2,H2+
                              ! 0=Use NICOLE approach, with
                              !     ANN trained with Andres code (273 molec)
                              ! 1=Use Andres code (2 molec)
                              ! 2=Use Andres code (273 molec)
+                             ! 3=Use Wittmann's
   integer, SAVE  :: print_abund
-  real :: pe_consistency
+  real :: eqstate_pe_consistency
   character(len=16), SAVE  :: molec(273), nombre_mol(273)
   character(len=2), SAVE :: elements(21)
   real(kind=8), SAVE :: abund_atom(21), pot_ion(21), afinidad(21)
@@ -599,8 +600,12 @@ Module Eq_state
   Use maths_chemical
   Use Param_structure
   Use Atomic_data
+  Use Wittmann_eqstate
   Use Profiling
   Implicit None
+  Private
+  Public :: Compute_Pe, Compute_Pg, Compute_others_from_T_Pe_Pg, &
+       eqstate_switch, eqstate_switch_others, eqstate_pe_consistency
   
 Contains
   
@@ -1731,16 +1736,14 @@ Contains
     character(len=16) :: name
     Character (len=16), Dimension(:), Allocatable :: names
     
-    print *,'choice=',choice_others
-    stop
-    if (choice_others .eq. 1) then
-       n_included=2
-       If (.not. Allocated(names)) Allocate(names(n_included))
-       names=(/'H 2/00','H 2/10'/)
-    Else if (choice_others .eq. 2) then 
+    If (eqstate_switch_others .eq. 2) then 
        n_included=273
        If (.not. Allocated(names)) Allocate(names(n_included))
        names=molec
+    Else
+       n_included=2
+       If (.not. Allocated(names)) Allocate(names(n_included))
+       names=(/'H 2/00','H 2/10'/)
     End if
 
     includ = 0
@@ -1918,9 +1921,15 @@ Contains
 
     Call Time_routine('compute_others_from_T_Pe_Pg',.True.)
     
-    HLimit=1.-10**(At_abund(2)-At_abund(1))
+    If (eqstate_switch_others .eq. 3) then ! Use Wittmann's
+       Call Wittmann_compute_others_from_T_pe_pg(n_grid, temp4, Pe4, Pg4,&
+       nH4, nHminus4, nHplus4, nH24, nH2plus4)
+       Call Time_routine('compute_others_from_T_Pe_Pg',.False.)
+       Return
+    Endif
 
-    If (choice_others .eq. 0) then ! Use ANN 
+    HLimit=1.-10**(At_abund(2)-At_abund(1))
+    If (eqstate_switch_others .eq. 0) then ! Use ANN 
        Ne4(1:n_grid)=Pe4(1:n_grid)/BK/Temp4(1:n_grid)
        Call Saha123(n_grid, 1, Temp4, Ne4, n0overn, n1overn, n2overn)
        Met2=At_abund(26)-7.5 ! Metalicity
@@ -1995,7 +2004,7 @@ Contains
        Return
     End if ! End use ANN
     
-    If (choice_others .eq. 1 .or. choice_others .eq. 2) then ! Use Andres
+    If (eqstate_switch_others .eq. 1 .or. eqstate_switch_others .eq. 2) then ! Use Andres
 ! Do the actual calculation
        temper_in=temp4
        Pe_in=Pe4
@@ -2176,12 +2185,17 @@ Contains
     
     Call Time_routine('compute_pe',.True.)
 
+    if (eqstate_switch .lt. 0 .or. eqstate_switch .gt. 2) then
+       print *,'Unknown value for Eq state in compute_pe, eq_state.f90'
+       stop
+    end if
+
     temper_in=temp4
     PT_in=PT4
     Debug_errorflags(flag_computepe)=0
     Debug_warningflags(flag_computepe)=0
 
-    If (choice_pe_pg .eq. 0 .or. choice_pe_pg .eq. 1) then ! Use ANNs only
+    If (eqstate_switch .eq. 0 .or. eqstate_switch .eq. 1) then ! Use ANNs only
        metalicity=At_abund(26)-7.5
        T4=temper_in
        Pg4=Pt_in
@@ -2190,12 +2204,11 @@ Contains
        End do
     End if
 
-    If (choice_pe_pg .eq. 2) then ! Use ANNs only
-       Print *,'Error in eq_state.f90, compute_pe. Option not yet implemented'
-       Stop
+    If (eqstate_switch .eq. 2) then ! Use Wittmann's EoS
+       Call wittmann_compute_pe(n_grid, temp4, PT4, Pe4)
     End if
 
-    If (pe_consistency .lt. 10) then
+    If (eqstate_pe_consistency .lt. 10) then
        ! Use Pe as initial guess and iterate
        Do loop = 1, n_grid
           Pgold=1e15
@@ -2205,7 +2218,7 @@ Contains
           niters=0
           Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
           Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
-          Do While ( Diff1  .gt. pe_consistency .and. Diff2 .gt. pe_consistency .and.  &
+          Do While ( Diff1  .gt. eqstate_pe_consistency .and. Diff2 .gt. eqstate_pe_consistency .and.  &
                niters .lt. 10)
              Pgold=Pg4(loop)
              Peold=Pe4(loop)
@@ -2275,7 +2288,7 @@ Contains
     Debug_errorflags(flag_computepg)=0
     Debug_warningflags(flag_computepg)=0
 
-    If (choice_pe_pg .eq. 0) then ! Use NICOLE approach (with ANNs and elements)
+    If (eqstate_switch .eq. 0) then ! Use NICOLE approach (with ANNs and elements)
        Met2=At_abund(26)-7.5 ! Metalicity
        If (Met2 .gt. .5) then
           Debug_warningflags(flag_computeopac)=1
@@ -2353,7 +2366,7 @@ Contains
        Return
     End if ! End use ANN
 
-    If (choice_pe_pg .eq. 1) then ! Use ANNs only
+    If (eqstate_switch .eq. 1) then ! Use ANNs only
        metalicity=At_abund(26)-7.5
        T4=temper_in
        P4=Pe_in
@@ -2364,10 +2377,14 @@ Contains
        Return
     End if
 
-    If (choice_pe_pg .eq. 2) then ! Use ANNs only
-       Print *,'Error in eq_state.f90, compute_pe. Option not yet implemented'
-       Stop
+    If (eqstate_switch .eq. 2) then ! Use Wittmann's
+       Call wittmann_compute_pg(n_grid, temp4, Pe4, Pg4)
+       Call Time_routine('compute_pg',.False.)
+       Return
     End if
+
+    print *,'Unknown value for Eq state in compute_pe, eq_state.f90'
+    stop
     
   End Subroutine Compute_Pg
 
