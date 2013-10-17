@@ -784,16 +784,16 @@ mpirun -n 8 ./nicole
 \item Eq of state for H (Optional, default=nicole): For the
   calculation of background opacities and some other quantities such
   as collisional rates, the code needs the relative distribution of
-  some H states both in atomic and molecular form (the H
-  ions H, H$^+$ and H$^-$ and the molecules H$_2$ and H$_2^+$). There
-  are several options for this switch: a)NICOLE to use the native
-  method described in Socas-Navarro et al (2014). This is the default
-  option and is probably the best compromise between speed, accuracy
-  and stability; b)ASENSIO2 to use the chemical equilibrium method
-  of Asensio Ramos (Ref???) but restricted to only two molecules in the
+  some H states both in atomic and molecular form (the H ions H, H$^+$
+  and H$^-$ and the molecules H$_2$ and H$_2^+$). There are several
+  options for this switch: a)NICOLE to use the native method described
+  in Socas-Navarro et al (2014). This is the default option and is
+  probably the best compromise between speed, accuracy and stability;
+  b)ASENSIO2 to use the chemical equilibrium method of Asensio Ramos
+  (Asensio Ramos 2003) but restricted to only two molecules in the
   chemical equilibrium; c)ASENSIO273 to use the same method with the
-  full list of 273 possible molecules; d)WITTMANN to solve for the
-  H populations as in Wittmann (1974), which in turn is an improvement
+  full list of 273 possible molecules; d)WITTMANN to solve for the H
+  populations as in Wittmann (1974), which in turn is an improvement
   over the procedure described by Mihalas (1967).
 \item Pe consistency (Optional, default=1e-3): Depending on how the
   equation of state is solved, it could be that the Pe, Pg values are
@@ -805,6 +805,14 @@ mpirun -n 8 ./nicole
   consistent within that tolerance. In principle this could slow down
   the procedure but in practice the difference in computing time
   should be negligible in almost all situations.
+\item Opacity Package (Optional, default=Asensio): Package to use for
+  the computation of background continuum opacities. Possible values:
+  a)ASENSIO, b)WITTMANN, c)SOPA . This last option is hidden 
+  in the normal distribution because we haven't been able to adapt the
+  original routines to conform with the standards. As such, it might
+  cause problems with compilation and other issues. If there is any
+  powerful reason why you feel that you'd need to use this package,
+  please contact the authors for a SOPA-enabled version.
 %\item Compute Hydrogen populations: (Optional, default=Yes). Some of
 %  the underlying calculations depend (typically very weakly) on some
 %  Hydrogen level populations. Normally, NICOLE will compute these
@@ -3045,6 +3053,8 @@ for version control
 \chapter{Bibliography}
 
 \begin{itemize}
+\item Asensio Ramos, A., Trujillo Bueno, J., Carlsson, M., Cernicharo,
+  J. ApJ 2003, 588, L61
 \item Bellot Rubio, L.R., Ruiz Cabo, B., and Collados Vera, M. A\&A 1998, 
       506, 805.
 \item Barkelm, P. S., Piskunov, N., and O'Mara, B. J. A\/AS 2000, 142, 467.
