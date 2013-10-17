@@ -290,9 +290,7 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
   If (Input_dens .eq. 'nel' .or. Input_dens .eq. 'pel') then
 !     el_p has already been computed by the Python script run_nicole.py
      Atmo%ne=Atmo%el_p/bk/Atmo%temp
-     Call Compute_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, &
-          Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus, &
-          Atmo%Gas_p)
+     Call Compute_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p)
      Do idepth=1, Params%n_points
         Avmolweight=Wsum/(Asum+ &
              Atmo%El_p(idepth)/Atmo%Gas_p(idepth))
@@ -301,9 +299,7 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
         Atmo%Rho(idepth)=Atmo%Gas_p(idepth)*Avmolweight/Avog/bk/Atmo%Temp(idepth)
      End do
   Else if (Input_dens .eq. 'pgas') then
-     Call Compute_Pe(Params%n_points, Atmo%Temp, Atmo%Gas_p, &
-          Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus, &
-          Atmo%El_p)
+     Call Compute_Pe(Params%n_points, Atmo%Temp, Atmo%Gas_p, Atmo%El_p)
      Atmo%ne=Atmo%el_p/bk/Atmo%temp
      Do idepth=1, Params%n_points
         Avmolweight=Wsum/(Asum+ &
@@ -317,11 +313,7 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
         Avmolweight=Wsum/Asum ! Average molecular weight.
         Atmo%Gas_p(idepth)=Atmo%Rho(idepth)/Avmolweight*Avog*bk*Atmo%Temp(idepth)
      End do
-     Do idepth=1, Params%n_points 
-        Call Compute_Pe(1, Atmo%Temp(idepth), Atmo%Gas_p(idepth), &
-             Atmo%nH(idepth), Atmo%nHminus(idepth), Atmo%nHplus(idepth), &
-             Atmo%nH2(idepth), Atmo%nH2plus(idepth), Atmo%El_p(idepth))
-     End do
+     Call Compute_Pe(Params%n_points, Atmo%Temp, Atmo%Gas_p, Atmo%El_p)
      Atmo%ne=Atmo%el_p/bk/Atmo%temp
      Do idepth=1, Params%n_points
         Avmolweight=Wsum/(Asum+ &

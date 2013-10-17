@@ -683,14 +683,14 @@ mpirun -n 8 ./nicole
   inversions will be tried to reach the acceptable $\chi^2$ before
   giving up and picking the best result of the multiple inversion
   attempts.
-\item Speed optimization: (Optional, default=1). Controls the behavior
-  of some approximations implemented to speed up the calculation. If 1
-  or more, use a newer vector routine for the calculation of Voigt
-  functions (recommended). If 2 or more, the code will use
-  neural networks for the conversion between gas and electron
-  pressure. This only works if the abundances employed are those of
-  Grevesse and Sauval (1998). IMPORTANT NOTE: This functionality is
-  currently broken but will be fixed in future versions.
+%\item Speed optimization: (Optional, default=1). Controls the behavior
+%  of some approximations implemented to speed up the calculation. If 1
+%  or more, use a newer vector routine for the calculation of Voigt
+%  functions (recommended). If 2 or more, the code will use
+%  neural networks for the conversion between gas and electron
+%  pressure. This only works if the abundances employed are those of
+%  Grevesse and Sauval (1998). IMPORTANT NOTE: This functionality is
+%  currently broken but will be fixed in future versions.
 \item Always compute derivatives: (Optional, default=Yes). If set to
   No, then the derivatives for the response functions are not
   recomputed after successful iteration steps. Only when an inversion
@@ -770,17 +770,52 @@ mpirun -n 8 ./nicole
   line can appear multiple times with different parameters). Possible
   accepted values for parameter are: Gas\_p, Rho, nH, nHminus, nHplus,
   nH2, nH2plus.
-\item Compute Hydrogen populations: (Optional, default=Yes). Some of
-  the underlying calculations depend (typically very weakly) on some
-  Hydrogen level populations. Normally, NICOLE will compute these
-  automatically assuming Saha-Boltzmann statistics but in some cases
-  the user might want to supply them directly. If this parameter is
-  set to No, the values in the input model will be preserved (unless
-  they are all zero, in which case the value of this flag will be
-  ignored). This flag is ignored whenever the hydrostatic equilibrium is 
-  recalculated. {\bf Note: This feature has been temporarily disabled
-  as of version 2.4, so effectively this parameter is set to yes always. 
-  The option to turn it off will be reinstated in the future.}
+\item Eq of state (Optional, default=nicole): This is a switch to
+  specify how to compute the electron pressure Pe from T and Pg, and
+  conversely the gas pressure Pg from T and Pe. NICOLE has three
+  different methods implemented (see Socas-Navarro et al
+  2014). Possible values are: a)NICOLE to use our own method described
+  in the paper above. This is probably the best compromise between
+  speed, accuracy and stability; b)ANN to use artificial neural
+  networks trained with precomputed values of (T,Pg,Pe). This is the
+  fastest method but not as accurate as the others. c)WITTMANN to use
+  the method described in Wittmann (1974), which in turn is an
+  improvement over the procedure described by Mihalas (1967).
+\item Eq of state for H (Optional, default=nicole): For the
+  calculation of background opacities and some other quantities such
+  as collisional rates, the code needs the relative distribution of
+  some H states both in atomic and molecular form (the H
+  ions H, H$^+$ and H$^-$ and the molecules H$_2$ and H$_2^+$). There
+  are several options for this switch: a)NICOLE to use the native
+  method described in Socas-Navarro et al (2014). This is the default
+  option and is probably the best compromise between speed, accuracy
+  and stability; b)ASENSIO2 to use the chemical equilibrium method
+  of Asensio Ramos (Ref???) but restricted to only two molecules in the
+  chemical equilibrium; c)ASENSIO273 to use the same method with the
+  full list of 273 possible molecules; d)WITTMANN to solve for the
+  H populations as in Wittmann (1974), which in turn is an improvement
+  over the procedure described by Mihalas (1967).
+\item Pe consistency (Optional, default=1e-3): Depending on how the
+  equation of state is solved, it could be that the Pe, Pg values are
+  not consistent due to the approximations employed. This means that
+  if we take a pair (T,Pe) to compute Pg and later recompute Pe from
+  this (T,Pg), the new Pg obtained will in general differ from the
+  original one. If {\em Pe consistency} is set to a value lower than
+  10, the Pe value obtained will be iterated until Pe and Pg are
+  consistent within that tolerance. In principle this could slow down
+  the procedure but in practice the difference in computing time
+  should be negligible in almost all situations.
+%\item Compute Hydrogen populations: (Optional, default=Yes). Some of
+%  the underlying calculations depend (typically very weakly) on some
+%  Hydrogen level populations. Normally, NICOLE will compute these
+%  automatically assuming Saha-Boltzmann statistics but in some cases
+%  the user might want to supply them directly. If this parameter is
+%  set to No, the values in the input model will be preserved (unless
+%  they are all zero, in which case the value of this flag will be
+%  ignored). This flag is ignored whenever the hydrostatic equilibrium is 
+%  recalculated. {\bf Note: This feature has been temporarily disabled
+%  as of version 2.4, so effectively this parameter is set to yes always. 
+%  The option to turn it off will be reinstated in the future.}
 \item Start X position: (Optional, default=1). The model atmosphere and
   the observed profile files may contain many models or profiles. This
   parameter specifies at which position to start the calculation. It
@@ -3003,7 +3038,8 @@ Be sure that the --mpi flag is NOT specified in this case.
   synthesis mode
 \end{itemize}
 
-... and at that point I stopped keeping track
+... and at that point I stopped keeping track. Using GIT since v2.70
+for version control
 
 
 \chapter{Bibliography}
@@ -3014,6 +3050,8 @@ Be sure that the --mpi flag is NOT specified in this case.
 \item Barkelm, P. S., Piskunov, N., and O'Mara, B. J. A\/AS 2000, 142, 467.
 \item Kostik, R. I., Shchukina, N. G., and Rutten, R. J. 1996, 
       A\&A, 305, 325.
+\item Mihalas, D. in Methods in Computational Physics, Vol. 7, Alder,
+  B. (ed.), New York; London; Academic Press 1967
 \item Press, W. H., Flannery, B. P., Teukolsky, S. A., and Vetterling, 
       W. T. 1986, Numerical Recipes (Cambridge: Cambridge U niv. Press)
 \item Ruiz Cabo, B., and del Taro Iniesta, J. C. 1992, ApJ, 398, 375.
@@ -3022,6 +3060,7 @@ Be sure that the --mpi flag is NOT specified in this case.
   1013.
 \item Scharmer, G. B., and Carlsson, M. 1985, J. Comput. Phys., 50,
   56.
+\item Socas-Navarro, H., de la Cruz Rodr\'\i guez, J., Asensio Ramos, A., Trujillo Bueno, J. and Ruiz Cobo, B. 2014, A\&A, {\em in preparation}.
 \item Socas-Navarro, H. and Trujillo Bueno, J. 1998, ApJ, 490, 383.
 \item Unsold 1955, Physik der Sternatmospharen, 2nd ed
 \end{itemize}

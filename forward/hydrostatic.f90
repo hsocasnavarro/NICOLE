@@ -83,8 +83,7 @@ Subroutine Hydrostatic(Params, Atmo)
      temp(1)=Min_temp
   End if
 
-  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%nH(1), Atmo%nHminus(1), &
-       Atmo%nHplus(1), Atmo%nH2(1), Atmo%nH2plus(1), Atmo%Gas_p(1))
+  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
   n2P=BK*temp(1)
   Call Compute_others_from_T_Pe_Pg(1,Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
        Atmo%nHminus(1), Atmo%nHplus(1), Atmo%nH2(1), Atmo%nH2plus(1))
@@ -114,9 +113,7 @@ Subroutine Hydrostatic(Params, Atmo)
              Gravity*dtau/(.5*(Kappa(ipoint-1)+Kappa(ipoint))) ! + & 
 !            (Atmo%B_str(ipoint-1)**2  - &
 !             Atmo%B_str(ipoint)**2) /8./Pi ! Magnetic pressure term
-        Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), &
-             Atmo%nH(ipoint), Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), &
-             Atmo%nH2(ipoint), Atmo%nH2plus(ipoint), Atmo%El_p(ipoint))
+        Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
         OldKappa=Kappa(ipoint)
         Call Compute_others_from_T_Pe_Pg(1,Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
              Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
@@ -133,9 +130,7 @@ Subroutine Hydrostatic(Params, Atmo)
         dif=Abs(OldKappa-Kappa(ipoint))/(OldKappa+Kappa(ipoint))
         iters=iters+1
      End do
-     Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), &
-          Atmo%nH(ipoint), Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), &
-          Atmo%nH2(ipoint), Atmo%nH2plus(ipoint), Atmo%El_p(ipoint))
+     Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
   End Do ! ipoint
   If (dif .gt. Precision) Warning2=.TRUE.
   If (Warning1 .or. Warning2) then 

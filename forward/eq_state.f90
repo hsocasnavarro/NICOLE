@@ -2159,8 +2159,7 @@ Contains
   !  PH2_out : partial pressure of H2 molecules (dyn/cm^2)
   !  PH2plus_out : partial pressure of H2+ molecules (dyn/cm^2)
   !-----------------------------------------------------------------
-  Subroutine Compute_Pe(n_grid, temp4, PT4, &
-       nH4, nHminus4,nHplus4, nH24, nH2plus4, Pe4)
+  Subroutine Compute_Pe(n_grid, temp4, PT4, Pe4)
     Use Debug_module
     Use Variables
     Use Atomic_data
@@ -2169,8 +2168,6 @@ Contains
     integer :: n_grid, mol_code
     real , dimension(n_grid) :: temp4, PT4, PH4, PHminus4,PHplus4, PH24, &
          PH2plus4, Pe4, T4, Pg4
-    real , dimension(n_grid) :: nH4, nHminus4,nHplus4, nH24, &
-         nH2plus4, ne4
     real(kind=8) :: temper_in(n_grid), PT_in(n_grid), n_e_in(n_grid)
     real(kind=8) :: calculate_abundance(n_grid), abun_out(n_grid)
     real(kind=8), dimension(n_grid) :: PH_out, PHminus_out, PHplus_out, PH2_out, PH2plus_out, P_elec_arr
@@ -2213,8 +2210,7 @@ Contains
        Do loop = 1, n_grid
           Pgold=1e15
           Peold=1e15
-          Call Compute_Pg(1, T4(loop), Pe4(loop), nH4(loop), nHminus4(loop), &
-               nHplus4(loop), nH24(loop), nH2plus4(loop), Pg4(loop))
+          Call Compute_Pg(1, T4(loop), Pe4(loop), Pg4(loop))
           niters=0
           Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
           Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
@@ -2223,8 +2219,7 @@ Contains
              Pgold=Pg4(loop)
              Peold=Pe4(loop)
              Pe4(loop)=Pe4(loop)*Pt_in(loop)/Pg4(loop)
-             Call Compute_Pg(1, T4(loop), Pe4(loop), nH4(loop), nHminus4(loop), &
-                  nHplus4(loop), nH24(loop), nH2plus4(loop), Pg4(loop))
+             Call Compute_Pg(1, T4(loop), Pe4(loop), Pg4(loop))
              niters=niters+1
              Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
              Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
@@ -2251,8 +2246,7 @@ Contains
   !  PH2_out : partial pressure of H2 molecules (dyn/cm^2)
   !  PH2plus_out : partial pressure of H2+ molecules (dyn/cm^2)
   !-----------------------------------------------------------------
-  Subroutine Compute_Pg(n_grid, temp4, Pe4, &
-       nH4, nHminus4,nHplus4, nH24, nH2plus4, Pg4)
+  Subroutine Compute_Pg(n_grid, temp4, Pe4, Pg4)
     Use Debug_module
     Use Variables
     Use Atomic_data
@@ -2262,8 +2256,6 @@ Contains
     integer :: n_grid, mol_code
     real , dimension(n_grid) :: temp4, Pg4, PH4, PHminus4,PHplus4, PH24, &
          PH2plus4, Pe4, try_Pe4, T4, P4
-    real , dimension(n_grid) :: nH4, nHminus4,nHplus4, nH24, &
-         nH2plus4, ne4
     real(kind=8) :: temper_in(n_grid), Pg(n_grid), Pe_in(n_grid)
     real(kind=8) :: calculate_abundance(n_grid), abun_out(n_grid)
     real(kind=8), dimension(n_grid) :: PH_out, PHminus_out, PHplus_out, PH2_out, PH2plus_out

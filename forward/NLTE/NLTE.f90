@@ -484,9 +484,10 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
        !       nH2 columns of the model
      NLTE%Atmo%ne=NLTE%Atmo%el_p/BK/NLTE%Atmo%Temp
      Allocate(tmp1(NLTE%NDEP))
-     Call Compute_Pg(NLTE%NDEP, NLTE%Atmo%Temp, NLTE%Atmo%El_p, &
+     Call Compute_others_from_T_Pe_Pg(NLTE%NDEP, NLTE%Atmo%Temp, &
+          NLTE%Atmo%El_p, NLTE%Atmo%Gas_p, &
           NLTE%Atmo%nH, NLTE%Atmo%nHminus, NLTE%Atmo%nHplus, NLTE%Atmo%nH2, &
-          NLTE%Atmo%nH2plus, tmp1)
+          NLTE%Atmo%nH2plus)
 
      Deallocate(tmp1)
   End if
@@ -1012,9 +1013,6 @@ Subroutine GenCol(Atom, NLTE)
  NE(:)=NLTE%Atmo%El_p(:)/bk/Temp(:)
  NH(:,:)=0. 
 
-! Call Compute_others_from_T_Pe_Pg(NLTE%NDEP,NLTE%Atmo%Temp, NLTE%Atmo%El_p,&
-!      NLTE%Atmo%Gas_p, NLTE%Atmo%nH, NLTE%Atmo%nHminus, NLTE%Atmo%nHplus, &
-!      NLTE%Atmo%nH2, NLTE%Atmo%nH2plus)     
  NH(1,:)=NLTE%Atmo%nH(:) ! Neutral H
  NH(6,:)=NLTE%Atmo%nHplus(:) ! Ionized H
 
