@@ -276,7 +276,7 @@ for icycle in range(int(ncycles)):
     opacities=get_value(config,'Opacity package','wittmann','NICOLE.input')
     opacities=opacities.lower()
     eqstate=get_value(config,'Eq state','0','NICOLE.input')
-    eqstate.lower()
+    eqstate=eqstate.lower()
     if (eqstate == '0' or eqstate == 'nicole'):
         eqstate = '0'
     elif (eqstate == '1' or eqstate == 'ann' or eqstate == 'simpleann'):
@@ -288,7 +288,7 @@ for icycle in range(int(ncycles)):
         print 'Must be NICOLE, ANN or Wittmann'
         sys.exit(1)
     eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
-    eqstateH.lower()
+    eqstateH=eqstateH.lower()
     if (eqstateH == '0' or eqstateH == 'nicole'):
         eqstateH = '0'
     elif (eqstateH == '1' or eqstateH == 'asensio' or eqstateH == 'andres' or 

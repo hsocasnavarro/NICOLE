@@ -1,10 +1,11 @@
- Code execution started on: 2013/09/30 at 10:37:45.274
-   Code execution ended on: 2013/09/30 at 10:37:45.291
+ Code execution started on: 2013/10/18 at 12:57:50.232
+   Code execution ended on: 2013/10/18 at 12:57:50.256
  Total execution time (s):           0
- Total execution time (hours):  4.722222222222222E-006
+ Total execution time (hours):  6.750000000000000E-006
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1  1.700000000000000E-002   100.000000000000     
-    ann_background_opacity          95  1.200000000000000E-003
-   7.05882352941176     
-    Fill densities           1  5.000000000000000E-004   2.94117647058824     
-    compute_pg           1  3.000000000000000E-004   1.76470588235294     
+    main           1  2.430000000000000E-002   100.000000000000     
+    Fill densities           1  7.500000000000000E-003   30.8641975308642     
+    compute_pg           1  7.300000000000000E-003   30.0411522633745     
+    background_opac          95  1.100000000000000E-003   4.52674897119342     
+    compute_others_from_T_Pe_Pg          95  5.000000000000000E-004
+   2.05761316872428     
