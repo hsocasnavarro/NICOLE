@@ -28,11 +28,6 @@ Contains
        Scat=chi_e
     endif
 
-    if (int(T4+.5) .eq. 4690 .or. int(T4+.5) .eq. 5300) then ! debug
-       print *,opacity_package,T4,lambda_in4
-       print *,background_opacity,scat
-    endif
-
     Call Time_routine('background_opac',.False.)
     Return
   End Function Background_opacity
