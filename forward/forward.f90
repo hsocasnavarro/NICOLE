@@ -844,7 +844,6 @@ Real function syn_hsra(lambda, theta)
 !       nH, nHminus, nHplus, nH2, nH2plus)     
   Do idepth=1, npoints
      n2P=BK*Temp(idepth)
-     print *,'synhsra' ! debug
      Cont_op(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
           nHminus(idepth)*n2P, nHplus(idepth)*n2P, nH2(idepth)*n2P, 0., lambda, Scat)
      Cont_op_500(idepth)=Background_opacity(Temp(idepth), El_p(idepth), Gas_p(idepth), nH(idepth)*n2P, &
@@ -2407,6 +2406,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                    Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, 5000., Scat)
            End do
            Cont_op=Cont_op/Cont_op_5000_2
+           Last_update=Wave(iwave)
         End if
  ! Add continuum opacity and emission at this wlength
         Do i=1, 4
