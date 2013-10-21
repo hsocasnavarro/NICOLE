@@ -1,16 +1,16 @@
- Code execution started on: 2013/10/18 at 16:45:29.529
-   Code execution ended on: 2013/10/18 at 16:45:31.756
- Total execution time (s):           2
- Total execution time (hours):  6.186666666666667E-004
+ Code execution started on: 2013/10/18 at 16:53:46.350
+   Code execution ended on: 2013/10/18 at 16:53:47.410
+ Total execution time (s):           1
+ Total execution time (hours):  2.946388888888889E-004
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   2.22720000000000        100.000000000000     
-    forward          10  0.895700000000000        40.2164152298851     
-    Fill densities          10  0.786000000000000        35.2909482758621     
-    compute_pg          12  0.786000000000000        35.2909482758621     
-    formalsolution        2000  0.300300000000000        13.4832974137931     
-    profiles          10  0.265300000000000        11.9118175287356     
-    hydrostatic          10  3.700000000000000E-002   1.66127873563218     
-    background_opac        3346  3.200000000000000E-002   1.43678160919540     
-    compute_others_from_T_Pe_Pg        1456  2.260000000000000E-002
-   1.01472701149425     
-    compute_pe         672  5.100000000000000E-003  0.228987068965517     
+    main           1   1.06070000000000        100.000000000000     
+    forward          10  0.685300000000000        64.6082775525596     
+    formalsolution        2000  0.225100000000000        21.2218346375035     
+    profiles          10  0.192600000000000        18.1578203073442     
+    hydrostatic          10  3.580000000000000E-002   3.37512963137551     
+    compute_pe         333  2.480000000000000E-002   2.33807862732158     
+    background_opac        3100  2.390000000000000E-002   2.25322899971717     
+    compute_pg        1278  1.280000000000000E-002   1.20675025926275     
+    compute_others_from_T_Pe_Pg        1210  1.170000000000000E-002
+   1.10304515885736     
+    Fill densities          10  4.800000000000000E-003  0.452531347223532     

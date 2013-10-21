@@ -22,9 +22,9 @@ Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
 #
 # Spectral regions
 #
-Eq state=nicole
+Eq state=ANN
 Eq state for H=nicole
-Pe consistency=1e10
+Pe consistency=1e-1
 Opacity package=asensio
 [Region 1]
   First wavelength=6300.

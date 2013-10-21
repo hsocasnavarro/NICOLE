@@ -2343,12 +2343,14 @@ Contains
           donornuclei=donornuclei-AtomicFraction*n2overn(1) ! P(H-)/(Pg-Pe)
           Do iel=2, n_elements ! For other elements (neglect molecules)
              scale=10**(at_abund(iel)-12) ! Scale to H
-             Call Saha123(1, iel, T1(1), Ne1(1),n0overn(1),n1overn(1),n2overn(1))
-             totalnuclei=totalnuclei+scale*n0overn(1) ! P(Fe)/(Pg-Pe)
-             totalnuclei=totalnuclei+scale*n1overn(1) ! P(Fe+)/(Pg-Pe)
-             totalnuclei=totalnuclei+scale*n2overn(1) ! P(Fe++)/(Pg-Pe)
-             donornuclei=donornuclei+scale*n1overn(1) ! P(Fe+)/(Pg-Pe)
-             donornuclei=donornuclei+2.*scale*n2overn(1) ! P(Fe++)/(Pg-Pe)
+             if (scale .gt. 1e-6) then ! Consider only significant elements
+                Call Saha123(1, iel, T1(1), Ne1(1),n0overn(1),n1overn(1),n2overn(1))
+                totalnuclei=totalnuclei+scale*n0overn(1) ! P(Fe)/(Pg-Pe)
+                totalnuclei=totalnuclei+scale*n1overn(1) ! P(Fe+)/(Pg-Pe)
+                totalnuclei=totalnuclei+scale*n2overn(1) ! P(Fe++)/(Pg-Pe)
+                donornuclei=donornuclei+scale*n1overn(1) ! P(Fe+)/(Pg-Pe)
+                donornuclei=donornuclei+2.*scale*n2overn(1) ! P(Fe++)/(Pg-Pe)
+             endif
           End do ! Do in elements iel
           donornuclei=max(donornuclei,1e-20*totalnuclei)
           Pg4(loop)=(totalnuclei/donornuclei)*Pe4(loop)
