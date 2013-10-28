@@ -2019,6 +2019,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      End if
   End do
 !
+  Atmo_pre=Atmo
+!
   Cont_op_5000_2=-10 ! Initialize
   Debug_warningflags(flag_forward)=0
   Debug_errorflags(flag_forward)=0
