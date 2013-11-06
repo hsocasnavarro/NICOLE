@@ -2402,12 +2402,17 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                    Atmo%Gas_p(idepth), Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
                    Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2p, &
                    Wave(iwave), Scat)
-              If (Cont_op_5000_2(1) .lt. 0) &
-                   Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), &
-                   Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
-                   Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, 5000., Scat)
            End do
-           Cont_op=Cont_op/Cont_op_5000_2
+           If (Cont_op_5000_2(1) .lt. 0) then
+              Do idepth=1, npoints
+                 Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), &
+                      Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, &
+                      Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, 5000., Scat)
+              End do
+              Cont_op_5000_2=Cont_op_5000_2/Atmo%rho ! Convert to cm2/g
+           End if
+           Cont_op=Cont_op/Atmo%rho ! Convert to cm2/g
+!           Cont_op=Cont_op/Cont_op_5000_2
            Last_update=Wave(iwave)
         End if
  ! Add continuum opacity and emission at this wlength
@@ -2579,6 +2584,7 @@ Subroutine Reset_densities(Atmo, Atmo_pre)
 !
   Type (Model) :: Atmo, Atmo_pre
 !
+
   If (Atmo%Keep_El_p .gt. 0.9) Atmo%El_p=Atmo_pre%El_p
   If (Atmo%Keep_Gas_p .gt. 0.9) Atmo%Gas_p=Atmo_pre%Gas_p
   If (Atmo%Keep_Rho .gt. 0.9) Atmo%Rho=Atmo_pre%Rho
