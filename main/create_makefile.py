@@ -159,7 +159,7 @@ import getopt
 import datetime
 import re
 import subprocess
-
+import shlex
 
 compiler=None
 cswitch=None
@@ -180,21 +180,42 @@ cwd=os.getcwd()
 
 fnull = open(os.devnull, 'w') # Null file
 
+# Reuse previous flags?
+sysarg=''
+for arg in sys.argv[1:]:
+    sysarg=sysarg+' '+arg
+if "--keepflags" in sys.argv: # Read previous flags from makefile
+    f=open('makefile','r')
+    lines=f.readlines()
+    f.close()
+    fline=''
+    for line in lines:
+        if re.search('# Flags:',line) != None:
+            fline=line
+    if fline == '':
+        sysarg=''
+    else:
+        fline=re.sub('# Flags:','',fline)
+        sysarg=re.sub('\n','',fline)
+    print 'Using previous flags:',sysarg
 
 # Look for compiler and flags in the command line
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hvy", ["help", "version", 
+    sysarglist=shlex.split(sysarg)
+    opts, args = getopt.getopt(sysarglist, "hvy", ["help", "version", 
                                                     "ignore","quiet","verbose",
                                                      "mpi","showtree","sopa",
-                                                     "recl=",
+                                                     "keepflags","recl=",
                                                  "cswitch=", "compiler=", 
                                               "modpath=", "modsuf=",
                                                     "otherflags="]) 
+
 except getopt.GetoptError, err:
     # print help information and exit:
     print str(err) # will print something like "option -a not recognized"
     usage()
     sys.exit(2)
+
 
 
 for o,a in opts:
@@ -819,6 +840,7 @@ f.write('# --modsuf='+modsuf+'\n')
 f.write('# --otherflags='+otherflags+'\n')
 f.write('# --mpi='+str(mpi)+'\n')
 f.write('# --recl='+recl+'\n')
+f.write('# Flags:'+sysarg+'\n')
 f.write('# ********************************************************* \n')
 f.write('F90comp='+compiler+'\n')
 f.write('CSwitch='+cswitch+'\n')
