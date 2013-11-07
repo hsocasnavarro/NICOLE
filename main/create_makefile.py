@@ -183,7 +183,7 @@ fnull = open(os.devnull, 'w') # Null file
 # Reuse previous flags?
 sysarg=''
 for arg in sys.argv[1:]:
-    sysarg=sysarg+' '+arg
+    sysarg=sysarg+' "'+arg+'"'
 if "--keepflags" in sys.argv: # Read previous flags from makefile
     f=open('makefile','r')
     lines=f.readlines()
