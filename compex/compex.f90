@@ -563,7 +563,6 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
         Trial_model%b_x=(Trial_model%b_x - Mn)*(Maxi-Mini)/ &
              (Mx-Mn) + Mini
      End if
-     print *,'tri2=',trial_model%b_x
      If (Params%printout .ge. 1) Print *,'Clipping Bx'
   End if
 !
