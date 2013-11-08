@@ -526,6 +526,31 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   Reguls(5)=Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
        Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 ) ! v_mic in km/s
   Regul_weights(5)=0.1
+  ! 
+  ! B. Square deviation from the mean
+  !
+  Reguls(6)=0.
+
+  Mean=Sum(Atmo%B_long)/Params%n_points
+  y=(Atmo%B_long-Mean)
+  Do idepth=2, params%n_points
+     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  End do
+
+  Mean=Sum(Atmo%B_x)/Params%n_points
+  y=(Atmo%B_x-Mean)
+  Do idepth=2, params%n_points
+     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  End do
+
+  Mean=Sum(Atmo%B_y)/Params%n_points
+  y=(Atmo%B_y-Mean)
+  Do idepth=2, params%n_points
+     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  End do
+
+  Reguls(6)=Sqrt(Reguls(6))
+  Regul_weights(6)=10.
 
   !
   !
@@ -575,6 +600,31 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   !
   Reguls(5)=Reguls(5) + Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
        Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 )
+  ! 
+  ! B. Square deviation from the mean
+  !
+
+  Mean=Sum(Atmo%B_long)/Params%n_points
+  y=(Atmo%B_long-Mean)
+  Do idepth=2, params%n_points
+     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  End do
+
+  Mean=Sum(Atmo%B_x)/Params%n_points
+  y=(Atmo%B_x-Mean)
+  Do idepth=2, params%n_points
+     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  End do
+
+  Mean=Sum(Atmo%B_y)/Params%n_points
+  y=(Atmo%B_y-Mean)
+  Do idepth=2, params%n_points
+     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  End do
+
+  Reguls(6)=Sqrt(Reguls(6))
+  Regul_weights(6)=10.
+
 
   Deviation=Sum(Reguls*Regul_weights)
 !  print *,'reguls=',reguls(1:4)*regul_weights(1:4)

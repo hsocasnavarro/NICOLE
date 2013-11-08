@@ -540,7 +540,7 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
         Trial_model%b_long=(Trial_model%b_long - Mn)*(Maxi-Mini)/ &
              (Mx-Mn) + Mini
      End if
-     If (Params%printout .ge. 1) Print *,'Clipping magnetic strength'
+     If (Params%printout .ge. 1) Print *,'Clipping Bz'
   End if
 !
 ! Check b_x
@@ -551,8 +551,10 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
           Trial_model%b_x(ipoint) .gt. Max_bx) Out_of_range=.TRUE.
   End do
   If (Out_of_range) then
+     print *,'tri1=',trial_model%b_x
      Mx=Maxval(Trial_model%b_x)
      Mn=Minval(Trial_model%b_x)
+     print *,'bx, min,max=',mx,mn
      If (Mx .lt. Min_bx) then
         Trial_model%b_x=Min_bx
      Else if (Mn .gt. Max_bx) then
@@ -563,7 +565,8 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
         Trial_model%b_x=(Trial_model%b_x - Mn)*(Maxi-Mini)/ &
              (Mx-Mn) + Mini
      End if
-     If (Params%printout .ge. 1) Print *,'Clipping magnetic strength'
+     print *,'tri2=',trial_model%b_x
+     If (Params%printout .ge. 1) Print *,'Clipping Bx'
   End if
 !
 ! Check b_y
@@ -586,7 +589,7 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
         Trial_model%b_y=(Trial_model%b_y - Mn)*(Maxi-Mini)/ &
              (Mx-Mn) + Mini
      End if
-     If (Params%printout .ge. 1) Print *,'Clipping magnetic strength'
+     If (Params%printout .ge. 1) Print *,'Clipping By'
   End if
 !
 ! Check macroturbulence
