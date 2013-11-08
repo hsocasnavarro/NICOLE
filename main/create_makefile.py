@@ -160,7 +160,6 @@ import getopt
 import datetime
 import re
 import subprocess
-import shlex
 
 compiler=None
 cswitch=None
@@ -182,28 +181,40 @@ cwd=os.getcwd()
 fnull = open(os.devnull, 'w') # Null file
 
 # Reuse previous flags?
-sysarg=''
-for arg in sys.argv[1:]:
-    sysarg=sysarg+' "'+arg+'"'
+sysarg=sys.argv[1:]
 if "--keepflags" in sys.argv: # Read previous flags from makefile
+    sysarg=list() # Discard any other possible flags
+    error=0
     f=open('makefile','r')
-    lines=f.readlines()
+    while 1:
+        line=f.readline()
+        if not line: 
+            error=1
+            break # end-of-file
+        if re.search('# Number of args:',line) != None:
+            line=re.sub('# Number of args:','',line)
+            line=re.sub('#.*','',line)
+            line=re.sub('\n','',line)
+            nargs=int(line)
+            for iarg in range(nargs):
+                line=f.readline()
+                if not line:
+                    error=1
+                    break
+                line=re.sub('# *','',line)
+                line=re.sub('\n','',line)
+                sysarg.append(line)
+            break
     f.close()
-    fline=''
-    for line in lines:
-        if re.search('# Flags:',line) != None:
-            fline=line
-    if fline == '':
-        sysarg=''
+    if error:
+        print "Couldn't read previous flags in current makefile"
+        sys.exit(1)
     else:
-        fline=re.sub('# Flags:','',fline)
-        sysarg=re.sub('\n','',fline)
-    print 'Using previous flags:',sysarg
-
+        print "Using previous command-line arguments:",sysarg
+#
 # Look for compiler and flags in the command line
 try:
-    sysarglist=shlex.split(sysarg)
-    opts, args = getopt.getopt(sysarglist, "hvy", ["help", "version", 
+    opts, args = getopt.getopt(sysarg, "hvy", ["help", "version", 
                                                     "ignore","quiet","verbose",
                                                      "mpi","showtree","sopa",
                                                      "keepflags","recl=",
@@ -841,7 +852,6 @@ f.write('# --modsuf='+modsuf+'\n')
 f.write('# --otherflags='+otherflags+'\n')
 f.write('# --mpi='+str(mpi)+'\n')
 f.write('# --recl='+recl+'\n')
-f.write('# Flags:'+sysarg+'\n')
 f.write('# ********************************************************* \n')
 f.write('F90comp='+compiler+'\n')
 f.write('CSwitch='+cswitch+'\n')
@@ -897,6 +907,10 @@ for ifile in range(len(source_files)):
             depobj=dep[0:len(dep)-4]+'.o'
             f.write('  '+depobj+'  ')
         f.write('\n')
+
+f.write("\n# Number of args:"+str(len(sysarg))+'\n')
+for arg in sysarg:
+    f.write('# '+arg+'\n')
 f.close()
 
 print '\n'
