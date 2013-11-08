@@ -4804,7 +4804,8 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      NLTE%Error=.True.
      If (NLTEInput%Verbose .ge. 4) then
         Do idepth=1, NDEP
-           Print *,'Conergence analysis:'
+           If (idepth .eq. 1) &
+                Print *,'Conergence analysis:'
            Print *,'i=',idepth,' tau=',NLTE%Atmo%ltau_500(idepth),' relchg=',&
                 MaxVal(Abs((NOLD(:,idepth)-NLTE%N(:,idepth))/ &
              NLTE%N(:,idepth))),' level=',MaxLoc(Abs((NOLD(:,idepth)-NLTE%N(:,idepth))/ &

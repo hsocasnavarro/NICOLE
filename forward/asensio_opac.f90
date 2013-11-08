@@ -617,10 +617,10 @@ contains
        Call Debug_log('In asensio_background_opacity. Pe .lt. Min_Pe parameter. Clipping it.',2)
        Pe=Min_Pe
     End if
-    If (T .gt. Max_Temp) then
-       Call Debug_log('In asensio_background_opacity. Temperature .gt. Max_Temp parameter. Clipping it.',2)
-       T=Max_Temp
-    End if
+!    If (T .gt. Max_Temp) then
+!       Call Debug_log('In asensio_background_opacity. Temperature .gt. Max_Temp parameter. Clipping it.',2)
+!       T=Max_Temp
+!    End if
     If (Pe .gt. Max_Pe) then
        Call Debug_log('In asensio_background_opacity. Pe .gt. Max_Pe parameter. Clipping it.',2)
        Pe=Max_Pe

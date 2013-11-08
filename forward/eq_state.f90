@@ -2017,10 +2017,10 @@ Contains
              temper_in(loop)=Min_T
              Call Debug_Log('T .lt. Min_T in Compute_others_from_T_Pe_Pg', 2)
           End if
-          If (temper_in(loop) .gt. Max_T) then
-             temper_in(loop)=Max_T
-             Call Debug_Log('T .gt. Max_T in Compute_others_from_T_Pe_Pg', 2)
-          End if
+!          If (temper_in(loop) .gt. Max_T) then
+!             temper_in(loop)=Max_T
+!             Call Debug_Log('T .gt. Max_T in Compute_others_from_T_Pe_Pg', 2)
+!          End if
           If (Pe_in(loop) .lt. Min_Pe) then
              Pe_in(loop)=Min_Pe
              Call Debug_Log('Pe .lt. Min_Pe in Compute_others_from_T_Pe_Pg', 2)
