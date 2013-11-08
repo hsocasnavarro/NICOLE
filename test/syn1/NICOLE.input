@@ -7,6 +7,7 @@ Mode = Synthesis
 #
 Input model= hsra_mag.model
 Output profiles= hsra_mag.pro # Output profiles
+Output model= modelout.mod # Output profiles
 Heliocentric angle= 1.0 # Cos(mu)
 #
 # Other misc optional fields

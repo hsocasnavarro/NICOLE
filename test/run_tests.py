@@ -243,9 +243,9 @@ else:
 #        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
 
         if abs(max(i)-1.000)>0.03 or abs(min(i)-0.230)>0.03 or \
-                abs(max(q)-0.)>1e-3 or abs(min(q)+.001)>1e-3 or \
-                abs(max(u)-0.0036)>1e-3 or abs(min(u))>1e-3 or \
-                abs(max(v)-0.029)>1e-3 or abs(min(v)+0.0295)>1e-3:
+                abs(max(q)-0.)>2e-3 or abs(min(q)+.001)>2e-3 or \
+                abs(max(u)-0.0036)>2e-3 or abs(min(u))>2e-3 or \
+                abs(max(v)-0.029)>2e-3 or abs(min(v)+0.0295)>2e-3:
             print '     ** ERROR!! NICOLE produced inaccurate results'
             success=0
         else:
@@ -296,9 +296,9 @@ else:
 #        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
 
         if abs(max(i)-limi[0])>0.01 or abs(min(i)-limi[1])>0.01 or \
-                abs(max(q)-limq[0])>1e-3 or abs(min(q)-limq[1])>1e-3 or \
-                abs(max(u)-limu[0])>1e-3 or abs(min(u)-limu[1])>1e-3 or \
-                abs(max(v)-limv[0])>1e-3 or abs(min(v)-limv[1])>1e-3:
+                abs(max(q)-limq[0])>2e-3 or abs(min(q)-limq[1])>2e-3 or \
+                abs(max(u)-limu[0])>2e-3 or abs(min(u)-limu[1])>2e-3 or \
+                abs(max(v)-limv[0])>2e-3 or abs(min(v)-limv[1])>2e-3:
             print '     ** ERROR!! NICOLE produced inaccurate results'
             success=0
         else:
@@ -353,9 +353,9 @@ else:
 #        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
 
         if abs(max(i)-limi[0])>0.03 or abs(min(i)-limi[1])>0.03 or \
-                abs(max(q)-limq[0])>1e-3 or abs(min(q)-limq[1])>1e-3 or \
-                abs(max(u)-limu[0])>1e-3 or abs(min(u)-limu[1])>1e-3 or \
-                abs(max(v)-limv[0])>1e-3 or abs(min(v)-limv[1])>1e-3:
+                abs(max(q)-limq[0])>2e-3 or abs(min(q)-limq[1])>2e-3 or \
+                abs(max(u)-limu[0])>2e-3 or abs(min(u)-limu[1])>2e-3 or \
+                abs(max(v)-limv[0])>2e-3 or abs(min(v)-limv[1])>2e-3:
             print '     ** ERROR!! NICOLE produced inaccurate results'
             success=0
         else:

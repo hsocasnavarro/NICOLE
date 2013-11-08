@@ -2081,7 +2081,7 @@ Contains
           call mnewt(3,niters,x_sol(1:21),21,1.e-5,1.e-5)
           
           iter=1
-          do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .le. 10)
+          do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .le. 100)
              !       do while ( (minval(x_sol(1:21)) < 0.d0 .or. niters .eq. Maxniters) .and. iter .lt. 15)
              iter=iter+1
              Write (String,*) 'ipoint, T, Pe, Pg=',loop,temper, P_elec, P_total
@@ -2203,6 +2203,7 @@ Contains
 
     If (eqstate_switch .eq. 2) then ! Use Wittmann's EoS
        Call wittmann_compute_pe(n_grid, temp4, PT4, Pe4)
+       Return
     End if
 
     If (eqstate_pe_consistency .lt. 10) then

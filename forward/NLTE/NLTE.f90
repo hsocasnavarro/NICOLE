@@ -440,6 +440,7 @@ Contains
 ! required arrays (such as ne, nH, rho, etc)
 !
 Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+  Use Wittmann_eqstate ! debug
   Implicit None
   Type (Parameters) :: Params
   Type (Model) :: Atmo
@@ -483,13 +484,10 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   Else ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
        !       nH2 columns of the model
      NLTE%Atmo%ne=NLTE%Atmo%el_p/BK/NLTE%Atmo%Temp
-     Allocate(tmp1(NLTE%NDEP))
      Call Compute_others_from_T_Pe_Pg(NLTE%NDEP, NLTE%Atmo%Temp, &
           NLTE%Atmo%El_p, NLTE%Atmo%Gas_p, &
           NLTE%Atmo%nH, NLTE%Atmo%nHminus, NLTE%Atmo%nHplus, NLTE%Atmo%nH2, &
           NLTE%Atmo%nH2plus)
-
-     Deallocate(tmp1)
   End if
    If (Params%NLTE_ltepop .eq. 1) then  ! Compute LTE populations
      Call LTE_pop_2(NLTE, Atom)
