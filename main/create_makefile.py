@@ -82,6 +82,7 @@ def usage():
     print " --showtree: Shows the full dependency tree of all source files"
     print " --ignore: Continue creating makefile even if some dependencies are not"
     print "   found in the source tree."
+    print " --keepflags: Use exactly the same command-line options as when the current makefile was created"
     print " --compiler=: Specify F90 compiler to use (may be preceded by the path"
     print "   if not in the search path). Use --compiler==list to print a list of"
     print "   known compilers. If your compiler is not one of these you will also"

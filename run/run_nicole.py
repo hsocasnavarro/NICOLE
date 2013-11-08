@@ -252,7 +252,7 @@ for icycle in range(int(ncycles)):
     speed=get_value(config,'Speed optimization','1','NICOLE.input')
     always_compute_der=get_value(config,'Always compute derivatives','Y','NICOLE.input')
     gravity=get_value(config,'Gravity','2.7414e+4','NICOLE.input')
-    regul=get_value(config,'Regularization','1.0','NICOLE.input')
+    regul=get_value(config,'Regularization','1.e-3','NICOLE.input')
     update_opac=get_value(config,'Update opacities every','10','NICOLE.input')
     contref=get_value(config,'Continuum reference','1','NICOLE.input')
     contval=get_value(config,'Continuum value','1','NICOLE.input')

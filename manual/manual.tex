@@ -332,6 +332,20 @@ To run the tests in non-interactive mode, e.g. on platforms where jobs
 need to be submitted to a queue system (typically supercomputers),
 refer to the procedure described in section~\ref{sec:compiling} below.
 
+Note: Often times you may want to create a new makefile using the same
+options as the last time. This is particularly useful e.g. when you
+update the source code distribution with a new release of the code. If
+the source code structure hasn't changed then you don't need to run
+creat\_makefile.py at all. However, there are times when a new version
+of NICOLE includes new source files or perhaps some files no longer
+exist or have been moved. Thus, it is always recommended to run 
+create\_makefile.py again every time you install a new version of NICOLE.
+To save you some hassle, you can use the --keepflags option to instruct
+create\_makefile.py to use exactly the same command-line arguments that
+you used the last time. These arguments are saved as comments in the
+makefile so they can be read and reused by create\_makefile.py at a later
+time.
+
 If everything went smoothly, go into the run/ directory.
 
 Note: NICOLE works internally with binary files (the format is
