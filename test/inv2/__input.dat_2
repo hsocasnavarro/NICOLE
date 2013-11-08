@@ -24,13 +24,14 @@ inversion.mod_2
 1     ! speed 
 1     ! always_compute_der 
 2.7414e+4     ! gravity 
-1.0     ! regularization 
+1.e-3     ! regularization 
 10    ! update_opac 
 1       !  contref 
 pel       ! inputdens 
  -1   -1   -1   -1   -1   -1   -1   -1        ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ 
 t          ! hscale 
 1          ! opac 
+2  0 1e-3          ! Eq state, Eq state for H, Pe_consistency 
 T     T   0   ! sethydro, setnH, restart 
 1   ! depcoef 
 6   ! nlines 

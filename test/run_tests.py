@@ -150,6 +150,9 @@ else:
         m_pg=data[95*3:95*3+95]
         data2=read_model('hsra_full.bin','nicole2.3',1,1,95,0,0)
         hsra_pg=data2[95*3:95*3+95]
+
+#        print 'pres=',m_pg[80],hsra_pg[80] # debug
+
         dif1=abs(m_pg[80]-hsra_pg[80])/hsra_pg[80]
         dif2=abs(m_pg[60]-hsra_pg[60])/hsra_pg[60]
         if dif1 > 0.35 or dif2 > 0.35:
@@ -190,10 +193,14 @@ else:
         m_elp=data[95*5:95*5+95]
         data2=read_model('hsra_full.bin','nicole2.3',1,1,95,0,0)
         hsra_elp=data2[95*5:95*5+95]
+
+#        print 'pres 1=',m_elp[80],hsra_elp[80] # debug
+#        print 'pres 2=',m_elp[60],hsra_elp[60] # debug
+
         dif1=abs(m_elp[80]-hsra_elp[80])/hsra_elp[80]
         dif2=abs(m_elp[60]-hsra_elp[60])/hsra_elp[60]
         if dif1 > 0.5 or dif2 > 0.5:
-            print '    ** ERROR!! NICOLE produced inaccurate results',m_elp[80],hsra_elp[80]
+            print '    ** ERROR!! NICOLE produced inaccurate results'
             success=0
         else:
             print '    Results appear to be correct'
@@ -231,10 +238,14 @@ else:
         q=data[1::4]
         u=data[2::4]
         v=data[3::4]
-        if abs(max(i)-1.000)>0.03 or abs(min(i)-0.224)>0.03 or \
-                abs(max(q)-0.)>1e-3 or abs(min(q)+.0010798)>1e-3 or \
-                abs(max(u)-0.00274)>1e-3 or abs(min(u))>1e-3 or \
-                abs(max(v)-0.0224)>1e-3 or abs(min(v)+0.0226)>1e-3:
+
+#        print 'max(i,q,u,v)=',max(i),max(q),max(u),max(v) # debug
+#        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
+
+        if abs(max(i)-1.000)>0.03 or abs(min(i)-0.230)>0.03 or \
+                abs(max(q)-0.)>1e-3 or abs(min(q)+.001)>1e-3 or \
+                abs(max(u)-0.0036)>1e-3 or abs(min(u))>1e-3 or \
+                abs(max(v)-0.029)>1e-3 or abs(min(v)+0.0295)>1e-3:
             print '     ** ERROR!! NICOLE produced inaccurate results'
             success=0
         else:
@@ -265,7 +276,6 @@ if result != 0:
 else:
     print '    Checking the results produced...'
     [mode,nx,ny,nlam]=check_prof('manyhsra_mag.pro')
-#    if [mode[0:6],nx,ny,nlam] != ['nicole',1,1000,200]:
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,10,200]:
         print '     ** ERROR!! NICOLE produced an incorrect file'
         success=0
@@ -277,15 +287,13 @@ else:
         u=data[2::4]
         v=data[3::4]
  
-        limi=[1.00071072578, 0.216204211116]
-        limq=[0.0, -0.00142102246173]
-        limu=[0.00398831954226, -0.000248447438935]
-        limv=[0.0297301225364, -0.0302375424653]
+        limi=[0.99999, 0.219]
+        limq=[0.0, -0.002]
+        limu=[0.0068, -0.000274]
+        limv=[0.0491, -0.0440]
 
-#        print max(i),min(i)
-#        print max(q),min(q)
-#        print max(u),min(u)
-#        print max(v),min(v)
+#        print 'max(i,q,u,v)=',max(i),max(q),max(u),max(v) # debug
+#        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
 
         if abs(max(i)-limi[0])>0.01 or abs(min(i)-limi[1])>0.01 or \
                 abs(max(q)-limq[0])>1e-3 or abs(min(q)-limq[1])>1e-3 or \
@@ -336,15 +344,13 @@ else:
         v=v[200:]
 
 
-        limi=[ 0.976746857166 , 0.249660283327 ]
-        limq=[ 1.23289300973e-05 , -1.09318489194e-06 ]
-        limu=[ 1.39897224471e-06 , -1.09652019091e-05 ]
-        limv=[ 0.00185064808466 , -0.00292685301974 ]
+        limi=[ 0.9724 , 0.2539 ]
+        limq=[ 1.8653e-05 , -1.03727e-06 ]
+        limu=[ 2.48e-06 , -1.481088e-05 ]
+        limv=[ 0.00270 , -0.0035475 ]
 
-#        print 'limi=[',max(i),',',min(i),']'
-#        print 'limq=[',max(q),',',min(q),']'
-#        print 'limu=[',max(u),',',min(u),']'
-#        print 'limv=[',max(v),',',min(v),']'
+#        print 'max(i,q,u,v)=',max(i),max(q),max(u),max(v) # debug
+#        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
 
         if abs(max(i)-limi[0])>0.03 or abs(min(i)-limi[1])>0.03 or \
                 abs(max(q)-limq[0])>1e-3 or abs(min(q)-limq[1])>1e-3 or \
@@ -354,7 +360,7 @@ else:
             success=0
         else:
             print '    Results appear to be correct'
-        
+
 # inv1
 dir='inv1'
 os.chdir(cwd)

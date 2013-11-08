@@ -16,6 +16,7 @@
       integer :: n, loop
 
       Do loop=1, n
+         Pe(loop)=0.3*Pg(loop)
          Call pefrompg10(T(loop),Pg(loop),Pe(loop))
       End do
     End subroutine wittmann_compute_pe
@@ -502,12 +503,12 @@
         dif=1. 
         n2=0 
         p1=p 
-        do while (dif.gt.prec.and.n2.lt.5.) 
+        do while (dif.gt.prec.and.n2.lt.50.) 
            n2=n2+1 
            p=(p+p1)/2. 
              p1=p 
              call pe_pg10(t,p,pg) 
-             dif=abs(abs( (p-p1)/(p+p1) )-1.0) 
+             dif=abs((p-p1)/p)  
          end do 
       return 
       END Subroutine                                        
