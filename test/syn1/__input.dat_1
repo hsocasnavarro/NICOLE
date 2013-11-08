@@ -24,7 +24,7 @@ hsra_mag.pro
 1     ! speed 
 1     ! always_compute_der 
 2.7414e+4     ! gravity 
-1.0     ! regularization 
+1.e-3     ! regularization 
 10    ! update_opac 
 1       !  contref 
 pel       ! inputdens 

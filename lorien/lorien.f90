@@ -523,10 +523,9 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   !
   ! v_mic
   !
-  Reguls(5)=Sum( (10**(Atmo%ltau_500(2:Params%n_points)- &
-       Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1) )
+  Reguls(5)=Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
+       Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 ) ! v_mic in km/s
   Regul_weights(5)=0.1
-
 
   !
   !
@@ -574,8 +573,8 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   !
   ! v_mic
   !
-  Reguls(5)=Reguls(5) + Sum( (10**(Atmo%ltau_500(2:Params%n_points)- &
-       Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1) )
+  Reguls(5)=Reguls(5) + Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
+       Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 )
 
   Deviation=Sum(Reguls*Regul_weights)
 !  print *,'reguls=',reguls(1:4)*regul_weights(1:4)
