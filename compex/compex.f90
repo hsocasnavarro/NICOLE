@@ -551,10 +551,8 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
           Trial_model%b_x(ipoint) .gt. Max_bx) Out_of_range=.TRUE.
   End do
   If (Out_of_range) then
-     print *,'tri1=',trial_model%b_x
      Mx=Maxval(Trial_model%b_x)
      Mn=Minval(Trial_model%b_x)
-     print *,'bx, min,max=',mx,mn
      If (Mx .lt. Min_bx) then
         Trial_model%b_x=Min_bx
      Else if (Mn .gt. Max_bx) then
