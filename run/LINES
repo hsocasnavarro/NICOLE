@@ -1,9 +1,10 @@
-[CaII 8542]
+# CaII lines from NIST database
+[CaII 8542_0]
   Element='Ca'
   Ionization stage=2
-  Wavelength=8542.091
-  Excitation potential= 1.7000
-  Log(gf)=-0.463
+  Wavelength= 8542.0857
+  Excitation potential=1.699932
+  Log(gf)=-0.36
   Term (lower)=2D2.5
   Term (upper)=2P1.5
   Collisions='Barklem'
@@ -16,9 +17,9 @@
 [CaII 8498]
   Element='Ca'
   Ionization stage=2
-  Wavelength=8498.023
-  Excitation potential= 1.6920
-  Log(gf)=-1.416
+  Wavelength=8498.0180
+  Excitation potential= 1.692488
+  Log(gf)=-1.318
   Term (lower)= 2D1.5
   Term (upper)= 2P1.5
   Collisions='Barklem'
@@ -28,12 +29,13 @@
   Mode='NLTE'
   Transition index in model atom=4
 
+
 [CaII 8662]
   Element='Ca'	
   Ionization stage=2
-  Wavelength=8666.141
-  Excitation potential= 1.6920
-  Log(gf)=-0.723
+  Wavelength=8662.1353
+  Excitation potential= 1.692488
+  Log(gf)=-0.622
   Term (lower)= 2D1.5
   Term (upper)= 2P0.5
   Collisions='Barklem'
@@ -43,12 +45,13 @@
   Mode='NLTE'
   Transition index in model atom=3
 
+
 [CaII K]
   Element='Ca'	
   Ionization stage=2
-  Wavelength=3933.660
+  Wavelength=3933.6633
   Excitation potential= 0.0000
-  Log(gf)=0.105
+  Log(gf)=0.135
   Term (lower)= 2S0.5
   Term (upper)= 2P1.5
   Collisions='Barklem'
@@ -58,12 +61,13 @@
   Mode='NLTE'
   Transition index in model atom=2
 
+
 [CaII H]
   Element='Ca'	
   Ionization stage=2
-  Wavelength=3968.470
+  Wavelength=3968.4684
   Excitation potential= 0.0000
-  Log(gf)=-0.199
+  Log(gf)=-0.18
   Term (lower)= 2S0.5
   Term (upper)= 2P0.5
   Collisions='Barklem'
@@ -73,22 +77,22 @@
   Mode='NLTE'
   Transition index in model atom=1
 
-[FeI 6302.5]
+
+[FeI 6302]
   Element='Fe'	
   Ionization stage=1
   Wavelength=6302.4940
   Excitation potential= 3.6860
-  Log(gf)=-1.16
+  Log(gf)=-1.13
   Term (lower)= 5P1.0
   Term (upper)= 5D0.0
   Collisions='Barklem'
   Damping sigma=850.2
   Damping alpha=0.239
-  Damping enhancement=1.2
   Width=2.
   Mode='LTE'
 
-[FeI 6301.5]
+[FeI 6301]
   Element='Fe'	
   Ionization stage=1
   Wavelength=6301.5012
@@ -102,3 +106,62 @@
   Width=2.
   Mode='LTE'
 
+[MnI 8701]
+  Element='Mn'
+  Ionization stage=1
+  Wavelength=8701.0120
+  Excitation potential=4.4290
+  Log(gf)=-0.477
+  Term (lower)= 6P2.5
+  Term (upper)= 6D2.5
+  Collisions='Barklem'
+  Damping sigma=737.77
+  Damping alpha=0.262
+  Width=2.
+  Mode='LTE'
+  Hyperfine structure=Yes
+  Hyperfine Alow=-0.01891
+  Hyperfine Blow=-0.00226
+  Hyperfine Aup= 0.017600
+  Hyperfine Bup= 0.003000
+  Nuclear spin=2.5
+
+[MnI 8740]
+  Element='Mn'
+  Ionization stage=1
+  Wavelength=8740.9140
+  Excitation potential=4.4350
+  Log(gf)=-0.055
+  Term (lower)= 6P3.5
+  Term (upper)= 6D4.5
+  Collisions='Barklem'
+  Damping sigma=736.41
+  Damping alpha=0.262
+  Width=2.
+  Mode='LTE'
+  Hyperfine structure=Yes
+  Hyperfine Alow= -0.01384
+  Hyperfine Blow= -0.000617
+  Hyperfine Aup= -0.01551
+  Hyperfine Bup=  0.00090
+  Nuclear spin=2.5
+
+[MnI 5537]
+  Element='Mn'
+  Ionization stage=1
+  Wavelength=5537.760
+  Excitation potential=2.1870
+  Log(gf)=-2.017
+  Term (lower)= 6D0.5
+  Term (upper)= 6P1.5
+  Collisions='Barklem'
+  Damping sigma=399.14
+  Damping alpha=0.281
+  Width=2.
+  Mode='LTE'
+  Hyperfine structure=Yes
+  Hyperfine Alow= 0.04
+  Hyperfine Blow= 0.00
+  Hyperfine Aup= -0.03105
+  Hyperfine Bup=  0.0006
+  Nuclear spin=2.5

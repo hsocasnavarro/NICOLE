@@ -30,7 +30,7 @@ modelout.mod
 pel       ! inputdens 
  -1   -1   -1   -1   -1   -1   -1   -1        ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ 
 t          ! hscale 
-3          ! opac 
+1          ! opac 
 0  0 1e-1          ! Eq state, Eq state for H, Pe_consistency 
 T     T   -1   ! sethydro, setnH, restart 
 1   ! depcoef 
