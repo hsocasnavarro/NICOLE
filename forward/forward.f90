@@ -2072,6 +2072,11 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      End if
   End if
   First_time=.FALSE.
+  If (do_NLTE) then
+     NLTEInput%Hydro=Hydro
+     NLTE%Atmo=Atmo
+     Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+  End if
 ! Check model sanity (hardwired limits)
 ! If flux computation is required, set Gaussian weights
   If (Params%heliocentric .ne. 0) then
@@ -2110,6 +2115,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 !
   End if
 !
+
   metal=at_abund(26)-7.5
   Call compute_others_from_T_Pe_Pg(Params%n_points,Atmo%Temp, Atmo%el_p, Atmo%Gas_p,&
        Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
@@ -2221,11 +2227,15 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         reference_cont=1.e15 ! For numerical precision. Will remove this factor
                              ! at the end
      Else If (Params%Reference_cont .eq. 1) then
-        reference_cont=conhsra(Region(iregion)%First_wlength + &
+!        reference_cont=conhsra(Region(iregion)%First_wlength + &
+!             Region(iregion)%nwavelengths * &
+!             Region(iregion)%Wave_step/2.) ! HSRA continuum at middlepoint
+        reference_cont=syn_hsra(Region(iregion)%First_wlength + &
              Region(iregion)%nwavelengths * &
-             Region(iregion)%Wave_step/2.) ! HSRA continuum at middlepoint
+             Region(iregion)%Wave_step/2., 1.0)! HSRA continuum
      Else If (Params%Reference_cont .eq. 2) then
-        reference_cont=conhsra(5000.) ! HSRA continuum at 500nm
+!        reference_cont=conhsra(5000.) ! HSRA continuum at 500nm
+        reference_cont=syn_hsra(5000., 1.0)! HSRA continuum
      Else If (Params%Reference_cont .eq. 3) then
       reference_cont=syn_hsra(Region(iregion)%First_wlength + &
              Region(iregion)%nwavelengths * &
@@ -2438,7 +2448,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice) ! Formal solution
-
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point

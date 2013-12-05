@@ -13,7 +13,7 @@ Use Model_structure
 !  real, parameter :: Min_t=3000., Min_v=-2.e6, Min_mic=0., &
 !       Min_b=0., Min_inc=0., Min_azi=0., Min_mac=0., &
 !       Min_stray=0., Min_ffactor=1.
-  real, parameter :: Max_t=30000., Max_v=2.e6, Max_mic=2.e6, &
+  real, parameter :: Max_t=100000., Max_v=2.e6, Max_mic=2.e6, &
        Max_blong=1e4, Max_bx=1e4, Max_by=1e4, Max_mac=5.e5, &
        Max_stray=1., Max_ffactor=1., Max_ab=12.0
   real, parameter :: Min_t=2500., Min_v=-2.e6, Min_mic=0., &

@@ -459,6 +459,7 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
   End do
   If (Out_of_range) then
      Where (Trial_model%temp .lt. Min_t) Trial_model%temp=Min_t
+     Where (Trial_model%temp .gt. Max_t) Trial_model%temp=Max_t
 !     Mx=Maxval(Trial_model%temp)
 !     Mn=Minval(Trial_model%temp)
 !     If (Mx .lt. Min_t) then

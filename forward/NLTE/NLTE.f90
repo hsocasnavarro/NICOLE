@@ -440,7 +440,6 @@ Contains
 ! required arrays (such as ne, nH, rho, etc)
 !
 Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
-  Use Wittmann_eqstate ! debug
   Implicit None
   Type (Parameters) :: Params
   Type (Model) :: Atmo
@@ -491,15 +490,6 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   End if
    If (Params%NLTE_ltepop .eq. 1) then  ! Compute LTE populations
      Call LTE_pop_2(NLTE, Atom)
-!     nlte%n=nlte%nstar ! debug
-!     Call LTE_pop_3(NLTE, Atom) ! Las de multi
-! 20:22 no funciona, 22 sí funciona, 20:21 sí funciona, 21:22 funciona pero 53 iter
-!     nlte%nstar=nlte%n ! Machacamos con las de nicole
-
-
-!     nlte%nstar(1,1:21)=nlte%n(1,1:21) ! Machacamos con las de nicole
-!     nlte%nstar(1,23:45)=nlte%n(1,23:45) ! Machacamos con las de nicole
-!     nlte%nstar(2:atom%nk,:)=nlte%n(2:atom%nk,:) ! Machacamos con las de nicole
   Else
      Call LTE_pop_3(NLTE, Atom) ! routine from MULTI
   End if
@@ -802,7 +792,8 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
                 Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, &
                 5000., Scat(idepth))
         End if
-        XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+!        XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+        XCONT(idepth)=XCONT(idepth)/NLTE%Xnorm(idepth)
         NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
         SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
              NLTE%BPlanck(idepth,itran)
@@ -824,7 +815,8 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
            XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), &
                 Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, &
                 Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, lambda, Dummy(1))
-           XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+!           XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+           XCONT(idepth)=XCONT(idepth)/NLTE%XNorm(idepth)
            NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
            SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
                 NLTE%BPlanck(idepth,itran)
@@ -2524,7 +2516,7 @@ Subroutine HCol(Atom, NLTE)
  Implicit None
  Type (NLTE_Atom) :: Atom
  Type (NLTE_variables) :: NLTE
- Real, Dimension(:,:,:), Allocatable :: C, c2 ! debug
+ Real, Dimension(:,:,:), Allocatable :: C
  Integer :: i, j, idepth, k
  Double Precision T
 
@@ -4375,16 +4367,21 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
           .and. MaxVal(Abs(NLTE%atmo%v_mic-Saved_NLTE%atmo%v_mic)) .lt. 1e-5 &
           .and. .not. NLTE%Error) &
      then 
-        NLTE%N(:,:)=Saved_NLTE%N(:,:)
-        NLTE%Source_f(:,:,:)=Saved_NLTE%Source_f(:,:,:)
-        NLTE%Error=Saved_NLTE%Error
-        NLTE%atmo=Saved_NLTE%atmo
-        If (NLTEInput%Verbose .ge. 4) &
+
+        print *,"DEBUG!!! Should be reusing old populations but it's commented out"
+!        NLTE%N(:,:)=Saved_NLTE%N(:,:)
+!        NLTE%Source_f(:,:,:)=Saved_NLTE%Source_f(:,:,:)
+!        NLTE%Error=Saved_NLTE%Error
+!        NLTE%atmo=Saved_NLTE%atmo
+
+
+        If (NLTEInput%Verbose .ge. 3) &
              Print *,'Using previous populations'
         Call time_routine('solvestat',.False.)
-        Return
+!        Return
      End if
   End if
+
 !
 ! First calculation of radiation field, needed to initialize Jnu for Sbck
   Call Radiation
@@ -4482,11 +4479,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
                  Rnu(:)=Xcont(:)/(Z(:)*Alpha(:)/NLTE%Xnorm(:)+Xcont(:))
                  S(:)=(1.-Rnu(:))*NLTE%Sl(:,itran)+Rnu(:)*SBck(:)
 
-!                 if (cont .and. xcont(40) .ge. 1e-2) then
-!                    print *,'itran=',itran,' inu=',inu,' imu=',imu
-!                    print *,'r=',rnu(40:41)
- !                endif
-
               End if
               IncidentInt=0. ! No incident radiation
 ! Compute monochromatic radiation field and local operator
@@ -4495,7 +4487,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
               Call time_routine('NLTE_formalsolution',.True.)
               Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
                    X, S, RNu, P, LStMuNu, ResetSafe)
-
 !              if (checknan(sum(s))) then
 !                 print *,'itran=',itran
 !                 print *,'p=',p
@@ -4558,7 +4549,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
                  If (LStar(idepth) .gt. 1) LStar(idepth)=1.
                  If (lstar(idepth) .gt. 1) then
                     print *,'lstar .gt. 1'
-                    stop  ! debug
                  endif
               End do
            End if
@@ -4567,7 +4557,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
                  If (LStar(idepth) .lt. 0) LStar(idepth)=0.
                  If (lstar(idepth) .lt. 0) then
                     print *,'lstar .lt. 0'
-                    stop ! debug
                  endif
               End do
            End if

@@ -180,7 +180,7 @@ Contains
         Last_accepted_nwchisq=NWChisq
         If (.not. Adjusted) Params%recompute_deriv=0 
         If (Lambda .gt. 1.e-8) Lambda=Lambda/10.
-        Guess_model=Trial_model ! debug, do nothing
+        Guess_model=Trial_model 
         Errors=Trial_errors
         Syn_profile=Trial_profile
         Call Printout(n_iter, Lambda, Chisq, NWChisq, Params%regularization*Regul, &
@@ -303,6 +303,7 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
   End if
   If (Params%always_compute_deriv .eq. 1 .or. &
        Params%recompute_deriv .eq. 1) then
+     Nodes%Reference_model=Guess_model ! Model_assign operation
      Call Compress(Params, Nodes, Guess_model, X)
      Call Compress_deriv(Params, Nodes, Derivatives, Dydx)
      Call Compute_chisq(Params, Obs_profile, Syn_profile, Sigma, &
@@ -331,7 +332,6 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
               Dydx(i_data, i_param)=(Pert_profile(i_data)-Syn_Profile(i_data))/ &
                    (X(i_param)-OldX)
            End do
-
            DRegulDx(i_param)=Params%regularization* &
                 (Pert_Regul-Regul)/(X(i_param)-OldX)
            X(i_param)=OldX
@@ -398,6 +398,7 @@ Subroutine Compute_trial_model(Params, Nodes, Guess_model, Lambda, &
   Integer :: i_param, j_param, i_data, ndata
   Logical, Dimension (Params%n_free_parameters) :: Zeroed
 !
+  Nodes%Reference_model=Guess_model ! Model_assign operation
   Call Compress(Params, Nodes, Guess_model, X)
   Chisq=WChisq
 !
