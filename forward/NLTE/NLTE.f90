@@ -4367,18 +4367,14 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
           .and. MaxVal(Abs(NLTE%atmo%v_mic-Saved_NLTE%atmo%v_mic)) .lt. 1e-5 &
           .and. .not. NLTE%Error) &
      then 
-
-        print *,"DEBUG!!! Should be reusing old populations but it's commented out"
-!        NLTE%N(:,:)=Saved_NLTE%N(:,:)
-!        NLTE%Source_f(:,:,:)=Saved_NLTE%Source_f(:,:,:)
-!        NLTE%Error=Saved_NLTE%Error
-!        NLTE%atmo=Saved_NLTE%atmo
-
-
         If (NLTEInput%Verbose .ge. 3) &
              Print *,'Using previous populations'
         Call time_routine('solvestat',.False.)
-!        Return
+        NLTE%N(:,:)=Saved_NLTE%N(:,:)
+        NLTE%Source_f(:,:,:)=Saved_NLTE%Source_f(:,:,:)
+        NLTE%Error=Saved_NLTE%Error
+        NLTE%atmo=Saved_NLTE%atmo
+        Return
      End if
   End if
 
