@@ -260,16 +260,12 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
   Integer :: idepth, iters, iatom
   Real :: Pel, Pg, Wsum, Asum, Avmolweight, dif, temp
   Logical :: Warning
-  Real, Parameter :: Min_Temp=2000., Min_Pe=1e-4
+  Real, Parameter :: Min_Pe=1e-4
 !
   Call Time_routine('Fill densities',.true.)
 !
 ! Check atmosphere for sanity
   Do idepth=1, Params%n_points
-     If (Atmo%Temp(idepth) .lt. Min_Temp) then
-        Call Debug_log('In fill_densities. Temperature .lt. Min_Temp parameter. Clipping it',2)
-        Atmo%Temp(idepth)=Min_Temp
-     End if
      If (Atmo%El_p(idepth) .lt. Min_Pe) then
         Call Debug_log('In fill_densities. Pe .lt. Min_Pe parameter. Clipping it',2)
         Atmo%El_p(idepth)=Min_Pe
@@ -1991,7 +1987,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Logical :: NLTE_done
   Logical :: CheckNaN
   Character (len=256) :: String
-  Real, Parameter :: Min_Temp=2000., Min_Pe=1e-4
+  real :: u1,u2,u3,du1,du2,du3 ! debug
+  Real, Parameter :: Min_Pe=1e-4
 !
   Call Time_routine('forward',.True.)
 
@@ -2009,10 +2006,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
        Call ipol_dscale(Params, Atmo, Line)  
 ! Check atmosphere for sanity
   Do idepth=1, npoints
-     If (Atmo%Temp(idepth) .lt. Min_Temp) then
-        Call Debug_log('In forward. Temperature .lt. Min_Temp parameter. Clipping it',2)
-        Atmo%Temp(idepth)=Min_Temp
-     End if
      If (Atmo%El_p(idepth) .lt. Min_Pe) then
         Call Debug_log('In forward. Pe .lt. Min_Pe parameter. Clipping it',2)
         Atmo%El_p(idepth)=Min_Pe

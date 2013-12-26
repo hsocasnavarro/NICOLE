@@ -340,6 +340,10 @@ Contains
        dz4=-z4*dx3/x3+.5/x3*(exp(x2-x3)*(dx2-dx3)+exp(-x3)*(-dx3*(gg-1. &
      &       )+ggg))                                                    
       hneutr=z2*(sum+z4)*p(1) 
+
+      if (lambda_in4 .le. 4000) & ! For UV, neutral H and Mg are computed in the UV package
+           hneutr=0.
+
 !-----------------------------------------------------------------------
                ! *** h2- ***                                            
    10 h2min=0. 
@@ -490,6 +494,8 @@ Contains
       y1=ccatom(kk,l)+y2*(ccatom(k,l)-ccatom(kk,l)) 
       y2=ccatom(kk,l+1)+y2*(ccatom(k,l+1)-ccatom(kk,l+1)) 
       carbon=z1*p(3)*10.**(y*(y1-y2)-y1-20.) 
+      if (lambda_in4 .le. 4000) & ! For UV, neutral H and metals are computed in the UV package
+           carbon=0.
 !-----------------------------------------------------------------------
                 ! *** na ***                                            
    50 sodium=0. 
@@ -535,6 +541,8 @@ Contains
       y1=csodiu(kk,l)+y2*(csodiu(k,l)-csodiu(kk,l)) 
       y2=csodiu(kk,l+1)+y2*(csodiu(k,l+1)-csodiu(kk,l+1)) 
       sodium=z1*p(4)*10.**(y*(y1-y2)-y1-10.) 
+      if (lambda_in4 .le. 4000) & ! For UV, neutral H and metals are computed in the UV package
+           sodium=0.
 !-----------------------------------------------------------------------
                                                                         
                 ! *** mg ***                                            
@@ -580,6 +588,9 @@ Contains
       y1=cmatom(kk,l)+y2*(cmatom(k,l)-cmatom(kk,l)) 
       y2=cmatom(kk,l+1)+y2*(cmatom(k,l+1)-cmatom(kk,l+1)) 
       mgatom=z1*p(5)*10.**(y*(y1-y2)-y1-20.) 
+
+      if (lambda_in4 .le. 4000) & ! For UV, neutral H and Mg are computed in the UV package
+           mgatom=0.
 !.......................................................................
                                                                         
    52        kac=kac+carbon+sodium+mgatom 

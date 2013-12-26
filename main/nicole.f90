@@ -20,7 +20,7 @@ Program Nicole
   Use File_operations
   Use debug_module
   Use Profiling
-  Use Background_opacity_module, Only: Opacity_package
+  Use Background_opacity_module, Only: Opacity_Package, Opacity_Package_UV
   Use Eq_state, Only: eqstate_switch_others, eqstate_switch, eqstate_pe_consistency
   Implicit None
   Type (Parameters) :: Params
@@ -153,7 +153,7 @@ Program Nicole
   Read (headerunit, '(A)') Input%input_dens
   Read (headerunit, *) KeepVars(1:8)
   Read (headerunit, '(A)') Input%hscale
-  Read (headerunit, *) Opacity_package
+  Read (headerunit, *) Opacity_package, Opacity_Package_UV
   Read (headerunit, *) eqstate_switch, eqstate_switch_others, eqstate_pe_consistency
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
   Read (headerunit, *) Input%depcoef_mode

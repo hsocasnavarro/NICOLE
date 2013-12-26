@@ -417,7 +417,7 @@ contains
     gff = (1.d0-exp(-theta2)) * exp(-theta1) * lambda_in**3
     
     hydrogen = cte * gff * sum
-    
+
   end function hydrogen
   
   !-----------------------------------------------------------------
@@ -583,14 +583,12 @@ contains
     real(kind=8) :: T, Pe, Pg, PH, PHminus, PHplus, PH2, PH2plus, lambda_in
     real(kind=8) :: factor, H_per_volume
     real(kind=8) :: contrib1, contrib2, contrib3, contrib4, contrib5, contrib6, contrib7, caca
-    real, Parameter :: Min_Temp=2000., Min_Pe=1e-4, Max_Temp=1e4, Max_Pe=1e7
-    real, Parameter :: Min_Lambda=2000., Max_Lambda=16000
-!    Integer :: flag
+    real, Parameter :: Min_Pe=1e-6, Max_Pe=1e6
+    real, Parameter :: Min_Lambda=300., Max_Lambda=120000
     Logical, Save :: FirstTime=.True.
     Character (Len=512) :: String
     ! Convert default Real to kind=8	
 
-!    flag=0
     T=T4
     Pe=Pe4
     PH=PH4
@@ -609,18 +607,10 @@ contains
        Call Debug_log('In asensio_background_opacity. Lambda .gt. Max_Lambda parameter. Clipping it.',2)
        lambda_in=Max_Lambda
     End if
-    If (T .lt. Min_Temp) then
-       Call Debug_log('In asensio_background_opacity. Temperature .lt. Min_Temp parameter. Clipping it.',2)
-       T=Min_Temp
-    End if
     If (Pe .lt. Min_Pe) then
        Call Debug_log('In asensio_background_opacity. Pe .lt. Min_Pe parameter. Clipping it.',2)
        Pe=Min_Pe
     End if
-!    If (T .gt. Max_Temp) then
-!       Call Debug_log('In asensio_background_opacity. Temperature .gt. Max_Temp parameter. Clipping it.',2)
-!       T=Max_Temp
-!    End if
     If (Pe .gt. Max_Pe) then
        Call Debug_log('In asensio_background_opacity. Pe .gt. Max_Pe parameter. Clipping it.',2)
        Pe=Max_Pe
@@ -630,21 +620,23 @@ contains
 
     contrib1 = hminus_ff(T, Pe, lambda_in)
     contrib2 = hminus_bf(T, Pe, lambda_in)
-    contrib3 = hydrogen(T, lambda_in)
     contrib4 = thomson(Pe, PH)
     contrib5 = rayleigh_h(lambda_in)
     contrib6 = rayleigh_h2(PH, PH2, lambda_in)
-    
-    ! Magnesium opacity is per total H atom. For this reason, we multiply by factor
-    ! because nH*factor=nH_tot
-    contrib7 = magnesium(T, Pe, lambda_in) * factor
+    contrib3=0.
+    contrib7=0.
+
+    If (lambda_in .gt. 4000) then ! For UV, neutral H and Mg are computed in the UV package
+       contrib3 = hydrogen(T, lambda_in)
+       ! Magnesium opacity is per total H atom. For this reason, we multiply by factor
+       ! because nH*factor=nH_tot
+       contrib7 = magnesium(T, Pe, lambda_in) * factor
+    End if
     
     asensio_background_opacity = PH / (PK*T) * &
          (contrib1 + contrib2 + contrib3 + contrib4 + contrib5 + contrib6 + contrib7)
     
     Scat=(contrib4+contrib5+contrib6)*PH/(PK*T)
-
-!    if (flag .eq. 1) print *,'andr=',asensio_background_opacity,scat
 
     If (Scat .lt. 0) then
        Write (String,*) 'T, Pe, PH, PHminus, PHplus, PH2, PH2plus, lambda, c1, c2, c3=', &

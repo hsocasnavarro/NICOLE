@@ -275,6 +275,7 @@ for icycle in range(int(ncycles)):
     hscale=hscale.lower()
     opacities=get_value(config,'Opacity package','wittmann','NICOLE.input')
     opacities=opacities.lower()
+    opacitiesUV=get_value(config,'Opacity package UV','top','NICOLE.input')
     eqstate=get_value(config,'Eq state','0','NICOLE.input')
     eqstate=eqstate.lower()
     if (eqstate == '0' or eqstate == 'nicole'):
@@ -351,9 +352,14 @@ for icycle in range(int(ncycles)):
     if opacities != 'andres' and opacities != 'sopa' and opacities != 'wittmann':
         print 'Error in NICOLE.input. Unknown opacity package:',opacities
         sys.exit(1)
+    if opacitiesUV != 'top' and opacitiesUV != 'dm':
+        print 'Error in NICOLE.input. Unknown opacity package UV:',opacitiesUV
+        sys.exit(1)
     if opacities == 'wittmann': opacities = '1'
     if opacities == 'andres': opacities = '2'
     if opacities == 'sopa': opacities = '3'
+    if opacitiesUV == 'top': opacities = '1'
+    if opacitiesUV == 'dm': opacities = '2'
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':
@@ -1118,7 +1124,7 @@ for icycle in range(int(ncycles)):
             keep_nHminus+' '+keep_nHplus+' '+keep_nH2+' '+keep_nh2plus+
             '       ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ \n')
     f.write(hscale+'          ! hscale \n')
-    f.write(opacities+'          ! opac \n')
+    f.write(opacities+'  '+opacitiesUV+'  ! opac, opacUV \n')
     f.write(eqstate+'  '+eqstateH+' '+peconsistency+'          ! Eq state, Eq state for H, Pe_consistency \n')
     f.write(sethydro+'     '+setnH+'   '+restart+'   ! sethydro, setnH, restart \n')
     f.write(depcoef+'   ! depcoef \n')

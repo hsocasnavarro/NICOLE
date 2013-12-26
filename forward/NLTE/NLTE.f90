@@ -3194,7 +3194,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
 !
   Implicit None
   Type (NLTE_variables) :: NLTE
-  Real, Parameter :: OptThin=1e-3, OptThick=1.e6
+  Real, Parameter :: OptThin=1e-2, OptThick=1.e2
   Integer :: imu, inu, itran, idepth, BoundUp, BoundLow, iformal, ii
   Real, Dimension(0:NLTE%NDEP) :: Iminus, Iplus
   Real, Dimension(NLTE%NDEP) :: X, S, P, LStMuNu, Tau_500, Tau_Nu, Dtau_Nu,&
@@ -3220,10 +3220,12 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
   T=Tau_500(1)*X(1)*CMu
   Tau_Nu(1)=T
   Dtau_Nu(1)=T
-!  Dtau_Nu(2:NLTE%NDEP)=.5*(X(2:NLTE%NDEP)+X(1:NLTE%NDEP-1))* &
-!       (Tau_500(2:NLTE%NDEP)-Tau_500(1:NLTE%NDEP-1))*CMu
-  call bezier_qintep(NLTE%ndep, tau_500, X, dtau_nu)
-  dtau_nu = dtau_nu * cmu
+
+  Dtau_Nu(2:NLTE%NDEP)=.5*(X(2:NLTE%NDEP)+X(1:NLTE%NDEP-1))* &
+       (Tau_500(2:NLTE%NDEP)-Tau_500(1:NLTE%NDEP-1))*CMu
+
+!  call bezier_qintep(NLTE%ndep, tau_500, X, dtau_nu) ! debug. Parece que converge mejor con la integracion lineal de toda la vida que con la de bezier
+!  dtau_nu = dtau_nu * cmu
 
   Do idepth=2, NLTE%NDEP
      Tau_Nu(idepth)=Tau_Nu(idepth-1)+DTau_Nu(idepth)
@@ -3232,6 +3234,12 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
      If (Tau_Nu(idepth) .gt. OptThick .and. Tau_Nu(idepth-1) .lt. OptThick) &
           BoundLow=idepth
   End do
+  BoundLow=BoundLow+1
+  If (BoundLow .gt. NLTE%NDEP) BoundLow=NLTE%NDEP
+  BoundUp=BoundUp-1
+  If (BoundUp .lt. 1) BoundUp=1
+!
+
 !  Call Check_tau(Tau_Nu)
 
   If (iformal .eq. 1) then
@@ -3270,7 +3278,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
   contains
 
                                             
-subroutine bezier_nlte
+subroutine bezier_NLTE
   !
   ! Computes J = J-  +   J+ and the local approximate lambda operator.
   ! The RTE is integrated using the Bezier-splines solution from Auer 2003.
@@ -3454,7 +3462,7 @@ subroutine bezier_nlte
   !
   do k = 1, nlte%ndep
     if(lstmunu(k) .lt. 0.0d0) then
-       print '(A,I0,A,E16.8)', 'Bezier_NLTE: warning, negative lambda operator LStMuNu(',k,')=',lstmunu(k)
+!       print '(A,I0,A,E16.8)', 'Bezier_NLTE: warning, negative lambda operator LStMuNu(',k,')=',lstmunu(k)
 !       print *,'rnu=',rnu
 !       print *,'k,rnu,rlu=',k,rnu(k),rlu(k)
 !       print *,'k,alpha,gamma=',k,alpha(k),gamma(k)
@@ -3828,144 +3836,196 @@ Subroutine FreqQuad(Atom, NLTEInput)
 
 End Subroutine FreqQuad
 
-      LOGICAL FUNCTION NGFUNC(Y,NK,NDEP,N, reset)
+SUBROUTINE NG(AN,NK,NDEP,NGON, Printout)
 !
-! Adapted from MULTI
+!  PERFORMS NG ACCELERATION
+!  SEE L.H. AUER , P. 101
+!  IN KALKOFEN, ED., "NUMERICAL RADIATIVE TRANSFER", 
+!  CAMBRIDGE UNIVERSITY PRESS 1987
 !
-!     NG ACCELERATION OF A VECTOR ITERATION SCHEME
+!: NG     90-09-11  NEW ROUTINE: (MARTIN J. STIFT, MATS CARLSSON)
+!:
 !
-!     INPUT
-!        Y(M)     -ITERATE OF VECTOR ROOT BEING SOUGHT
-!        N        =1...5, THE ORDER OF THE ACCELERATION TO BE USED
-!        YY(M,N+2)-SCRATCH ARRAY, MUST NOT BE ALTERED AFTER CALL TO NG.
-!     OUTPUT
-!        NG       =.TRUE. IF AN ACCELERATION HAS BEEN MADE, THEN
-!        Y(I)     = ACCELERATED VECTOR
-!     RESET
-!        CALL NG0 -CLEARS STORAGE OF PREVIOUS ITERATES
 !
-!     METHOD
-!     APPROXIMATE THE ROOT VECTOR IN TERM OF THE PREVIOUS ITERATES Y,YY(1)...
-!        ROOT ~ Y + SUM(C(I)*(YY(I) - Y)     AND
-!        ROOT ~ YY(1) + SUM(*C(I)*(YY(I+1) - YY(1)).
-!     SUBTRACT THESE TWO EXPRESSION.  USE LEAST SQUARES TO DETERMINE C'S.
+      Real, DIMENSION(NK,NDEP) :: AN
+      LOGICAL :: NGON, Printout
+!
+      Real, DIMENSION(3,3) :: AA
+      Real, Dimension(3) :: BB
+      Real, Dimension(:,:,:), Allocatable, Save :: YS
+      Integer, Save :: ICALL
+      DATA ICALL/0/
+!
+!  IF NGON=.FALSE., RESET ITERATION COUNT AND RETURN
+!
+      If (.not. Allocated(YS)) Allocate(YS(5,NK,NDEP))
+      IF(.NOT.NGON) THEN
+        ICALL=0
+        RETURN
+      ENDIF
+      ICALL=ICALL+1
+!
+! STORE ITERATED LEVEL POPULATIONS FOR NG ACCELERATION
+!
+      IS0 = MOD(ICALL-1,5) + 1
+      DO 910 I = 1,NK
+        DO 900 K = 1,NDEP
+          YS(IS0,I,K) = (AN(I,K))
+  900   END DO
+  910 END DO
+!
+      IF (IS0.EQ.5) THEN
+!
+         If (Printout) &
+              Print *,' NG acceleration'
 
-      DIMENSION Y(NK,NDEP)
-!,YY(MK,MDEP,7)
-!      DIMENSION YY2(MK*MDEP,7)
-      DIMENSION A(7,7),C(7)
-      Integer, Save :: NTRY
-      Real, Dimension(:,:,:), Allocatable, Save :: YY
-      Real, Dimension(:,:), Allocatable, Save :: YY2
-      Logical :: reset
-      DATA NTRY /0/
+        DO 960 I = 1,NK
 !
-      NGFUNC=.FALSE.
-      If (.not. Allocated(YY)) Allocate(YY(NK, NDEP, 7))
-      If (.not. Allocated(YY2)) Allocate(YY2(NK*NDEP, 7))
-      If (reset) then
-         NTRY=0
-         YY(:,:,:)=0.
-         YY2(:,:)=0.
-         Return
-      End if
+          DO 930 K1 = 1,3
+            DO 920 K2 = 1,3
+              AA(K1,K2) = 0.
+  920       END DO
+            BB(K1) = 0.
+  930     END DO
 !
-      IF (N.LT.1.OR.N.GT.5) RETURN
-      NTRY = NTRY + 1
-      YY(1:NK,1:NDEP,NTRY) = Y(1:NK,1:NDEP)
-      NGFUNC = .FALSE.
-      IF (NTRY.LE.N+1) RETURN
-!     ACCELERATION
-      A(1:N,1:N)=0.
-      C(1:N)=0.
-      DO K1=1,NK
-         DO K2=1,NDEP
-            YY2((K1-1)*NDEP+K2,1:7)=YY(K1,K2,1:7)
-         END DO
-      END DO
-      DO 700 K = 1, NK*NDEP
-         WT = 1.D0/(1.d0 + ABS(YY2(K,NTRY)))
-         DO 600 I = 1, N
-            DY = YY2(K,NTRY-1) - YY2(K,NTRY)
-            DI = WT* (DY + YY2(K,NTRY-I) - YY2(K,NTRY-I-1))
-            C(I) = C(I) + DI*DY
-            DO 500 J = 1, N
-               A(I,J) = A(I,J) + DI*(DY+YY2(K,NTRY-J)-YY2(K,NTRY-J-1))
-500         END DO
-600      END DO
-700   END DO
-      CALL LLSLV(A,C,N,7)
-!     INCLUDE CORRECTION
-      NGFUNC = .TRUE.
-      DO 1000 I = 1, N
-         DO 900 K = 1, NK
-            DO K2=1,NDEP
-               Y(K,K2) = Y(K,K2) + C(I)*(YY2((K-1)*NDEP+K2,NTRY-I)- &
-                    YY2((K-1)*NDEP+K2,NTRY))
-            END DO
-900      END DO
-1000  END DO
-!      ENTRY NG0
-      NTRY = 0
+          DO 940 K = 1,NDEP
+            WT = 1. / YS(5,I,K)**2
+            D0 = YS(5,I,K) - YS(4,I,K)
+            D1 = D0 - YS(4,I,K) + YS(3,I,K)
+            D2 = D0 - YS(3,I,K) + YS(2,I,K)
+            D3 = D0 - YS(2,I,K) + YS(1,I,K)
+            AA(1,1) = AA(1,1) + WT * D1 * D1
+            AA(1,2) = AA(1,2) + WT * D1 * D2
+            AA(1,3) = AA(1,3) + WT * D1 * D3
+            AA(2,2) = AA(2,2) + WT * D2 * D2
+            AA(2,3) = AA(2,3) + WT * D2 * D3
+            AA(3,3) = AA(3,3) + WT * D3 * D3
+            AA(2,1) = AA(1,2)
+            AA(3,1) = AA(1,3)
+            AA(3,2) = AA(2,3)
+            BB(1)   = BB(1)   + WT * D0 * D1
+            BB(2)   = BB(2)   + WT * D0 * D2
+            BB(3)   = BB(3)   + WT * D0 * D3
+  940     END DO
+!
+          CALL LINEQ (AA,BB,3,3)
+
+          DO 950 K = 1,NDEP
+            AN(I,K) = (1. - BB(1) - BB(2) - BB(3)) * YS(5,I,K) + &
+                     BB(1) * YS(4,I,K) +  &
+                     BB(2) * YS(3,I,K) +  &
+                     BB(3) * YS(2,I,K)
+!            AN(I,K)=Exp(AN(I,K))
+  950     END DO
+!
+  960   END DO
+ENDIF
+!
+RETURN
+End SUBROUTINE NG
+
+SUBROUTINE LINEQ(A,B,N,M)
+!
+!  FINDS SOLUTION OF SYSTEM OF LINEAR EQUATIONS
+!  WITH GAUSSIAN ELIMINATION WITH PIVOTING
+!
+!: LINEQ  90-06-05  NEW ROUTINE: (MARTIN J STIFT)
+!:
+!:        09-05-01  MODIFICATIONS: (MATS CARLSSON)
+!:        MADE ROUTINE GENERAL AND NOT SPECIALIZED TO 3X3 MATRICES
+!:
+!     INCLUDE 'PREC'
+!
+      PARAMETER (MDIM=10000)
+      DIMENSION A(M,M),B(M),C(MDIM),ICOL(MDIM)
+!
+      IF(N.GT.MDIM) THEN
+         PRINT *,'LINEQ: N.GT.MDIM'
+         STOP
+      ENDIF
+!
+! INITIALIZE COLUMN COUNT AND STARTING POINTS
+!
+      DO 10 I = 1,N
+        ICOL(I) = I
+   10 CONTINUE
+!
+      IBEG = 1
+      JBEG = 1
+!
+! DETERMINE PIVOT
+!
+   20 AMA = ABS(A(IBEG,JBEG))
+      IMA = IBEG
+      JMA = JBEG
+      DO 30 I = IBEG,N
+        DO 30 J = JBEG,N
+          IF(ABS(A(I,J)).LE.AMA) GOTO 30
+          AMA = ABS(A(I,J))
+          IMA = I
+          JMA = J
+   30 CONTINUE
+!
+! ORDER MATRIX DEPENDING ON PIVOT
+!
+      DO 40 I = 1,N
+        TEMP = A(I,JMA)
+        A(I,JMA) = A(I,JBEG)
+        A(I,JBEG) = TEMP
+   40 CONTINUE
+!
+      DO 50 J = JBEG,N
+        TEMP = A(IMA,J)
+        A(IMA,J) = A(IBEG,J)
+        A(IBEG,J) = TEMP
+   50 CONTINUE
+!
+      TEMP = B(IMA)
+      B(IMA) = B(IBEG)
+      B(IBEG) = TEMP
+      IT = ICOL(JBEG)
+      ICOL(JBEG) = ICOL(JMA)
+      ICOL(JMA)= IT
+      IBEG = IBEG + 1
+      JBEG = JBEG + 1
+!
+! ELIMINATE
+!
+      IMIN = IBEG - 1
+      JMIN = JBEG - 1
+      DO 70 I = IBEG,N
+        QUOT = A(I,JMIN) / A(IMIN,JMIN)
+        DO 60 J = JBEG,N
+          A(I,J) = A(I,J) - QUOT * A(IMIN,J)
+   60   CONTINUE
+        B(I) = B(I) - QUOT * B(IMIN)
+   70 CONTINUE
+      IF (IBEG.LT.N) GOTO 20
+!
+! DETERMINE COEFFICIENTS
+!
+      B(N) = B(N) / A(N,N)
+      N1 = N - 1
+      DO 90 I = N1,1,-1
+        I1 = I + 1
+        DO 80 J = N,I1,-1
+          B(I) = B(I) - A(I,J) * B(J)
+   80   CONTINUE
+        B(I) = B(I) / A(I,I)
+   90 CONTINUE
+!
+! REORDER COEFFICIENTS
+!
+      DO 100 I = 1,N
+        C(ICOL(I))=B(I)
+  100 CONTINUE
+!
+      DO 110 I = 1,N
+        B(I) = C(I)
+  110 CONTINUE
+!
       RETURN
-    END FUNCTION NGFUNC
-
-      SUBROUTINE LLSLV (S, X, N, NR)                                     
-!                                                                       
-! Adapted from MULTI
-!
-!     SOLUTION OF THE SYMMETRIC SYSTEM OF LINEAR EQUATIONS              
-!           S*X = X                                                     
-!     INPUT                                                             
-!         S(I,J) = S(J,I)   SYMMETRIC MATRIX ONLY LOWER (J<=I) USED     
-!         X(I)   -RIGHT HAND SIDE                                       
-!         N      -SIZE OF SYSTEM                                        
-!         NR     -ACTUAL FIRST DIMENSION OF S(NR,*)                     
-!     OUTPUT                                                            
-!         S(I,J),J<=I  = DECOMPOSITION L                                
-!         X(I)   -SOLUTION                                              
-!     NOTE                                                              
-!     THE SYMMETRIC MATRIX IS DECOMPOSED L*LT = S                       
-!                                                                       
-      REAL S (NR, NR) , X (NR) , SUM                                  
-      INTEGER I, J, K, N, NR                                             
-!                                                                       
-!     FACTOR S(I,J) = SUM(K=1,MIN(I,J): S(I,K)*S(J,K))                  
-!                         
-      DO 1200 I = 1, N                                                   
-         DO 1100 J = 1, I                                                
-            SUM = S (I, J)                                               
-            DO 1000 K = 1, J - 1                                         
-               SUM = SUM - S (I, K) * S (J, K)                           
- 1000       END DO                                                       
-            IF (J.LT.I) THEN                                             
-               S (I, J) = SUM / S (J, J)                                 
-            ELSE                                                         
-               S (I, J) = SQRT (ABS (SUM) )                            
-            ENDIF                                                        
- 1100    END DO                                                          
- 1200 END DO                                                             
-      ENTRY LLRESLV (S, X, N, NR)                                        
-!                                                                       
-!     SOLVE L*LT X = X                                                  
-!           L IS SYMMETRIC FACTOR DETERMINED BY A CALL TO LLSLV         
-!                                                                       
-      DO 2100 I = 1, N                                                   
-         SUM = X (I)                                                     
-         DO 2000 J = 1, I - 1                                            
-            SUM = SUM - S (I, J) * X (J)                                 
- 2000    END DO                                                          
-         X (I) = SUM / S (I, I)                                          
- 2100 END DO                                                             
-      DO 2300 I = N, 1, - 1                                              
-         SUM = X (I)                                                     
-         DO 2200 J = N, I + 1, - 1                                       
-            SUM = SUM - S (J, I) * X (J)                                 
- 2200    END DO                                                          
-         X (I) = SUM / S (I, I)                                          
- 2300 END DO                                                             
-      RETURN                                                             
-      END SUBROUTINE LLSLV                       
+END SUBROUTINE LINEQ
 !
 ! This subroutine reads the file NLTE_lines with information to match
 ! the lines in the LINES file to the NLTE transitions in the ATOM file.
@@ -4429,6 +4489,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
               Call ReadX(Xcont, Scat, Sc)
               LStar(:)=0.
            End if
+
            hc4p=hh*cc*1.e-5/NLTEInput%QNORM/4./Pi
            irec=irec+1
            Call ReadJ(irec, Jnu)
@@ -4483,28 +4544,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
               Call time_routine('NLTE_formalsolution',.True.)
               Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
                    X, S, RNu, P, LStMuNu, ResetSafe)
-!              if (checknan(sum(s))) then
-!                 print *,'itran=',itran
-!                 print *,'p=',p
-!                 print *,'sl=',nlte%sl(:,itran)
-!                 print *,'gij=',gij
-!                 print *,'z=',z
-!                 print *,'r=',rnu
-!                 print *,'x=',x
-!                 print *,'xcont=',xcont
-!                 print *,'z=',z
-!                 print *,'alpha=',alpha
-!                 print *,'lstmunu=',lstmunu
-!                 pause
-!              endif
-!              if ( (itran .eq. 11 .or. itran .eq. 12) .and. inu .ge. 1 .and. imu .ge. 1) then
-!                 print *,'itran=',itran,' inu=',inu
-!                 print *,'xcont=',xcont
-!                 print *,'x-xcont=',x-xcont
-!                 print *,'p=',p
-!                 pause
-!              endif
-
               Call time_routine('NLTE_formalsolution',.False.)
               ResetSafe=.False.
               If (iter .le. NLTEInput%NumLambdaIters) LStMuNu(:)=0.
@@ -4756,13 +4795,10 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 
 ! NG acceleration
      If (iter .eq. 1) & ! Reset NG acceleration
-          resetNG=NGFunc(NLTE%N, Atom%NK, NLTE%NDEP, 3, .true.)
+          Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .false., .false.)
 
-     If (RelChg .lt. 1 .and. NLTEInput%NGacc) then
-        If (NGFunc(NLTE%N, Atom%NK, NLTE%NDEP, 3, .false.)) then
-           If (NLTEInput%Verbose .ge. 4) &
-                Print *,'NG acceleration'
-        End if
+     If (iter .gt. 5 .and. NLTEInput%NGacc) then
+        Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .true., NLTEInput%Verbose .ge. 4)
      End if
      If (minval(nlte%n) .lt. 0) then
         print *,'negativ pop after NG!!'

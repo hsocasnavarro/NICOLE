@@ -47,7 +47,7 @@ Module Variables
   real(kind=8), SAVE :: atomic_partition(7,3,21)
   real(kind=8), SAVE :: equilibrium(273), nh, temper, n_e, equilibrium_atomic(2,21)
   real(kind=8), parameter :: NA_ME = -4.89104734208d0, PK_CH = 1.3806503d-16
-  real(kind=8), parameter :: Min_T=2000, Max_T=10000, Min_Pg=1e-3, Max_Pg=1e6, Min_Pe=1e-3, Max_Pe=1e5
+  real(kind=8), parameter :: Min_Pg=1e-3, Max_Pg=1e6, Min_Pe=1e-3, Max_Pe=1e5
   real(kind=8), SAVE :: x_sol(22), x0_sol(22), P_total, P_elec
   !  Data Elements/'H_','HE','C_','N_','O_','F_','NA','MG','AL','SI', &
   !       'P_','S_','CL','K_','CA','TI','CR','MN','FE','NI','CU'/
@@ -2013,14 +2013,6 @@ Contains
        Debug_warningflags(flag_computepg)=0
        
        Do loop = 1, n_grid
-          If (temper_in(loop) .lt. Min_T) then
-             temper_in(loop)=Min_T
-             Call Debug_Log('T .lt. Min_T in Compute_others_from_T_Pe_Pg', 2)
-          End if
-!          If (temper_in(loop) .gt. Max_T) then
-!             temper_in(loop)=Max_T
-!             Call Debug_Log('T .gt. Max_T in Compute_others_from_T_Pe_Pg', 2)
-!          End if
           If (Pe_in(loop) .lt. Min_Pe) then
              Pe_in(loop)=Min_Pe
              Call Debug_Log('Pe .lt. Min_Pe in Compute_others_from_T_Pe_Pg', 2)

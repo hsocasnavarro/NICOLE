@@ -820,13 +820,25 @@ mpirun -n 8 ./nicole
   the procedure but in practice the difference in computing time
   should be negligible in almost all situations.
 \item Opacity Package (Optional, default=Asensio): Package to use for
-  the computation of background continuum opacities. Possible values:
-  a)ASENSIO, b)WITTMANN, c)SOPA . This last option is hidden 
-  in the normal distribution because we haven't been able to adapt the
+  the computation of background continuum opacities from most common
+  contributors in the visible and infrared. Possible values:
+  a)ASENSIO, b)WITTMANN, c)SOPA . This last option is hidden in the
+  normal distribution because we haven't been able to adapt the
   original routines to conform with the standards. As such, it might
   cause problems with compilation and other issues. If there is any
   powerful reason why you feel that you'd need to use this package,
   please contact the authors for a SOPA-enabled version.
+\item Opacity Package UV (Optional, default=TOP): Package to use for
+  the computation of background continuum opacities from the most common
+  contributors in the UV. Possible values: a)TOP, b)DM. The first
+  option (TOP) will make use of photoionization cross-sections
+  tabulated by The Opacity Project/The Iron Project for most neutral
+  and singly ionized elements between Z=1 and Z=26. For Fe we use the
+  data provided by Bautista (1997, A\&AS 122, 166) and by Nahar and
+  Pradham (1994, J. Phys. B 27, 429), using the smoothing technique of
+  Allende Prieto (2008, Phys Scr 133). The second option (DM) uses the
+  approximation of Dragon and Mutschlecner (1980, Apj 239, 104). These
+  contributions are considered only at wavelenghts below 4000~\AA .
 %\item Compute Hydrogen populations: (Optional, default=Yes). Some of
 %  the underlying calculations depend (typically very weakly) on some
 %  Hydrogen level populations. Normally, NICOLE will compute these
