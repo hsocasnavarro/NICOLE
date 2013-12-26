@@ -23,6 +23,12 @@ Contains
     Real, Dimension(1) :: TT, U1, U2, U3, dU1, dU2, dU3, n0overn1, Ne
     Real :: Eioniz, Excit, Ab, novernh, Opac
     Integer :: ilam, iz, ilev
+    Logical :: FirstTime=.True.
+
+    If (FirstTime) then ! Read data from file the first time
+       Call UVopacity_TOPbase_init
+       FirstTime=.False.
+    End if
 
     TT(1)=T
     Ne(1)=Pe/BK/T

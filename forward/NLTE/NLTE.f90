@@ -3221,11 +3221,11 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
   Tau_Nu(1)=T
   Dtau_Nu(1)=T
 
-  Dtau_Nu(2:NLTE%NDEP)=.5*(X(2:NLTE%NDEP)+X(1:NLTE%NDEP-1))* &
-       (Tau_500(2:NLTE%NDEP)-Tau_500(1:NLTE%NDEP-1))*CMu
+!  Dtau_Nu(2:NLTE%NDEP)=.5*(X(2:NLTE%NDEP)+X(1:NLTE%NDEP-1))* &
+!       (Tau_500(2:NLTE%NDEP)-Tau_500(1:NLTE%NDEP-1))*CMu
 
-!  call bezier_qintep(NLTE%ndep, tau_500, X, dtau_nu) ! debug. Parece que converge mejor con la integracion lineal de toda la vida que con la de bezier
-!  dtau_nu = dtau_nu * cmu
+  call bezier_qintep(NLTE%ndep, tau_500, X, dtau_nu) ! debug. Parece que converge mejor con la integracion lineal de toda la vida que con la de bezier
+  dtau_nu = dtau_nu * cmu
 
   Do idepth=2, NLTE%NDEP
      Tau_Nu(idepth)=Tau_Nu(idepth-1)+DTau_Nu(idepth)

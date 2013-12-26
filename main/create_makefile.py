@@ -553,6 +553,16 @@ mains=[treetop+'main'+dirsep+'nicole.f90']
 ignoredeps=['mpif.h'] # To allow compilation of mpi version
 #ignoredeps.append('NRTYPE;') # Avoid crash in svdcmp.f90 because we can't handle ;
 
+# Hard-wire source tree directory in forward/uv_opacity_topbase_data.f90
+# to find file UV_TOP.dat
+path=os.path.realpath(treetop+'forward'+dirsep)+dirsep
+source=open(treetop+'forward'+dirsep+'uv_opacity_topbase_data.presource').read()
+source=re.sub('\./',path,source)
+source=re.sub('Len=\*','Len='+str(len(path)),source)
+f=open(treetop+'forward'+dirsep+'uv_opacity_topbase_data.f90','w')
+f.write(source)
+f.close()
+
 # Check Numerical Recipes routines
 print 'Checking for availability of required routines from the Numerical Recipes'
 files=['svdcmp','svbksb','pythag','nr','nrutil','nrtype','convlv','twofft','four1','realft','fourrow']

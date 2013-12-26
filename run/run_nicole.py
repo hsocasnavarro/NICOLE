@@ -358,8 +358,8 @@ for icycle in range(int(ncycles)):
     if opacities == 'wittmann': opacities = '1'
     if opacities == 'andres': opacities = '2'
     if opacities == 'sopa': opacities = '3'
-    if opacitiesUV == 'top': opacities = '1'
-    if opacitiesUV == 'dm': opacities = '2'
+    if opacitiesUV == 'top': opacitiesUV = '1'
+    if opacitiesUV == 'dm': opacitiesUV = '2'
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':
