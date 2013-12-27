@@ -25,13 +25,23 @@ Contains
        If (Exists) then
           Call Open_file(unit,'UV_TOP.dat')
        Else
-          Print *,'Could not find file UV_TOP.dat'
-          Print *,'This file should be either in the source code tree that this'
-          print *,'exectubale was compiled from or in the current running directory'
-          print *,''
-          print *,'The source tree where I was looking for it is:'
-          print *,Path
-          Stop
+          Inquire(File='UV_TOP.dat-fromgit/UV_TOP.dat',Exist=Exists)
+          If (Exists) then
+             Call Open_file(unit,'UV_TOP.dat-fromgit/UV_TOP.dat')
+          Else
+             Print *,'Could not find file UV_TOP.dat'
+             Print *,'This file should be either in the source code tree that this'
+             print *,'exectubale was compiled from or in the current running directory'
+             print *,''
+             print *,'The source tree where I was looking for it is:'
+             print *,Path
+             print *,''
+             print *,'A simple solution is to download the following zip file and'
+             print *,'extract (unzip) it here:'
+             print *,'https://github.com/hsocasnavarro/UV_TOP.dat/archive/fromgit.zip'
+             print *,''
+             Stop
+          End if
        End if
     End if
     !   
