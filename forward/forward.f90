@@ -1984,7 +1984,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Integer :: iregion, i, j, nw, istart, iend, NMu, imu, itran, imin, irec, iostat
   Integer, Parameter :: nformalsolutions=8
   Integer, Dimension(nformalsolutions) :: nformal
-  Logical, Save :: First_time=.TRUE., do_NLTE
+  Logical, Save :: FirstTime=.TRUE., do_NLTE
   Logical :: NLTE_done
   Logical :: CheckNaN
   Character (len=256) :: String
@@ -2018,7 +2018,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Debug_warningflags(flag_forward)=0
   Debug_errorflags(flag_forward)=0
   NLTE_done=.FALSE.
-  If (First_time) then
+  If (FirstTime) then
      ! Check if abundances are default (check only first 30 elements)
      Params%def_abund=1
      Do i=1, 30
@@ -2064,15 +2064,14 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         End do
      End if
   End if
-  First_time=.FALSE.
+  FirstTime=.FALSE.
   If (do_NLTE) then
      NLTEInput%Hydro=Hydro
      NLTE%Atmo=Atmo
      Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   End if
-! Check model sanity (hardwired limits)
-! If flux computation is required, set Gaussian weights
 
+! If flux computation is required, set Gaussian weights
   If (Params%heliocentric .ne. 0) then
      NMu=1
      XMU(1)=Params%heliocentric

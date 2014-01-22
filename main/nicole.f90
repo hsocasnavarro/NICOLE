@@ -567,6 +567,7 @@ Program Nicole
         ! Open other files needed in inversion mode and leave open
         Call Open_file_direct(chisqunit,'Chisq.dat'//Cyclesuffix, &
              RealBytes) ! To write
+
         Call Open_file_direct(datainunit, Input%Obs_profile_file, &
              RealBytes*Params%n_data)
         Call Open_file_direct(modeloutuniterr, Trim(Input%Model_out_file)//'.err', &
@@ -630,6 +631,7 @@ Program Nicole
            !
            if(Input%mode.eq.'i') Call Read_direct(LittleEndian,datainunit,irec+1, &
                 Obs_profile, Params%n_data, iost1)
+
            If (Input%Stray_profile_file .ne. '') then
               Call Read_direct(LittleEndian,strayinunit,irec+1, &
                    Params%Stray_prof, Params%n_data, iost1)
