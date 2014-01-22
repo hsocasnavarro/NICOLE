@@ -3177,7 +3177,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
 !
   Implicit None
   Type (NLTE_variables) :: NLTE
-  Real, Parameter :: OptThin=1e-2, OptThick=1.e2
+  Real, Parameter :: OptThin=1e-4, OptThick=1.e2
   Integer :: imu, inu, itran, idepth, BoundUp, BoundLow, iformal, ii
   Real, Dimension(0:NLTE%NDEP) :: Iminus, Iplus
   Real, Dimension(NLTE%NDEP) :: X, S, P, LStMuNu, Tau_500, Tau_Nu, Dtau_Nu,&

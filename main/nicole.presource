@@ -115,6 +115,8 @@ Program Nicole
   !
   Do icycle=icycle0, Params%ncycles
   ! {{{
+     If (Params%Printout .ge. 1 .and. Params%ncycles .gt. 1) &
+          Print *,'Inversion Cycle:',icycle
 
   !
   ! Read input file and set various parameters

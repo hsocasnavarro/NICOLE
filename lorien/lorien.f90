@@ -145,8 +145,7 @@ Contains
   n_failed=0
   n_iter=1
   StopIter=.FALSE.
-  Do while (Pertur .gt. 0.09 .or. & ! Always do first 6 iterations
-       (n_failed .le. 3 .and. n_iter .lt. Params%max_inv_iters .and. .not. StopIter))
+  Do while ( .not. StopIter )
      Call Compute_trial_model(Params, Nodes, Guess_model, Lambda, &
           Obs_profile, Syn_profile, NWChisq, Sigma, Dydx, Trial_model, &
           Trial_errors, Chisq, DChiDx, D2ChiD2x)
@@ -214,6 +213,8 @@ Contains
                 DchiDx, D2ChiD2x)
         End if
      End if
+     If (n_failed .gt. 3 .and. Pertur .lt. 0.09) StopIter=.True.
+     If (n_iter .ge. Params%max_inv_iters) StopIter=.True.
      n_iter=n_iter+1
   End do
   Params%Skip_lambda=1 

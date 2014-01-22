@@ -191,8 +191,9 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
 ! Construct the profile to convolve (one for each Stokes profiles)
 !
      n=Region(iregion)%nwavelengths ! Number of points
-     If (m .gt. n) then
+     If (m .ge. n) then
         Print *,'Error in Convolve_profile. m .gt. n !!!'
+        Return
      Else
 ! Find nearest power of 2
         i=1
@@ -202,8 +203,8 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
         n2=2.**i
         If (n2 .gt. Params%n_data) then
            Print *,'Number of wlengths=',Params%n_data/4,'. n2=',n2
-           Print *,'Cannot convolve. Aborting ...'
-           Stop
+           Print *,'Cannot convolve'
+           Return
         End if
 ! 
         Do istokes=1, 4
