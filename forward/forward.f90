@@ -507,7 +507,6 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
 !
   Call Time_routine('profiles',.True.)
   npoints=Params%n_points
-  B_str=Sqrt(Atmo%B_long**2+Atmo%B_x**2+Atmo%B_y**2)
   Do ind=1, npoints
      If (Abs(Atmo%B_x(ind)) .lt. ZeroFieldThreshold) &
           Atmo%B_x(ind)=ZeroFieldThreshold
@@ -516,6 +515,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
      If (Abs(Atmo%B_long(ind)) .lt. ZeroFieldThreshold) &
           Atmo%B_long(ind)=ZeroFieldThreshold
   End do
+  B_str=Sqrt(Atmo%B_long**2+Atmo%B_x**2+Atmo%B_y**2)
   inc=atan2(Sqrt(Atmo%B_x**2+Atmo%B_y**2),Atmo%B_long)/Pi*180.
   azi=atan2(Atmo%B_y, Atmo%B_x)/Pi*180.
   If (FirstTime) then
@@ -523,7 +523,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
      If (Line%Hyperfine) then
         If (MaxVal(B_str)-MinVal(B_str) .lt. 10) Constant_B=.TRUE.
      End if
-     FirstTime=.FALSE.
+!     FirstTime=.FALSE.
   End if
 !
   Incomplete=.FALSE.
@@ -663,7 +663,7 @@ Subroutine Scalar_hermite(npoints, tau_nu, S, Intensity)
   Real, Dimension (npoints) :: tau_nu, S, Intensity
   Real, Dimension (npoints) :: S_p
   Real :: A, E, J, J_down, Cal_J, Cal_J_down, D, dtau
-  Real, Parameter :: Optically_thick = 100, Optically_thin=1.e-4
+  Real, Parameter :: Optically_thick = 100, Optically_thin=1.e-2
   Logical, Save :: Warning_thin=.TRUE., Warning_thick=.TRUE.
   logical :: checknan
 !
@@ -1987,7 +1987,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Logical :: NLTE_done
   Logical :: CheckNaN
   Character (len=256) :: String
-  real :: u1,u2,u3,du1,du2,du3 ! debug
   Real, Parameter :: Min_Pe=1e-4
 !
   Call Time_routine('forward',.True.)
@@ -2072,6 +2071,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   End if
 ! Check model sanity (hardwired limits)
 ! If flux computation is required, set Gaussian weights
+
   If (Params%heliocentric .ne. 0) then
      NMu=1
      XMU(1)=Params%heliocentric
@@ -2114,6 +2114,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
        Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
     Call Reset_densities(Atmo, Saved)
 !
+
   nformal(1:nformalsolutions)=0. ! Initialize the f. s. counter
   idata=1 ! Index for Syn_profile
   Syn_profile(:)=-1e10
@@ -2157,6 +2158,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         If (NLTEInput%VelFree) NLTE%Atmo%v_los=0.
         If (NLTE_done .eqv. .FALSE.) then
 !           Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+           NLTEInput%UseColSwitch=0
            Call SolveStat(NLTE, NLTEInput, Atom)
            If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
               If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
@@ -2441,6 +2443,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice) ! Formal solution
+
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point

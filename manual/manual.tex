@@ -21,7 +21,7 @@ the Lorien Engine}
 e-mail: \mbox{hsocas@iac.es; jaime@astro.su.se; aasensio@iac.es}\\
 }
 
-\date{Version 2.72, Sep 2013}
+\date{Version 14.01}
 
 \maketitle
 
@@ -685,18 +685,18 @@ mpirun -n 8 ./nicole
   so that a value of $\chi^2$=1 corresponds to a fit at the noise
   level. If the weights are supplied manually using a Weights.pro
   file, then this value has no effect.
-\item Acceptable Chi-square: (Optional, default=5). This parameter is
+\item Acceptable Chi-square: (Optional, default=0). This parameter is
   used to avoid (or at least minimize) the effects of local minima. If
   the inversion results in a $\chi^2$ value worse than this parameter,
   the code will discard this result and run again with a randomized
   initialization.
-\item Maximum inversion iterations: (Optional, default=25). Upper
-  limit to how many iterations will be performed in an inversion
-  cycle.
 \item Maximum number of inversions: (Optional, default=5). How many
   inversions will be tried to reach the acceptable $\chi^2$ before
   giving up and picking the best result of the multiple inversion
   attempts.
+\item Maximum inversion iterations: (Optional, default=25). Upper
+  limit to how many iterations will be performed in an inversion
+  cycle.
 %\item Speed optimization: (Optional, default=1). Controls the behavior
 %  of some approximations implemented to speed up the calculation. If 1
 %  or more, use a newer vector routine for the calculation of Voigt

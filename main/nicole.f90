@@ -1,4 +1,4 @@
-!                      N I C O L E   v 2.72
+!                      N I C O L E   v 14.01
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -72,7 +72,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 2.72 ******************'
+     Print *,'*************** N I C O L E   v 13.12 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -940,6 +940,8 @@ Contains
             .and. irec .ge. irec0 )  )
           If (i_inv .gt. 1) &
                Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model)
+          If (Params%Printout .ge. 1) &
+               Print *,' Inversion try:',i_inv
           Chisq=1e10
           If (debug_level .ge. 1) then ! Open core file and write inversion info
              ! {{{
@@ -1034,6 +1036,8 @@ Contains
              Best_Model=Guess_Model
              BestChisq=Chisq
           End if
+          If (Params%Printout .ge. 1) &
+               Print *,' Chisq=',Chisq,'. Best so far=',BestChisq
           If (debug_level .ge. 1) then
              Call MyFlush(Debug_FileUnit)
              Close (Debug_FileUnit,Status='DELETE')

@@ -1,0 +1,18 @@
+ Code execution started on: 2013/12/26 at 17:38:41.608
+   Code execution ended on: 2013/12/26 at 17:39:34.140
+ Total execution time (s):          52
+ Total execution time (hours):  1.459208333333333E-002
+ Subroutines profiled   (Name, number of calls, time(s), % of total time)
+    main           1   52.5315000000000        100.000000000000     
+    compute_dchisq_dx          26   32.2341000000000     
+   61.3614688329859     
+    forward         271   31.2924000000000        59.5688301304931     
+    hydrostatic         536   26.1141000000000        49.7113160675024     
+    compute_pe       20723   23.6585000000000        45.0367874513387     
+    compute_pg      126207   20.4275000000000        38.8861920942672     
+    formalsolution       54200   11.4894000000000        21.8714485594358     
+    profiles         273   4.75360000000000        9.04904676241874     
+    background_opac       84379   4.21980000000000        8.03289454898490     
+    compute_others_from_T_Pe_Pg       15545   2.48830000000000     
+   4.73677698143019     
+    Fill densities           2  1.890000000000000E-002  3.597841295222866E-002

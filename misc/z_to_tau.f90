@@ -82,6 +82,11 @@ Subroutine Z_to_tau(Params, Atmo)
 !
   n2P=BK*Atmo%Temp(1)
   metal=Atmo%Abundance(26)-7.5
+
+  Call Compute_others_from_T_Pe_Pg(1, Atmo%Temp(1), &
+       Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
+       Atmo%nHminus(1), Atmo%nHplus(1), &
+       Atmo%nH2(1), Atmo%nH2plus(1))
   Kappa(1)=Background_opacity(Atmo%Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1)*n2P, &
        Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, &
        Atmo%nH2plus(1)*n2P, 5000., Scat)
@@ -95,6 +100,10 @@ Subroutine Z_to_tau(Params, Atmo)
 !
   Do ipoint=2, Params%n_points
      n2P=BK*Atmo%Temp(ipoint)
+     Call Compute_others_from_T_Pe_Pg(1, Atmo%Temp(ipoint), &
+          Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
+          Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), &
+          Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
      Kappa(ipoint)=Background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), &
           Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P,&
           Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint)*n2P, 5000., Scat)

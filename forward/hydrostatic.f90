@@ -43,6 +43,7 @@ Subroutine Hydrostatic(Params, Atmo)
      Allocate(Saved_Atmo%nHplus(Params%n_points))
      Allocate(Saved_Atmo%nHminus(Params%n_points))
      Allocate(Saved_Atmo%nH2(Params%n_points))
+     Allocate(Saved_Atmo%nH2plus(Params%n_points))
   Else
      If (MaxVal(Abs(Atmo%temp-Saved_Atmo%temp)) .lt. 10) then
         Atmo%z_scale=Saved_Atmo%z_scale
@@ -54,6 +55,7 @@ Subroutine Hydrostatic(Params, Atmo)
         Atmo%nHplus=Saved_Atmo%nHplus
         Atmo%nHminus=Saved_Atmo%nHminus
         Atmo%nH2=Saved_Atmo%nH2
+        Atmo%nH2plus=Saved_Atmo%nH2plus
         Call time_routine('hydrostatic',.False.)
         Return
      End if
@@ -173,6 +175,7 @@ Subroutine Hydrostatic(Params, Atmo)
   Saved_Atmo%nHplus=Atmo%nHplus
   Saved_Atmo%nHminus=Atmo%nHminus
   Saved_Atmo%nH2=Atmo%nH2
+  Saved_Atmo%nH2plus=Atmo%nH2plus
   Call time_routine('hydrostatic',.False.)
 
   Return

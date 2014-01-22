@@ -5,7 +5,7 @@ Use Model_structure
 ! rho is in g/cm^3, b_long, b_x and b_y are in gauss
 ! v_mac is in cm/s, stray and ffactor are dimensionless (0 < stray < 1).
   real, parameter :: Norm_t=500., Norm_v=1.e5, Norm_mic=1.e5, &
-       Norm_blong=500., Norm_bx=1000., Norm_by=1000., Norm_mac=1.e5, &
+       Norm_blong=500., Norm_bx=100., Norm_by=100., Norm_mac=1.e5, &
        Norm_stray=0.10, Norm_ffactor=0.10, Norm_ab=1.
 !  real, parameter :: Max_t=30000., Max_v=2.e6, Max_mic=2.e6, &
 !       Max_b=10000., Max_inc=180., Max_azi=360., Max_mac=5.e5, &

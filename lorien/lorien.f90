@@ -301,6 +301,7 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
      Allocate(DChiDx_saved(Params%n_data))
      Allocate(D2ChiD2X_saved(Params%n_data, Params%n_data))
   End if
+  DyDx(:,:)=0.
   If (Params%always_compute_deriv .eq. 1 .or. &
        Params%recompute_deriv .eq. 1) then
      Nodes%Reference_model=Guess_model ! Model_assign operation
