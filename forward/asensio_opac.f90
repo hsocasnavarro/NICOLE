@@ -616,27 +616,47 @@ contains
        Pe=Max_Pe
     End if
 
-    factor = 1.d0 + (PHminus + PHplus + 2.d0*(PH2+PH2plus)) / PH
 
-    contrib1 = hminus_ff(T, Pe, lambda_in)
-    contrib2 = hminus_bf(T, Pe, lambda_in)
-    contrib4 = thomson(Pe, PH)
-    contrib5 = rayleigh_h(lambda_in)
-    contrib6 = rayleigh_h2(PH, PH2, lambda_in)
-    contrib3=0.
-    contrib7=0.
+    If (PH .gt. 1.e-6*(PH2+PH2plus)) then ! There is atomic H, act normally
+       factor = 1.d0 + (PHminus + PHplus + 2.d0*(PH2+PH2plus)) / PH
+       contrib1 = hminus_ff(T, Pe, lambda_in)
+       contrib2 = hminus_bf(T, Pe, lambda_in)
+       contrib4 = thomson(Pe, PH)
+       contrib5 = rayleigh_h(lambda_in)
+       contrib6 = rayleigh_h2(PH, PH2, lambda_in)
+       contrib3=0.
+       contrib7=0.
+    Else ! All H is in molecular form. Cant compute things per H atom
+       factor=1.
+       contrib1 = 0.
+       contrib2 = 0.
+       contrib4 = thomson(Pe, 1.)
+       contrib5 = 0.
+       contrib6 = rayleigh_h(lambda_in)
+       contrib3 = 0.
+       contrib7 = 0.
+    End if
 
     If (lambda_in .gt. 4000) then ! For UV, neutral H and Mg are computed in the UV package
-       contrib3 = hydrogen(T, lambda_in)
-       ! Magnesium opacity is per total H atom. For this reason, we multiply by factor
-       ! because nH*factor=nH_tot
        contrib7 = magnesium(T, Pe, lambda_in) * factor
+       If (PH .gt. 1.e-6*(PH2+PH2plus)) then ! There is atomic H, act normally
+          contrib3 = hydrogen(T, lambda_in)
+          ! Magnesium opacity is per total H atom. For this reason, we multiply by factor
+          ! because nH*factor=nH_tot
+       Else ! All H is in molecular form. Cant compute things per H atom
+          contrib3 = 0.
+       End if
     End if
     
-    asensio_background_opacity = PH / (PK*T) * &
-         (contrib1 + contrib2 + contrib3 + contrib4 + contrib5 + contrib6 + contrib7)
-    
-    Scat=(contrib4+contrib5+contrib6)*PH/(PK*T)
+    If (PH .gt. 1.e-6*(PH2+PH2plus)) then ! There is atomic H, act normally
+       asensio_background_opacity = PH / (PK*T) * &
+            (contrib1 + contrib2 + contrib3 + contrib4 + contrib5 + contrib6 + contrib7)
+       Scat=(contrib4+contrib5+contrib6)*PH/(PK*T)
+    Else ! All H is in molecular form. Cant compute things per H atom
+       asensio_background_opacity = 1. / (PK*T) * &
+            (contrib1 + contrib2 + contrib3 + contrib4 + contrib5 + contrib6 + contrib7)
+       Scat=1. / (PK*T) * (contrib4+contrib5+contrib6)
+    End if
 
     If (Scat .lt. 0) then
        Write (String,*) 'T, Pe, PH, PHminus, PHplus, PH2, PH2plus, lambda, c1, c2, c3=', &
