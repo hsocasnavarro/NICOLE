@@ -927,8 +927,9 @@ override the values given in LINES simply by specifying again the
 parameter with a different value. At least one line must be defined
 (for continua calculation, set the Log(gf) to a very small value)
 
-When doing inversions, we can have a section specifying the number of
-nodes to be used. It starts with the line:
+When doing inversions, the number of nodes to be used must be
+specified in a section of the configuration file. It starts with the
+line:
 
 \vskip12pt
 \leftline{
@@ -936,21 +937,25 @@ nodes to be used. It starts with the line:
 \vskip12pt
 
 In this section we specify the number of nodes. Valid tokens are:
-Temperature, T, Temp, Velocity, v, vel, vlos, v\_los, Microturbulence,
-micro, vmic, v\_mic, Macro, v\_mac, B\_long, Blong, Bl, Bz,
-B\_x, Bx, B\_y, By, Stray, Stray light, Filling factor, ffactor, Abundances,
-Number of abundances. NICOLE has defaults for all of these values so
-you don't need to specify them all. Here is an example of such
-a section:
+Temperature, T, Velocity, Microturbulence,
+Macroturbulence, Bz, Bx, By,
+Stray light, Filling factor, Abundances.
+Here is an example of the nodes section:
 
 \begin{verbatim}
 [Nodes]
-T=6
-v_mic=2
-B_long=1
-B_x=1
-B_y=1
-v_los=4
+# Nodes for first atmospheric component
+#   Commented in parenthesis are default values for different cycles
+Temperature=4       # (4, 8, 10)
+Velocity=1          # (1, 4, 6)
+Bz=1                # (1, 4, 4)
+Bx=1                # (1, 2, 2)
+By=1                # (1, 2, 2)
+Microturbulence=0   # (0, 2, 2)
+Macroturbulence=0   # (0, 1, 1)
+Abundances=0        # (0, 0, 0)
+Stray Light=0       # (0, 1, 1)
+Filling Factor=0    # (0, 0, 0)
 \end{verbatim}
 
 By default NICOLE will set the nodes equispaced through the
@@ -958,7 +963,7 @@ atmosphere. You may override this and explicitly set the location of
 the nodes by supplying a comma-separated list of heights. The whole list must be enclosed within quotes ("). For instance:
 \begin{verbatim}
 [Nodes]
-T=" -5.5 , -4 , -3.5 , -2 , 0 , 2"
+Temperature=" -5.5 , -4 , -3.5 , -2 , 0 , 2"
 \end{verbatim}
 
 For NLTE calculations we can include a section to override the default
