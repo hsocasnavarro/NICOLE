@@ -39,4 +39,26 @@ Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
 [Line 1]
   Line=FeI 6301.5
 [Nodes]
-Temperature= 4
+# Nodes for first atmospheric component
+#   Commented in parenthesis are default values for different cycles
+Temperature=4       # (4, 8, 10)
+Velocity=3          # (1, 4, 6)
+Bz=2                # (1, 4, 4)
+Bx=1                # (1, 2, 2)
+By=1                # (1, 2, 2)
+Microturbulence=2   # (0, 2, 2)
+Macroturbulence=1   # (0, 1, 1)
+Abundances=0        # (0, 0, 0)
+Stray Light=1       # (0, 1, 1)
+Filling Factor=0    # (0, 0, 0)
+
+[Nodes 2]
+# Nodes for second atmospheric component
+Temperature=0       # (0, 0, 0)
+Velocity=0          # (0, 0, 0)
+Bz=0                # (0, 0, 0)
+Bx=0                # (0, 0, 0)
+By=0                # (0, 0, 0)
+Microturbulence=0   # (0, 0, 0)
+Macroturbulence=0   # (0, 0, 0)
+Abundances=0        # (0, 0, 0)

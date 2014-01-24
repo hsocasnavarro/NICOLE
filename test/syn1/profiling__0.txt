@@ -1,16 +1,16 @@
- Code execution started on: 2013/12/26 at 17:38:34.291
-   Code execution ended on: 2013/12/26 at 17:38:34.497
+ Code execution started on: 2014/01/24 at 16:26:50.451
+   Code execution ended on: 2014/01/24 at 16:26:50.675
  Total execution time (s):           0
- Total execution time (hours):  5.727777777777778E-005
+ Total execution time (hours):  6.222222222222222E-005
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1  0.206200000000000        100.000000000000     
-    forward           1  0.171300000000000        83.0746847720660     
-    hydrostatic           1  0.109900000000000        53.2977691561591     
-    compute_pe         213  9.719999999999999E-002   47.1387002909796     
-    compute_pg         814  9.350000000000000E-002   45.3443258971872     
-    formalsolution         200  3.040000000000000E-002   14.7429679922405     
-    background_opac         471  1.570000000000000E-002   7.61396702230844     
-    profiles           1  1.110000000000000E-002   5.38312318137730     
-    Fill densities           1  6.000000000000000E-003   2.90979631425800     
-    compute_others_from_T_Pe_Pg         217  2.300000000000000E-003
-   1.11542192046557     
+    main           1  0.224000000000000        100.000000000000     
+    forward           1  0.184500000000000        82.3660714285714     
+    hydrostatic           1  0.120500000000000        53.7946428571428     
+    compute_pe         213  0.106100000000000        47.3660714285714     
+    compute_pg         814  0.100400000000000        44.8214285714286     
+    formalsolution         200  3.310000000000000E-002   14.7767857142857     
+    background_opac         471  1.730000000000000E-002   7.72321428571428     
+    profiles           1  1.100000000000000E-002   4.91071428571429     
+    Fill densities           1  6.200000000000000E-003   2.76785714285714     
+    compute_others_from_T_Pe_Pg         217  3.900000000000000E-003
+   1.74107142857143     

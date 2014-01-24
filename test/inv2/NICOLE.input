@@ -18,7 +18,7 @@ Output model= inversion.mod
 # Other misc optional fields
 #
 Formal solution method= 0 # (0=auto, 1=Hermite, 2=WPM)
-Printout detail= 4 # (default=1)
+Printout detail= 2 # (default=1)
 Acceptable Chi-square=10
 Maximum number of inversions=1
 Debug mode= 3
@@ -60,15 +60,28 @@ Fe=5.1
 O=8.5
 Ni=6.3
 
-#Nodes
 [Nodes]
+# Nodes for first atmospheric component
+#   Commented in parenthesis are default values for different cycles
+Temperature=4       # (4, 8, 10)
+Velocity=1          # (1, 4, 6)
+Bz=1                # (1, 4, 4)
+Bx=1                # (1, 2, 2)
+By=1                # (1, 2, 2)
+Microturbulence=0   # (0, 2, 2)
+Macroturbulence=0   # (0, 1, 1)
 Abundances= Fe O Ni
-# T =0
-# v_los =0
-# v_mic =0
-# B_long =0
-# B_x =0
-# B_y =0
-# Stray light =0
-# v_mac =0
-# expansion=0 
+Stray Light=0       # (0, 1, 1)
+Filling Factor=0    # (0, 0, 0)
+
+[Nodes 2]
+# Nodes for second atmospheric component
+Temperature=0       # (0, 0, 0)
+Velocity=0          # (0, 0, 0)
+Bz=0                # (0, 0, 0)
+Bx=0                # (0, 0, 0)
+By=0                # (0, 0, 0)
+Microturbulence=0   # (0, 0, 0)
+Macroturbulence=0   # (0, 0, 0)
+Abundances=0        # (0, 0, 0)
+

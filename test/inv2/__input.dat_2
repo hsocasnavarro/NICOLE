@@ -48,20 +48,20 @@ T     T   0   ! sethydro, setnH, restart
 4 ! Nodes in T 
 3 ! Nodes in v_los 
 1 ! Nodes in v_mic 
--1 ! Nodes in B_long 
--1 ! Nodes in B_x 
--1 ! Nodes in B_y 
--1 ! Nodes in Stray light 
--1 ! Nodes in v_mac 
--1 ! Nodes in ffactor 
+0 ! Nodes in B_long 
+0 ! Nodes in B_x 
+0 ! Nodes in B_y 
+1 ! Nodes in Stray light 
+1 ! Nodes in v_mac 
+1 ! Nodes in ffactor 
 3 ! Number of abundances to invert 
 26  8  28  ! Abundances to invert 
--1 ! Nodes in T 2
--1 ! Nodes in v_los 2
--1 ! Nodes in v_mic 2
--1 ! Nodes in B_long 2
--1 ! Nodes in B_x 2
--1 ! Nodes in B_y 2
+0 ! Nodes in T 2
+0 ! Nodes in v_los 2
+0 ! Nodes in v_mic 2
+0 ! Nodes in B_long 2
+0 ! Nodes in B_x 2
+0 ! Nodes in B_y 2
 0 ! Number of abundances to invert 2
 3 0 F F F ! debug, optimize grid, outputpop, outputcontop, outputNLTEsf
 1e-4 Elim 1 
