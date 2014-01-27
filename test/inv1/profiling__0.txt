@@ -1,18 +1,18 @@
- Code execution started on: 2014/01/27 at 17:01:24.570
-   Code execution ended on: 2014/01/27 at 17:02:03.287
- Total execution time (s):          38
- Total execution time (hours):  1.075458333333333E-002
+ Code execution started on: 2014/01/27 at 17:44:17.835
+   Code execution ended on: 2014/01/27 at 17:44:50.703
+ Total execution time (s):          32
+ Total execution time (hours):  9.130027777777777E-003
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   38.7165000000000        100.000000000000     
-    compute_dchisq_dx          28   25.6316000000000     
-   66.2032983353351     
-    forward         296   24.7865000000000        64.0205080521225     
-    hydrostatic         586   16.1657000000000        41.7540325184353     
-    compute_pe       23000   14.3807000000000        37.1435951080289     
-    compute_pg      104961   12.0072000000000        31.0131339351439     
-    formalsolution       59200   10.5285000000000        27.1938320870946     
-    profiles         298   3.75070000000000        9.68760089367582     
-    background_opac       92948   3.34470000000000        8.63895238464221     
-    compute_others_from_T_Pe_Pg       17764   1.92220000000000     
-   4.96480828587295     
-    Fill densities           2  1.160000000000000E-002  2.996138597238903E-002
+    main           1   32.8681000000000        100.000000000000     
+    compute_dchisq_dx          21   23.6384000000000     
+   71.9189731076637     
+    forward         257   20.7553000000000        63.1472461140133     
+    hydrostatic         508   13.5103000000000        41.1045968583520     
+    compute_pe       19060   12.0950000000000        36.7985980327430     
+    compute_pg       91630   10.4030000000000        31.6507495109240     
+    formalsolution       51400   9.41290000000000        28.6384062358335     
+    profiles         259   3.36750000000000        10.2454963931593     
+    background_opac       80104   2.97350000000000        9.04676570900052     
+    compute_others_from_T_Pe_Pg       14826  0.864200000000000     
+   2.62929709961939     
+    Fill densities           2  1.260000000000000E-002  3.833504218375872E-002

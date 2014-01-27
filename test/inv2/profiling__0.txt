@@ -1,18 +1,18 @@
- Code execution started on: 2014/01/27 at 17:02:04.103
-   Code execution ended on: 2014/01/27 at 17:03:30.208
- Total execution time (s):          86
- Total execution time (hours):  2.391819444444445E-002
+ Code execution started on: 2014/01/27 at 17:44:51.228
+   Code execution ended on: 2014/01/27 at 17:45:23.230
+ Total execution time (s):          32
+ Total execution time (hours):  8.889416666666667E-003
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   86.1055000000000        100.000000000000     
-    compute_dchisq_dx          27   71.0293000000000     
-   82.4910139305852     
-    forward         377   68.3579000000000        79.3885408016909     
-    profiles        4518   23.0083000000000        26.7210573076052     
-    hydrostatic         750   16.9688000000000        19.7069873585311     
-    compute_pe       19738   14.9805000000000        17.3978433433404     
-    formalsolution       75400   14.8070000000000        17.1963463425681     
-    compute_pg       73198   12.5146000000000        14.5340309271765     
-    background_opac      224146   8.01010000000000        9.30265778608799     
-    compute_others_from_T_Pe_Pg      194740   5.69860000000000     
-   6.61816028012148     
-    Fill densities           2  2.060000000000000E-002  2.392413957296572E-002
+    main           1   32.0019000000000        100.000000000000     
+    compute_dchisq_dx           6   24.9447000000000     
+   77.9475593636628     
+    forward          98   21.4226000000000        66.9416503395111     
+    hydrostatic         192   10.7952000000000        33.7329971032970     
+    compute_pe        8088   9.54400000000000        29.8232292457635     
+    compute_pg       30999   7.97980000000000        24.9353944609539     
+    compute_others_from_T_Pe_Pg       52890   5.98010000000000     
+   18.6867029770107     
+    profiles        1172   5.72150000000000        17.8786259565838     
+    formalsolution       19600   3.71840000000000        11.6193101034626     
+    background_opac       60534   2.05800000000000        6.43086816720257     
+    Fill densities           2  2.540000000000000E-002  7.937028738918626E-002

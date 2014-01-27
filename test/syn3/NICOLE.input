@@ -16,6 +16,7 @@ Printout detail= 4 # (default=1)
 Debug mode= 3
 Restart=-1
 #
+#
 Impose hydrostatic equilibrium= N # Y/N (Only for synthesis)
 Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
 Continuum reference=1

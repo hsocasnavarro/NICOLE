@@ -83,8 +83,18 @@ def validate(source,filestocheck,keysinfile,quiet=0):
                 try:
                     ind=keysinfile[ifile].index(l)
                 except:
-                    badlines.append('Error in file '+filestocheck[ifile]+'. Offending line ['+str(indline)+']:'+line)
+                    badlines.append('\nError in file '+filestocheck[ifile]+'. Offending line ['+str(indline)+']:'+line)
                     errors=1
+                    import difflib
+                    matches=difflib.get_close_matches(l,keysinfile[ifile])
+                    if (len(matches) > 0):
+                        if (len(matches) == 1):
+                            badlines.append('Did you mean the following instead?')
+                        else:
+                            badlines.append('Did you mean one of the following instead?')
+                        for suggestion in matches:
+                            badlines.append(' '+suggestion+'=')
+
 #        if errors == 0:
 #            print '  ... no errors found'
 
@@ -603,7 +613,9 @@ for icycle in range(int(ncycles)):
     #
     # Nodes
     #
-    nodesT=get_value(config,'Temperature','','NICOLE.input','Nodes')
+    nodesT=get_value(config,'Temperature','-1','NICOLE.input','Nodes')
+    if nodesT == '-1': nodesT=get_value(config,'T','-1','NICOLE.input','Nodes')
+    if nodesT == '-1': nodesT=get_value(config,'Temp','-1','NICOLE.input','Nodes')
     nodesTx=''
     nod=nodesT
     if re.search(',',nod): # Node locations
@@ -613,7 +625,11 @@ for icycle in range(int(ncycles)):
         nodesT=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesTx=locnod
-    nodesv=get_value(config,'Velocity','','NICOLE.input','Nodes')
+    nodesv=get_value(config,'Velocity','-1','NICOLE.input','Nodes')
+    if nodesv == '-1': nodesv=get_value(config,'v','-1','NICOLE.input','Nodes')
+    if nodesv == '-1': nodesv=get_value(config,'vel','-1','NICOLE.input','Nodes')
+    if nodesv == '-1': nodesv=get_value(config,'vlos','-1','NICOLE.input','Nodes')
+    if nodesv == '-1': nodesv=get_value(config,'v_los','-1','NICOLE.input','Nodes')
     nodesvx=''
     nod=nodesv
     if re.search(',',nod): # Node locations
@@ -623,7 +639,10 @@ for icycle in range(int(ncycles)):
         nodesv=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesvx=locnod
-    nodesvmic=get_value(config,'Microturbulence','','NICOLE.input','Nodes')
+    nodesvmic=get_value(config,'Microturbulence','-1','NICOLE.input','Nodes')
+    if nodesvmic == '-1': nodesvmic=get_value(config,'Micro','-1','NICOLE.input','Nodes')
+    if nodesvmic == '-1': nodesvmic=get_value(config,'vmic','-1','NICOLE.input','Nodes')
+    if nodesvmic == '-1': nodesvmic=get_value(config,'v_mic','-1','NICOLE.input','Nodes')
     nodesvmicx=''
     nod=nodesvmic
     if re.search(',',nod): # Node locations
@@ -633,8 +652,15 @@ for icycle in range(int(ncycles)):
         nodesvmic=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesvmicx=locnod
-    nodesvmac=get_value(config,'Macroturbulence','','NICOLE.input','Nodes')
-    nodesblong=get_value(config,'Bz','','NICOLE.input','Nodes')
+    nodesvmac=get_value(config,'Macroturbulence','-1','NICOLE.input','Nodes')
+    if nodesvmac == '-1': nodesvmac=get_value(config,'Macro','-1','NICOLE.input','Nodes')
+    if nodesvmac == '-1': nodesvmac=get_value(config,'vmac','-1','NICOLE.input','Nodes')
+    if nodesvmac == '-1': nodesvmac=get_value(config,'v_mac','-1','NICOLE.input','Nodes')
+    nodesblong=get_value(config,'B_long','-1','NICOLE.input','Nodes')
+    if nodesblong == '-1': nodesblong=get_value(config,'Blong','-1','NICOLE.input','Nodes')
+    if nodesblong == '-1': nodesblong=get_value(config,'Bl','-1','NICOLE.input','Nodes')
+    if nodesblong == '-1': nodesblong=get_value(config,'B_z','-1','NICOLE.input','Nodes')
+    if nodesblong == '-1': nodesblong=get_value(config,'Bz','-1','NICOLE.input','Nodes')
     nodesblongx=''
     nod=nodesblong
     if re.search(',',nod): # Node locations
@@ -644,7 +670,8 @@ for icycle in range(int(ncycles)):
         nodesblong=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesblongx=locnod
-    nodesbx=get_value(config,'Bx','','NICOLE.input','Nodes')
+    nodesbx=get_value(config,'B_x','-1','NICOLE.input','Nodes')
+    if nodesbx == '-1': nodesbx=get_value(config,'Bx','-1','NICOLE.input','Nodes')
     nodesbxx=''
     nod=nodesbx
     if re.search(',',nod): # Node locations
@@ -654,7 +681,8 @@ for icycle in range(int(ncycles)):
         nodesbx=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesbxx=locnod
-    nodesby=get_value(config,'By','','NICOLE.input','Nodes')
+    nodesby=get_value(config,'B_y','-1','NICOLE.input','Nodes')
+    if nodesby == '-1': nodesby=get_value(config,'By','-1','NICOLE.input','Nodes')
     nodesbyx=''
     nod=nodesby
     if re.search(',',nod): # Node locations
@@ -664,11 +692,16 @@ for icycle in range(int(ncycles)):
         nodesby=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesbyx=locnod
-    nodesstray=get_value(config,'Stray light','','NICOLE.input','Nodes')
-    nodesexp=get_value(config,'Filling factor','','NICOLE.input','Nodes')
-    nodesab=get_value(config,'Abundances','','NICOLE.input','Nodes')
+    nodesstray=get_value(config,'Stray','-1','NICOLE.input','Nodes')
+    if nodesstray == '-1': nodesstray=get_value(config,'Stray light','-1','NICOLE.input','Nodes')
+    nodesexp=get_value(config,'ffactor','-1','NICOLE.input','Nodes')
+    if nodesexp == '-1': nodesexp=get_value(config,'filling factor','-1','NICOLE.input','Nodes')
+    nodesab=get_value(config,'Abundances','-1','NICOLE.input','Nodes')
+    if nodesab == '-1': nodesab=get_value(config,'Number of abundances','-1','NICOLE.input','Nodes')
 # Nodes for the second component
-    nodesT2=get_value(config,'Temperature','','NICOLE.input','Nodes 2')
+    nodesT2=get_value(config,'Temperature','-1','NICOLE.input','Nodes 2')
+    if nodesT2 == '-1': nodesT2=get_value(config,'T','-1','NICOLE.input','Nodes 2')
+    if nodesT2 == '-1': nodesT2=get_value(config,'Temp','-1','NICOLE.input','Nodes 2')
     nodesTx2=''
     nod=nodesT2
     if re.search(',',nod): # Node locations
@@ -678,7 +711,11 @@ for icycle in range(int(ncycles)):
         nodesT2=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesTx2=locnod
-    nodesv2=get_value(config,'Velocity','','NICOLE.input','Nodes 2')
+    nodesv2=get_value(config,'Velocity','-1','NICOLE.input','Nodes 2')
+    if nodesv2 == '-1': nodesv2=get_value(config,'v','-1','NICOLE.input','Nodes 2')
+    if nodesv2 == '-1': nodesv2=get_value(config,'vel','-1','NICOLE.input','Nodes 2')
+    if nodesv2 == '-1': nodesv2=get_value(config,'vlos','-1','NICOLE.input','Nodes 2')
+    if nodesv2 == '-1': nodesv2=get_value(config,'v_los','-1','NICOLE.input','Nodes 2')
     nodesvx2=''
     nod=nodesv2
     if re.search(',',nod): # Node locations
@@ -688,7 +725,10 @@ for icycle in range(int(ncycles)):
         nodesv2=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesvx2=locnod
-    nodesvmic2=get_value(config,'Microturbulence','','NICOLE.input','Nodes 2')
+    nodesvmic2=get_value(config,'Microturbulence','-1','NICOLE.input','Nodes 2')
+    if nodesvmic2 == '-1': nodesvmic2=get_value(config,'Micro','-1','NICOLE.input','Nodes 2')
+    if nodesvmic2 == '-1': nodesvmic2=get_value(config,'vmic','-1','NICOLE.input','Nodes 2')
+    if nodesvmic2 == '-1': nodesvmic2=get_value(config,'v_mic','-1','NICOLE.input','Nodes 2')
     nodesvmicx2=''
     nod=nodesvmic2
     if re.search(',',nod): # Node locations
@@ -698,7 +738,11 @@ for icycle in range(int(ncycles)):
         nodesvmic2=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesvmicx2=locnod
-    nodesblong2=get_value(config,'Bz','','NICOLE.input','Nodes 2')
+    nodesblong2=get_value(config,'B_long','-1','NICOLE.input','Nodes 2')
+    if nodesblong2 == '-1': nodesblong2=get_value(config,'Blong','-1','NICOLE.input','Nodes 2')
+    if nodesblong2 == '-1': nodesblong2=get_value(config,'Bl','-1','NICOLE.input','Nodes 2')
+    if nodesblong2 == '-1': nodesblong2=get_value(config,'B_z','-1','NICOLE.input','Nodes 2')
+    if nodesblong2 == '-1': nodesblong2=get_value(config,'Bz','-1','NICOLE.input','Nodes 2')
     nodesblongx2=''
     nod=nodesblong2
     if re.search(',',nod): # Node locations
@@ -708,7 +752,8 @@ for icycle in range(int(ncycles)):
         nodesblong2=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesblongx2=locnod
-    nodesbx2=get_value(config,'Bx','','NICOLE.input','Nodes 2')
+    nodesbx2=get_value(config,'B_x','-1','NICOLE.input','Nodes 2')
+    if nodesbx2 == '-1': nodesbx2=get_value(config,'Bx','-1','NICOLE.input','Nodes 2')
     nodesbxx2=''
     nod=nodesbx2
     if re.search(',',nod): # Node locations
@@ -718,7 +763,8 @@ for icycle in range(int(ncycles)):
         nodesbx2=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesbxx2=locnod
-    nodesby2=get_value(config,'By','','NICOLE.input','Nodes 2')
+    nodesby2=get_value(config,'B_y','-1','NICOLE.input','Nodes 2')
+    if nodesby2 == '-1': nodesby2=get_value(config,'By','-1','NICOLE.input','Nodes 2')
     nodesbyx2=''
     nod=nodesby2
     if re.search(',',nod): # Node locations
@@ -728,7 +774,8 @@ for icycle in range(int(ncycles)):
         nodesby2=str(len(locnod))
         for i in range(99-len(locnod)): locnod.append(0.)
         nodesbyx2=locnod
-    nodesab2=get_value(config,'Abundances','','NICOLE.input','Nodes 2')
+    nodesab2=get_value(config,'Abundances','-1','NICOLE.input','Nodes 2')
+    if nodesab2 == '-1': nodesab2=get_value(config,'Number of abundances','-1','NICOLE.input','Nodes 2')
     f=open('nodelocations.dat'+suffix,'wb')
     scratch=list()
     if (len(nodesTx) > 0):
@@ -1358,7 +1405,7 @@ for icycle in range(int(ncycles)):
     f.write(nodesvmac+' ! Nodes in v_mac \n')
     f.write(nodesexp+' ! Nodes in ffactor \n')
     nab=0
-    if nodesab != '0': 
+    if nodesab != '-1': 
         nodesab=nodesab.lower()
         nodesab=nodesab.split(" ")
         nab=len(nodesab)
@@ -1374,7 +1421,7 @@ for icycle in range(int(ncycles)):
     f.write(nodesbx2+' ! Nodes in B_x 2\n')
     f.write(nodesby2+' ! Nodes in B_y 2\n')
     nab=0
-    if nodesab2 != '0': 
+    if nodesab2 != '-1': 
         nodesab2=nodesab2.lower()
         nodesab2=nodesab2.split(" ")
         nab=len(nodesab2)
