@@ -3162,7 +3162,7 @@ Function Rint1(TE, TR, HKTT)
   Return
 End Function Rint1
 !
-Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu, Reset)
+Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu, UseLinear)
 ! Given the opacity and source function, this routine solves the
 ! scalar radiative transfer equation. It returns P (the average
 ! incoming and outgoing intensity) and LStMuNu (the monochromatic local 
@@ -3181,17 +3181,11 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
   Integer :: imu, inu, itran, idepth, BoundUp, BoundLow, iformal, ii
   Real, Dimension(0:NLTE%NDEP) :: Iminus, Iplus
   Real, Dimension(NLTE%NDEP) :: X, S, P, LStMuNu, Tau_500, Tau_Nu, Dtau_Nu,&
-       RNu, tmp, tmp2, tmp3, tmp4
+       RNu
   Real :: IncidentInt, CMu, T
-  Logical, Dimension (:,:,:,:), Allocatable, Save :: Safe
-  Logical :: CheckNaN, Reset
+  Logical :: CheckNaN, UseLinear
   Real :: u
 !
-  If (.not. Allocated(Safe)) then
-     Allocate (Safe(NLTE%NDEP, NLTE%NMU, NLTE%MQ, NLTE%NRAD))
-  endif
-  If (Reset) &
-       Safe(:,:,:,:)=.False.
   Iminus(:)=0.
   Iplus(:)=0.
   BoundUp=1
@@ -3227,31 +3221,6 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
 
   If (iformal .eq. 1) then
      Call Bezier_NLTE
-!     Call shortcharacteristics
-     tmp=lstmunu
-     tmp2=iplus(1:)
-     tmp3=iminus(1:)
- ! debug
-!     ii=boundlow
-!     boundlow=nlte%ndep
-!     Call Bezier_NLTE
-!     Call shortcharacteristics
-
-!     if (ii .lt. 420) then
-!        if (maxval(abs(tmp2(:)-iplus(1:))/tmp2(:)) .gt. 1e-3) then
-!           print *,'bound=',ii
-!           print *,'iplus app=',tmp2(ii-2:ii+2)
-!           print *,'iplus tru=',iplus(ii-2:ii+2)
-!           print *,'s,sgrad=',s(ii),(s(ii)-s(ii-1))/dtau_nu(ii)
-!           pause
-!        endif
-!     endif
-
-!     lstmunu=tmp
-!     p=0.5*(iplus(1:)+iminus(1:))
-!     p=0.5*(tmp2+iminus(1:))
-!     p=0.5*(iplus(1:)+tmp3)
-!     p=0.5*(tmp2+tmp3)
   Else
      Call ShortCharacteristics
   End if
@@ -3579,7 +3548,7 @@ subroutine cent_deriv_d2(n,x,y,yp)
                If (step .eq. 1) then
                   Iminus(K)=Iminus(K-1)*EXPDTM+DELTAI
 ! Valgrind complains about Iminus(2) here
-                  IF ( Iminus(K) .lt. 0 .or. DELTAL .gt. 1.1)  then
+                  IF ( Iminus(K) .lt. 0 .or. DELTAL .gt. 1. .or. UseLinear)  then
 ! COMPUTE AGAIN USING LINEAR INTERPOLATION
 !                     print *,'using linear interp 1 at ',k
 !                     print *,'dtau=',dtm,dtp
@@ -3606,7 +3575,7 @@ subroutine cent_deriv_d2(n,x,y,yp)
                Else
                   Iplus(K)=Iplus(K+1)*EXPDTM+DELTAI
 
-                  IF (Iplus(K) .lt. 0 .or. DELTAL .gt. 1.1 ) then
+                  IF (Iplus(K) .lt. 0 .or. DELTAL .gt. -1. .or. UseLinear ) then
 ! COMPUTE AGAIN USING LINEAR INTERPOLATION
 !                     print *,'using linear interp 2 at ',k
 !                     print *,'dtau=',dtm,dtp
@@ -4360,8 +4329,8 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
   Integer :: i, j, iter, itran, idepth, imu, inu, irec, unit
   Character (Len=15) :: String
   Character (Len=256) :: Message
-  Logical :: Converged, Newmat, Cont, resetNG, ResetSafe
-  Logical, Save :: FirstTime=.True.
+  Logical :: Converged, Newmat, Cont, resetNG
+  Logical, Save :: FirstTime=.True., UseLinear=.True.
 ! Do we need to redo the whole calculation?
   Call time_routine('solvestat',.True.)
   Debug_errorflags(flag_NLTE)=0
@@ -4397,13 +4366,13 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 
 !
 ! First calculation of radiation field, needed to initialize Jnu for Sbck
+  Relchg=1e10
   Call Radiation
   FirstTime=.False.
   Converged=.False.
   Depth_converged(:)=.False.
   Newmat=.True.
   iter=0
-  ResetSafe=.True.
 
   If (NLTEInput%MaxIters .lt. 1) then
      Converged=.True.
@@ -4500,10 +4469,17 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 !              If (imu .eq. 1) NLTE%Source_f(:,inu,itran)=NLTE%Sl(:,itran)
 
               Call time_routine('NLTE_formalsolution',.True.)
+              If (RelChg .lt. 1e-4) UseLinear=.False.
+              if (itran .eq. 1 .and. imu .eq. 1 .and. inu .eq. 1) then
+                 If (UseLinear) then
+                    print *,'lineal'
+                 Else
+                    print *,'parab'
+                 endif
+              endif
               Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
-                   X, S, RNu, P, LStMuNu, ResetSafe)
+                   X, S, RNu, P, LStMuNu, UseLinear)
               Call time_routine('NLTE_formalsolution',.False.)
-              ResetSafe=.False.
               If (iter .le. NLTEInput%NumLambdaIters) LStMuNu(:)=0.
               If (Debug_level .ge. 1) then
                  If (checknan(Sum(P))) then
@@ -4924,8 +4900,9 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
                End if
                Iminus(0)=0. ! No incident radiation
 ! Compute monochromatic radiation field and local operator
+               If (RelChg .lt. 1e-4) UseLinear=.False.
                Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
-               X, S, RNu, P, LStMuNu, ResetSafe)
+               X, S, RNu, P, LStMuNu, UseLinear)
                If (Debug_level .ge. 1) then
                   If (checknan(Sum(P))) then
                      Do idepth=1, NLTE%NDEP

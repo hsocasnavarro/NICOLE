@@ -630,7 +630,7 @@ contains
        factor=1.
        contrib1 = 0.
        contrib2 = 0.
-       contrib4 = thomson(Pe, 1.)
+       contrib4 = thomson(Pe, 1.d0)
        contrib5 = 0.
        contrib6 = rayleigh_h(lambda_in)
        contrib3 = 0.
