@@ -16,6 +16,7 @@ Contains
     Real :: nu, chi_0, chi_e, eta, num, den, Rho
     Integer :: i
 
+
     Call Time_routine('background_opac',.True.)
 
     TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4

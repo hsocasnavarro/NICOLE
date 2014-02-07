@@ -581,7 +581,7 @@ contains
     real :: asensio_background_opacity, T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat
     real :: nu, chi_0, chi_e, eta, tmp
     real(kind=8) :: T, Pe, Pg, PH, PHminus, PHplus, PH2, PH2plus, lambda_in
-    real(kind=8) :: factor, H_per_volume
+    real(kind=8) :: factor, H_per_volume, One
     real(kind=8) :: contrib1, contrib2, contrib3, contrib4, contrib5, contrib6, contrib7, caca
     real, Parameter :: Min_Pe=1e-6, Max_Pe=1e6
     real, Parameter :: Min_Lambda=300., Max_Lambda=120000
@@ -630,7 +630,8 @@ contains
        factor=1.
        contrib1 = 0.
        contrib2 = 0.
-       contrib4 = thomson(Pe, 1.d0)
+       One=1.d0
+       contrib4 = thomson(Pe, One)
        contrib5 = 0.
        contrib6 = rayleigh_h(lambda_in)
        contrib3 = 0.

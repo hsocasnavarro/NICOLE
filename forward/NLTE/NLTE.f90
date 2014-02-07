@@ -2582,6 +2582,7 @@ FUNCTION H1BB (I,J,T)
 !: H1BB   90-02-28  MODIFICATIONS: (MARTIN J. STIFT)
 !:        REWRITTEN.  UP TO 50 BOUND LEVELS + ONE CONTINUUM LEVEL
 !:
+      implicit none
       INTEGER I,J,K
       DOUBLE PRECISION &
               T,S,X, &
@@ -2785,6 +2786,7 @@ FUNCTION H1BB (I,J,T)
 !: H1BF   90-02-28  MODIFICATIONS: (MARTIN J. STIFT)
 !:        REWRITTEN.  UP TO 50 BOUND LEVELS + ONE CONTINUUM LEVEL
 !:
+      Implicit None
       INTEGER I,K
       DOUBLE PRECISION &
               T,RATIK,AI,ENG,DION, &
@@ -3183,7 +3185,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
   Real, Dimension(NLTE%NDEP) :: X, S, P, LStMuNu, Tau_500, Tau_Nu, Dtau_Nu,&
        RNu
   Real :: IncidentInt, CMu, T
-  Logical :: CheckNaN, UseLinear
+  Logical :: CheckNaN, UseLinear(NLTE%NDEP)
   Real :: u
 !
   Iminus(:)=0.
@@ -3548,7 +3550,7 @@ subroutine cent_deriv_d2(n,x,y,yp)
                If (step .eq. 1) then
                   Iminus(K)=Iminus(K-1)*EXPDTM+DELTAI
 ! Valgrind complains about Iminus(2) here
-                  IF ( Iminus(K) .lt. 0 .or. DELTAL .gt. 1. .or. UseLinear)  then
+                  IF ( Iminus(K) .lt. 0 .or. DELTAL .gt. 1. .or. UseLinear(K))  then
 ! COMPUTE AGAIN USING LINEAR INTERPOLATION
 !                     print *,'using linear interp 1 at ',k
 !                     print *,'dtau=',dtm,dtp
@@ -3575,7 +3577,7 @@ subroutine cent_deriv_d2(n,x,y,yp)
                Else
                   Iplus(K)=Iplus(K+1)*EXPDTM+DELTAI
 
-                  IF (Iplus(K) .lt. 0 .or. DELTAL .gt. -1. .or. UseLinear ) then
+                  IF (Iplus(K) .lt. 0 .or. DELTAL .gt. -1. .or. UseLinear(K) ) then
 ! COMPUTE AGAIN USING LINEAR INTERPOLATION
 !                     print *,'using linear interp 2 at ',k
 !                     print *,'dtau=',dtm,dtp
@@ -4330,9 +4332,12 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
   Character (Len=15) :: String
   Character (Len=256) :: Message
   Logical :: Converged, Newmat, Cont, resetNG
-  Logical, Save :: FirstTime=.True., UseLinear=.True.
+  Logical, Save :: FirstTime=.True.
+  Logical, Dimension (NLTE%NDEP) :: UseLinear
 ! Do we need to redo the whole calculation?
   Call time_routine('solvestat',.True.)
+  UseLinear(:)=.False.
+  UseLinear(:)=.True.
   Debug_errorflags(flag_NLTE)=0
   Debug_warningflags(flag_NLTE)=0
   If (FirstTime) then
@@ -4469,14 +4474,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 !              If (imu .eq. 1) NLTE%Source_f(:,inu,itran)=NLTE%Sl(:,itran)
 
               Call time_routine('NLTE_formalsolution',.True.)
-              If (RelChg .lt. 1e-4) UseLinear=.False.
-              if (itran .eq. 1 .and. imu .eq. 1 .and. inu .eq. 1) then
-                 If (UseLinear) then
-                    print *,'lineal'
-                 Else
-                    print *,'parab'
-                 endif
-              endif
               Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
                    X, S, RNu, P, LStMuNu, UseLinear)
               Call time_routine('NLTE_formalsolution',.False.)
@@ -4599,11 +4596,13 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      End if
 ! Add collisional and fixed rates (C and F have inverted indeces wrt W):
 !  W is rate into level i from level j, while C is rate from level i to j
+
      Do i=1, Atom%NK
         Do j=1, Atom%NK
            NLTE%W(i,j,:)=NLTE%W(i,j,:)+NLTE%C(j,i,:)*CRSW+NLTE%F(j,i,:)
         End do
      End do
+
 ! The sum over the i-th column gives the total rate out of the i-th level
      Do i=1, Atom%NK
         Do j=1, i-1
@@ -4639,6 +4638,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 !
 ! Ok. Matrices are now ready. Update populations
 !
+
      NOld(:,:)=NLTE%N(:,:)
      Do idepth=1,NLTE%NDEP
         If (.not. Depth_converged(idepth)) then 
@@ -4900,7 +4900,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
                End if
                Iminus(0)=0. ! No incident radiation
 ! Compute monochromatic radiation field and local operator
-               If (RelChg .lt. 1e-4) UseLinear=.False.
                Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
                X, S, RNu, P, LStMuNu, UseLinear)
                If (Debug_level .ge. 1) then
