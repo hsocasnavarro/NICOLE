@@ -310,14 +310,16 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
         Avmolweight=Wsum/Asum ! Average molecular weight.
         Atmo%Gas_p(idepth)=Atmo%Rho(idepth)/Avmolweight*Avog*bk*Atmo%Temp(idepth)
      End do
-     Call Compute_Pe(Params%n_points, Atmo%Temp, Atmo%Gas_p, Atmo%El_p)
-     Atmo%ne=Atmo%el_p/bk/Atmo%temp
-     Do idepth=1, Params%n_points
-        Avmolweight=Wsum/(Asum+ &
-             Atmo%El_p(idepth)/Atmo%Gas_p(idepth))
-!             Atmo%ne(idepth)/(Atmo%nH(idepth)+Atmo%nHplus(idepth)+ &
-!             Atmo%nHminus(idepth)+Atmo%nH2(idepth))) ! Average molecular weight.
-        Atmo%Gas_p(idepth)=Atmo%Rho(idepth)/Avmolweight*Avog*bk*Atmo%Temp(idepth)
+     Do iters=1,3
+        Call Compute_Pe(Params%n_points, Atmo%Temp, Atmo%Gas_p, Atmo%El_p)
+        Atmo%ne=Atmo%el_p/bk/Atmo%temp
+        Do idepth=1, Params%n_points
+           Avmolweight=Wsum/(Asum+ &
+                Atmo%El_p(idepth)/Atmo%Gas_p(idepth))
+   !             Atmo%ne(idepth)/(Atmo%nH(idepth)+Atmo%nHplus(idepth)+ &
+   !             Atmo%nHminus(idepth)+Atmo%nH2(idepth))) ! Average molecular weight.
+           Atmo%Gas_p(idepth)=Atmo%Rho(idepth)/Avmolweight*Avog*bk*Atmo%Temp(idepth)
+        End do
      End do
   Else
      Print *,'Error: Input density must be one of the following: Pel, Nel, Dens or Pgas'
@@ -2158,8 +2160,14 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         If (NLTEInput%VelFree) NLTE%Atmo%v_los=0.
         If (NLTE_done .eqv. .FALSE.) then
 !           Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+           NLTE%linear=Params%NLTE_Linear
            NLTEInput%UseColSwitch=0
            Call SolveStat(NLTE, NLTEInput, Atom)
+           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
+              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
+              NLTE%linear=1
+              Call SolveStat(NLTE, NLTEInput, Atom)
+           End if
            If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
               If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
               NLTE%N=NLTE%NStar

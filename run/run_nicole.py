@@ -593,6 +593,9 @@ for icycle in range(int(ncycles)):
         ngacc = 'T'
     else:
         ngacc = 'F'
+    nlteoptthin=get_value(config,'optically thin','1e-5','NICOLE.input','NLTE')
+    nlteoptthick=get_value(config,'optically thick','1e2','NICOLE.input','NLTE')
+    nltelinear=get_value(config,'linear formal solution','0','NICOLE.input','NLTE')
     nltemaxiters=get_value(config,'max iters','-','NICOLE.input','NLTE')
     if nltemaxiters == '-': nltemaxiters='500'
     lambdaiters=get_value(config,'lambda iterations','-','NICOLE.input','NLTE')
@@ -1443,6 +1446,7 @@ for icycle in range(int(ncycles)):
     f.write(nmu+' '+usecolswitch+' '+nlteformalsolution+' NMU, usecolswitch, formalsolution \n')
     f.write(qnorm+' '+cper+' QNORM, CPER \n')
     f.write(velfree+' '+ngacc+' '+lambdaiters+' velfree, ngacc,lambdaiters \n')
+    f.write(nlteoptthin+' '+nlteoptthick+' '+nltelinear+' nlte opt thin, opt thick, linear \n')
     f.write(nltemaxiters+' nltemaxiters \n')
     f.write(ltepop+' NLTE ltepop \n')
     f.close()

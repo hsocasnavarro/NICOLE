@@ -2195,6 +2195,7 @@ Contains
 
     If (eqstate_switch .eq. 2) then ! Use Wittmann's EoS
        Call wittmann_compute_pe(n_grid, temp4, PT4, Pe4)
+       Call Time_routine('compute_pe',.False.)
        Return
     End if
 
@@ -2274,6 +2275,7 @@ Contains
     Debug_warningflags(flag_computepg)=0
 
     If (eqstate_switch .eq. 0) then ! Use NICOLE approach (with ANNs and elements)
+
        Met2=At_abund(26)-7.5 ! Metalicity
        If (Met2 .gt. .5) then
           Debug_warningflags(flag_computeopac)=1

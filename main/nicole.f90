@@ -235,6 +235,7 @@ Program Nicole
   Read (headerunit, *) Params%NLTE_NMU, Params%NLTE_UseColSwitch, Params%NLTE_Formal_Solution
   Read (headerunit, *) Params%NLTE_QNorm, Params%NLTE_CPER
   Read (headerunit, *) Params%NLTE_VelFree, Params%NLTE_NGAcc, Params%NLTE_NumLambdaIters
+  Read (headerunit, *) Params%NLTE_OptThin, Params%NLTE_OptThick, Params%NLTE_Linear
   Read (headerunit, *) Params%NLTE_MaxIters
   Read (headerunit, *) Params%NLTE_ltepop
 

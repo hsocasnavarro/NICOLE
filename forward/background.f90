@@ -16,6 +16,11 @@ Contains
     Real :: nu, chi_0, chi_e, eta, num, den, Rho
     Integer :: i
 
+! debug
+!    if (lambda_in4 .lt. 4000) then
+!       print *,'Capping UV opacities'
+!       lambda_in4 = 4e3+1
+!    endif
 
     Call Time_routine('background_opac',.True.)
 

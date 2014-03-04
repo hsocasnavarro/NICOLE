@@ -33,7 +33,8 @@ Module Param_structure
      Real, Dimension (:), pointer :: Stray_prof ! For the stray light
      Character (len=20) :: WeightsFilename
      Real :: NLTE_Elim1=1e-3, NLTE_Elim2=1e-3
-     Real ::  NLTE_QNORM, NLTE_CPER
+     Real ::  NLTE_QNORM, NLTE_CPER, NLTE_OptThin, NLTE_OptThick
+     Integer :: NLTE_linear
      Integer :: NLTE_NMU, NLTE_MaxIters, NLTE_Verbose, NLTE_ISum, &
           NLTE_ltepop
      Integer :: NLTE_IStart, NLTE_UseColSwitch, &

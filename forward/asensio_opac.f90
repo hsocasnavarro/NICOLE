@@ -563,6 +563,8 @@ contains
   
   !-----------------------------------------------------------------
   ! Calculates the background opacity due to various species
+  !   Output opacity already contains scattering term
+  !   Output opacity units are cm2/cm3
   ! INPUT :
   !	T : temperature in K
   !	Pe : electron pressure

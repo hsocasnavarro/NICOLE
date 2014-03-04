@@ -1,5 +1,6 @@
 Module Wittmann_opac_module
 ! Background opacity and scattering coefficient in cm^2/cm^3
+! Opacity already contains scattering coeff
 
  Use Atomic_data
  Use LTE

@@ -131,6 +131,13 @@ Module NLTE_inp
 !          Using virtual files is much faster, but some large computations
 !          may demand disk files.
 ! NGacc=Whether or not to use NG acceleration (e.g., .TRUE.)
+! OptThin, OptThick=Minimum and maximum optical thickness for the
+!          radiative transfer. Use 0 and Inf to do the transfer over
+!          the entire atmo. Otherwise the atmo will be assumed to be
+!          transparent above OptThin and use the diffussion approximation
+!          below OptThick
+! Linear=Use Linear interpolation in the NLTE formal solution (more stable
+!          but less accurate)
 ! MaxIters=Maximum number of allowed iterations in solvestat (e.g.,200)
 ! IStart=As in MULTI, initialization for the populations: 0=Start with
 !          zero radiation field and solve the statistical equilibrium eqs;
@@ -148,7 +155,7 @@ Module NLTE_inp
 ! NLTE_Formal_solution: 1 for Bezier, 2 for Short Characteristics
 ! NLTE_LtePop: 1 -> Use normal routine; 2-> Use MULTI routine
 !
-     Real :: elim1, elim2, QNORM, CPER
+     Real :: elim1, elim2, QNORM, CPER, OptThin, OptThick
      Integer :: NMU, MaxIters, Verbose, ISum, IStart, UseColSwitch, &
           NumLambdaIters
      Integer :: NLTE_formal_solution
@@ -401,10 +408,11 @@ Module NLTE_vars
 ! Error is set to .true. if something has gone wrong in the NLTE calculation
 !  (e.g., non-convergence, NaN results, negative populations or other 
 !  oddities) 
-     Integer :: NDEP, MQ, NMU, NRAD
+     Integer :: NDEP, MQ, NMU, NRAD, Linear
      Real, Dimension(:,:), pointer :: Nstar, N, BPlanck, WPhi, Sl
      Real, Dimension(:,:,:), pointer :: W, F, C, Source_f
      Real, Dimension(:), pointer :: XMu, WMu, Xnorm
+     Real :: OptThin, OptThick
      Logical :: Error=.False.
      Type (Model) :: Atmo
 !
@@ -556,6 +564,9 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
         NLTEInput%VelFree=Params%NLTE_VelFree
         NLTEInput%VirtualFiles=.True.
         NLTEInput%NGacc=Params%NLTE_NGAcc
+        NLTE%Linear=Params%NLTE_Linear
+        NLTE%OptThin=Params%NLTE_OptThin
+        NLTE%OptThick=Params%NLTE_OptThick
         NLTEInput%MaxIters=Params%NLTE_MaxIters
         NLTEInput%NLTE_formal_solution=Params%NLTE_Formal_solution
         NLTEInput%Verbose=Params%printout
@@ -793,14 +804,14 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
            Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth),&
                 Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, &
                 Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, &
-                5000., Scat(idepth))
+                5000., Dummy(1))
         End if
 !        XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
-        XCONT(idepth)=XCONT(idepth)/NLTE%Xnorm(idepth)
         NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
-        SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
+        SC(idepth)=(XCONT(idepth)-Scat(idepth))/XCONT(idepth)* &
              NLTE%BPlanck(idepth,itran)
         SCAT(idepth)=SCAT(idepth)/XCONT(idepth)
+        XCONT(idepth)=XCONT(idepth)/NLTE%Xnorm(idepth)
         if (xcont(idepth) .lt. 0) &
              Call Debug_Log('Error!! Negative NLTE continuum opaicity',1)
      End do
@@ -819,11 +830,11 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
                 Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, &
                 Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, lambda, Dummy(1))
 !           XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
-           XCONT(idepth)=XCONT(idepth)/NLTE%XNorm(idepth)
            NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
-           SC(idepth)=XCONT(idepth)/XCONT(idepth)* &
+           SC(idepth)=(XCONT(idepth)-Dummy(1))/XCONT(idepth)* &
                 NLTE%BPlanck(idepth,itran)
            SCAT(idepth)=Dummy(1)/XCONT(idepth)
+           XCONT(idepth)=XCONT(idepth)/NLTE%XNorm(idepth)
         End do
         Call WriteX(XCONT, SCAT, SC)
      End do
@@ -3179,7 +3190,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
 !
   Implicit None
   Type (NLTE_variables) :: NLTE
-  Real, Parameter :: OptThin=1e-4, OptThick=1.e2
+  Real :: OptThin, OptThick
   Integer :: imu, inu, itran, idepth, BoundUp, BoundLow, iformal, ii
   Real, Dimension(0:NLTE%NDEP) :: Iminus, Iplus
   Real, Dimension(NLTE%NDEP) :: X, S, P, LStMuNu, Tau_500, Tau_Nu, Dtau_Nu,&
@@ -3188,6 +3199,8 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
   Logical :: CheckNaN, UseLinear(NLTE%NDEP)
   Real :: u
 !
+  OptThin=NLTE%OptThin
+  OptThick=NLTE%OptThick
   Iminus(:)=0.
   Iplus(:)=0.
   BoundUp=1
@@ -3203,21 +3216,29 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
 !  Dtau_Nu(2:NLTE%NDEP)=.5*(X(2:NLTE%NDEP)+X(1:NLTE%NDEP-1))* &
 !       (Tau_500(2:NLTE%NDEP)-Tau_500(1:NLTE%NDEP-1))*CMu
 
-  call bezier_qintep(NLTE%ndep, tau_500, X, dtau_nu) ! debug. Parece que converge mejor con la integracion lineal de toda la vida que con la de bezier
-  dtau_nu = dtau_nu * cmu
+!  call bezier_qintep(NLTE%ndep, tau_500, X, dtau_nu) 
+!  dtau_nu = dtau_nu * cmu
+
+  call get_dtau
 
   Do idepth=2, NLTE%NDEP
      Tau_Nu(idepth)=Tau_Nu(idepth-1)+DTau_Nu(idepth)
+  End do
+  ! First point of the grid
+  tau_nu(1) = exp(2.0d0 * log(tau_nu(2)) - log(tau_nu(3)))
+  dtau_nu(1) = tau_nu(2) - tau_nu(1)
+
+  Do idepth=2, NLTE%NDEP
      If (Tau_Nu(idepth) .gt. OptThin .and. Tau_Nu(idepth-1) .lt. OptThin) &
           BoundUp=idepth-1
      If (Tau_Nu(idepth) .gt. OptThick .and. Tau_Nu(idepth-1) .lt. OptThick) &
           BoundLow=idepth
   End do
+
   BoundLow=BoundLow+1
   If (BoundLow .gt. NLTE%NDEP) BoundLow=NLTE%NDEP
   BoundUp=BoundUp-1
   If (BoundUp .lt. 1) BoundUp=1
-!
 
 !  Call Check_tau(Tau_Nu)
 
@@ -3225,242 +3246,348 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
      Call Bezier_NLTE
   Else
      Call ShortCharacteristics
-  End if
-
+  End If
+!
   Return
 !
   contains
 
-                                            
-subroutine bezier_NLTE
-  !
-  ! Computes J = J-  +   J+ and the local approximate lambda operator.
-  ! The RTE is integrated using the Bezier-splines solution from Auer 2003.
-  !
-  ! Written by Jaime de la Cruz Rodriguez (IFA-UU 2012)
-  !
-  ! -
-  Use Bezier_math
-  Implicit None
-  Integer :: k, k1, floor
-  Real(8), dimension(NLTE%ndep) :: alpha, beta, gamma, eps, sp, Rlu, dtau_nu_2
-  Real(8) :: dtau05, dtau2, idtau2, dtau, ex1, t, ex, c1, mmi, mma, dopt, &
-       dtau4, dtau3, spb, dtau1, der, der1, il, sgrad
-
-  !
-  ! Source function derivatives
-  !
-  call cent_deriv_d2(NLTE%ndep, dtau_nu, S, Sp)
-
-  !
-  ! Init variables
-  !
-  Rlu(1:boundup)=0.
-  Rlu(boundup:boundlow) = 1.0d0 - Rnu(boundup:boundlow)
-  Rlu(boundlow:NLTE%ndep)=1.
-!  Rlu(:)=1.0d0 - Rnu(:)
-!  Rlu=Max(Rlu(:),Rlu(:)*0.)
-!  Rlu=Min(Rlu(:),Rlu(:)*0.+1.)
-  !
-  LStMuNu = 0.d0
-  !
-  T = Tau_Nu(BoundUp)
-
-  If (T .lt. OptThin) then ! Optically thin
-     Ex1=T*(1.d0-T*(0.5d0 - T * (0.1666666666666666d0 - T * 0.04166666666666666d0)))
-  Else
-     if (T .lt. 20) then
-        Ex1 = 1.0d0 - Exp(-T)
-     Else
-        Ex1 = 1.0d0
-     End if
-  End if
-  !
-  Ex = 1.0d0 - Ex1
-
-  !
-  ! Fill-in the transparent part
-  !
-  Iminus(0)=0.0d0
-!  Iminus(1:BoundUp)=S(1:BoundUp)*(T-0.5d0*T**2)
-  Iminus(1:BoundUp)=Iminus(0)
-  !
-  ! Boundary conditions at the bottom
-  !
-  do k = boundlow, NLTE%ndep
-!     If (k .ge. 2) then
-!        sgrad= (S(k) - S(k-1)) / dTau_Nu(k)
-!     Else
-!        sgrad=(S(k+1)-S(k))/Dtau_nu(k)
-!     End if
-     Iplus(k) = S(k)  !+ Max(sgrad,-S(k)*.9)
-     Iminus(k) = Iplus(k)
-  end do
-
-  If (BoundLow .ge. 2) then ! If not all is optically thick, do the transfer
-     alpha = 0
-     beta = 0
-     gamma = 0
-     eps = 0
-     !
-     ! compute coeffs. and exponentials in a separate loop.
-     ! (Improves compiler optimizations in the forward and backwards integration)
-     ! 
-     do k = boundlow - 1, boundup, -1
-        k1 = k + 1
-        dtau = dtau_nu(k1)
-        dtau05 = dtau * 0.5d0
-        dtau2 = dtau * dtau
-
-        !
-        ! Terms of the RT-Bezier integral
-        !
-        if(dtau < 1.e-4) then ! Analytical expansion
-           dtau4 = dtau2 * dtau2
-           dtau3 = dtau * dtau2
-           eps(k1) = 1.d0 - dtau + 0.5d0 * dtau2! - dtau3 / 6.d0
-           alpha(k1) = dtau/3.d0 - dtau2/12.d0   + dtau3/60.d0 !- dtau4 / 360.d0
-           beta(k1)  = dtau/3.d0 - dtau2*0.25d0  + dtau3*0.1d0 !- dtau4 / 36.d0
-           gamma(k1) = dtau/3.d0 - dtau2/6.0d0   + dtau3*0.05d0!- dtau4 / 90.d0
-        else                  ! Accurate calculation
-           eps(k1) = exp(-dtau)
-           idtau2 = 1.0d0 / dtau2
-           alpha(k1) = (dtau2 - 2.0d0*dtau + 2.0d0 - 2.0d0*eps(k1))    * idtau2
-           beta(k1)  = (2.0d0 - (2.0d0 + 2.0d0*dtau + dtau2)*eps(k1))  * idtau2
-           gamma(k1) = (2.d0*dtau - 4.0d0 + (2.d0*dtau+4.0d0)*eps(k1)) * idtau2
-        endif
-     end do
-     
-     
-     !
-     ! Upwards integration 
-     !
-     do k = boundlow - 1, boundup, -1
-        k1 = k + 1
-        dtau = dtau_nu(k1)
-
-        !
-        ! Bezier control point
-        ! 
-        c1 = S(k) + dtau * Sp(k) * 0.5d0 
-        dopt = Rlu(k) * (alpha(k1) + gamma(k1))
-
-        if(c1 .lt. 0.0d0) c1 = s(k)
-        !
-        ! J+
-        !
-        Iplus(k) = Iplus(k1) * eps(k1) + alpha(k1) * S(K) + beta(k1) * S(k1) + &
-             c1 * gamma(k1)
-
-        !
-        ! Approx. lambda operator
-        !
-        LStMuNu(k) = LStMuNu(k) + dopt
-     End do
-     
-     !
-     ! Downwards integration
-     !
-     do k = boundup+1, boundlow
-        k1 = k - 1
-
-        dtau = dtau_nu(k)
-  
-        !
-        ! Bezier control point
-        ! 
-        c1 = S(k) - dtau * Sp(k) * 0.5d0 
-        dopt = Rlu(k) * (alpha(k) + gamma(k))
-        if(c1 .lt. 0.0d0) c1 = s(k)
-
-        !
-        ! J-
-        !
-        Iminus(k) = Iminus(k1) * eps(k) + alpha(k) * S(K) + beta(k) * S(k1) + &
-             c1 * gamma(k)
-        !
-        ! Approx. lambda operator
-        !
-        LStMuNu(k) = LStMuNu(k) + dopt
-        
-     end do
-  End If
-
-!  do k = 1, NLTE%ndep-1
-!     if (dtau_nu(k) .lt. 1e3 .and. dtau_nu(k+1) .ge. 1e3) then
-!        print *,'k,dtau=',k,dtau_nu(k)
-!        print *,'ip,im,s,dif=',iplus(k),iminus(k),s(k),s(k)+(s(k)-s(k-1))/dtau_nu(k)
-!     endif
-!  end do
-
-  !
-  ! Compute contribution to J and normalize lambda operator
-  !
-  Iplus(1:Boundup) = Iplus(boundup)
-
-  !
-  do k = 1, NLTE%ndep
-     P(k) = (Iplus(k) + Iminus(k)) * 0.5d0
-     LStMuNu(k) = LStMuNu(k) * 0.5d0
-  end do
-  !
-  do k = boundlow, NLTE%ndep-1
-     LStMuNu(k) = Rlu(k)
-  end do
-
-  LStMuNu(NLTE%ndep) = 0.5*Rlu(NLTE%ndep)
-  Iplus(0) = 2.0d0 * (Ex * P(1) + S(1) * 0.5d0 * Ex1**2)
-
-  !
-  ! Check Lambda operator
-  !
-  do k = 1, nlte%ndep
-    if(lstmunu(k) .lt. 0.0d0) then
-!       print '(A,I0,A,E16.8)', 'Bezier_NLTE: warning, negative lambda operator LStMuNu(',k,')=',lstmunu(k)
-!       print *,'rnu=',rnu
-!       print *,'k,rnu,rlu=',k,rnu(k),rlu(k)
-!       print *,'k,alpha,gamma=',k,alpha(k),gamma(k)
-       LStMuNu(k) = 0.d0
-!       stop
-    end if
-
-    if(lstmunu(k) .gt. 1.0d0) then
-       print '(A,I0,A,E16.8,A)', 'Bezier_NLTE: warning, lambda operator LStMuNu(',k,')=',lstmunu(k), ' >1'
-       LStMuNu(k) = 1.0d0 
-!       if (lstmunu(k) .gt. 1.0d0+1e-5) then
-!          stop
-!       endif
-    end if
-  end do
-
-END subroutine bezier_nlte
-subroutine cent_deriv_d2(n,x,y,yp)
-    Implicit None
-    integer :: n, k
-    Real :: x(n), y(n)
-    real(8) :: der, der1, yp(n), dx , dx1, lambda
+ subroutine bezier_nlte
     
-    
-    do k = 2, n - 1
-       dx = x(k) ! x(k) - x(k-1)
-       der = (y(k) - y(k-1)) / dx
+      Implicit none
+      integer :: k0, k1, dk, k
+      real(8) :: rlu(nlte%ndep), ex, ex1, t, sgrad, dtau, der, der1
+      logical :: stopme
+      
+      !
+      ! Init variables
+      !
+      Rlu(1:boundup)=0.
+      Rlu(boundlow:NLTE%ndep)=1.
+      Rlu(boundup:boundlow) = 1.0d0 - Rnu(boundup:boundlow)
+      !
+      LStMuNu = 0.d0
+      !
+      T = Tau_Nu(BoundUp)
+      
+      If (T .lt. 1e-3) then ! Optically thin
+         Ex1=T*(1.d0-T*(0.5d0 - T * ((1.0d0 / 6.0d0) - T / 24.d0)))
+      Else
+         if (T .lt. 100) then
+            Ex1 = 1.0d0 - Exp(-T)
+         Else
+            Ex1 = 1.0d0
+         End if
+      End if
+      !
+      Ex = 1.0d0 - Ex1
+      
+      !
+      ! Fill-in the transparent part
+      !
+      Iminus(0)=0.0d0
+      Iminus(1:BoundUp)= Iminus(0)!S(1:BoundUp)*(T-0.5d0*T**2)
+      
+      !
+      ! Boundary conditions at the bottom
+      !
+         do k = boundlow, NLTE%ndep
+            If (k .gt. 1 .and. k .lt. NLTE%NDEP) then
+               ! sgrad=(S(k+1)-S(k-1)) &
+               !      /(DTau_Nu(k+1)+DTau_Nu(k))
+            
+               !
+               der = (s(k) - s(k-1)) / dtau_nu(k)
+               der1 = (s(k + 1) - s(k)) / dtau_nu(k+1)
+               If(der*der1 .lt. 0.0d0) then
+                  sgrad = 0
+               Else
+                  !
+                  sgrad = (der * dtau_nu(k+1) + der1 * dtau_nu(k)) / (dtau_nu(k+1) + dtau_nu(k))
+               endif
+            Else 
+               sgrad=(S(k)-S(k-1))/DTau_nu(k)
+            End if
+            Iplus(k) = S(k) + sgrad * NLTE%XMu(imu)
+            Iminus(k) = Iplus(k)
+         end do
+
+      If (BoundLow .ge. 2) then ! If all is not optically thick
+         
+         ! Upwards integration
+         k0 = boundlow
+         k1 = boundup
+         dk = -1
+         call bezier_ray(k0, k1, dk)
+         
+         ! Downwards integration
+         k0 = boundup
+         k1 = boundlow
+         dk = 1
+         call bezier_ray(k0, k1, dk)
+      end if
+      
+      !
+      ! Compute contribution to J and normalize lambda operator
+      !
+      Iplus(0:Boundup) = Iplus(boundup)
+      !
+      do k = 1, NLTE%ndep
+         P(k) = (Iplus(k) + Iminus(k)) * 0.5d0
+         LStMuNu(k) = LStMuNu(k) * 0.5d0
+      end do
+      
+      !
+      do k = boundlow, NLTE%ndep-1
+         LStMuNu(k) = 1.0d0
+      end do
+      LStMuNu(BoundLow:NLTE%NDEP)=1.d0-RNU(BoundLow:NLTE%NDEP)
+      LStMuNu(NLTE%ndep) = 0.5d0*(1.0d0-RNU(NLTE%NDEP))
+      Iplus(0) = 2.0d0 * (Ex * P(1) + S(1) * 0.5d0 * Ex1**2)
+      
+      do k = boundup, boundlow
+       !  print *, rlu(k),  lstmunu(k)
+         lstmunu(k) = min(1.0d0 , lstmunu(k))
+         lstmunu(k) = max(1.d-12, lstmunu(k))
+      end do
+      !
+ end subroutine bezier_nlte
+    subroutine get_dtau
+      Implicit none
+      integer :: k, ku, kd
+      real(8) :: xu, xd, x0, dx, dx1, der, der1
+      real(8) :: ctu, ctd, lambda, cmu03, dt, dt1
+      real(8) :: xp(nlte%ndep)
+      
+      dtau_nu(2:nlte%ndep) = tau_500(2:nlte%ndep)-tau_500(1:nlte%ndep-1)
+      der = (x(2) - x(1)) / dtau_nu(2)
+      xp(1) = der
+
+      cmu03 = 1.d0 / (3.d0 * NLTE%XMu(imu))
+
+      do k = 2, nlte%ndep - 1
+         ku = k-1
+         kd = k+1
+         dt = dtau_nu(k)
+         dt1 = dtau_nu(kd)
+         der1 = (x(kd) - x(k)) / dt1
+         if(der*der1 .gt. 0.0d0) then
+            !lambda = (1.0+dt1/(dt+dt1))/3.0d0
+            !xp(k) = DER/(LAMBDA*DER1+(1.0d0-LAMBDA)*DER)*DER1
+            xp(k) = (der * dt1 + der1*dt) / (dt+dt1)
+         else
+            xp(k) = 0.0d0
+         end if
+         
+         der = der1
+      end do
+      xp(nlte%ndep) = der
+      
+      do k = 2,nlte%ndep
+         ku = k-1
+         kd = k+1
+         dt = dtau_nu(k)
+         xu = x(ku)
+         x0 = x(k)
+         !
+         if(k .eq. nlte%ndep) then
+            ctu =  xu + 0.5d0 * dt * xp(ku)
+         elseif(k .eq. 2) then
+            ctu = x0 - 0.5d0 * dt * xp(k)
+         else
+            ctu = ( (x0 - 0.5d0 * dt * xp(k))  +  (xu + 0.5d0 * dt * xp(ku)) ) * 0.5d0
+         endif
+
+         if(ctu .gt. max(x0, xu) .or. (ctu .lt. min(x0,xu)) .or. (ctu .lt. 0.d0)) ctu = xu
+
+         dtau_nu(k) = dt * (ctu + x0 + xu) * cmu03
+      enddo
+      dtau_nu(1) = 0.d0
+    end subroutine get_dtau
+  subroutine linear_ray(k0, k1, dk)
+      
+      Implicit None
+      
+      integer :: k, kd, ku, dk, k0, k1, kend
+      real(8) :: u0, u1, u2
+      real(8) :: dt, dt1, dtau, dt2, dt3
+      real(8) :: c0, cu, eps, cmu05 ,rlu, dI
+      real(8) :: xu, xd, x0, dx, dx1, der, der1, der_save
+      real(8) :: ctu, ctd, xp, lambda, cmu03
+
+       ! Ray integration
+      !
+      cmu05 = 0.5d0  / NLTE%XMu(imu)
+      cmu03 = 1.0d0 / (3.0d0 * NLTE%XMu(imu))
+      !
+      !call get_dtau(tau_500, x, dt, k0+dk, dk)
+      !dt = dt / NLTE%XMu(imu)
+
+      dt1 = cmu05 * (x(k0+dk) + x(k0)) * abs(Tau_500(k0+dk) - Tau_500(k0))
+
+      do k = k0 + dk, k1, dk
+         ku = k - dk
+        ! kd = k + dk
+
+         if(dk .eq. -1) then
+            dt = dtau_nu(k+1)
+         !   dt1 = dtau_nu(k)
+         else
+            dt = dtau_nu(k)
+        !    dt1 = dtau_nu(k+1)
+         end if
+
+         dt2 = dt**2
+         dt3 = dt2 * dt
+         ! Introduce U{0,1} to compute the interpolation coeff.
+         if(dt .gt. 1e-2) then 
+            if(dt .lt. 100) then
+               eps = exp(-dt)
+            else
+               eps = 0.0d0
+            end if
+            u0 = 1.0d0 - eps
+            u1 = dt - u0
+         else
+            dt3 = dt2 * dt
+            dt2 = dt * dt
+            eps = 1.0d0 - dt + dt2 * 0.5d0 - dt3 / 6.0d0 !+ dt3*dt/24.0d0
+            u1 = 0.5d0 * dt2 - dt3 / 6.0d0 !- (dt3*dt) / 24.0d0
+            u0 = dt - u1
+         endif
+         
+         ! Interpolation coeff.
+         c0 = u1 / dt
+         cu = u0 - c0
+         dI = cu * s(ku) + c0 * s(k) 
+         
+         if(dk .eq. 1) then
+            iminus(k) = iminus(ku) * eps + dI
+         else
+            iplus(k) = iplus(ku) * eps + dI
+         endif
+
+         lstmunu(k) = LStMuNu(k) + c0 * (1.d0-rnu(k))
+         
+         ! Reuse value 
+      end do
+
+    end subroutine linear_ray
+    subroutine bezier_ray(k0, k1, dk)
+      
+      Implicit None
+      
+      integer :: k, kd, ku, dk, k0, k1, kend
+      real(8) :: u0, u1, u2
+      real(8) :: dt, dt1, dtau, dt2, dt3, rlu, dt33
+      real(8) :: S0, Su, Sd, sp, ome
+      real(8) :: cp, mmi, mma, dI
+      real(8) :: c0, cu, cd, eps, cmu05, cp1
+      real(8) ::  xu, xd, x0, dx, dx1, der, der1, der_save
+      real(8) :: ctu, ctd, xp, lambda, cmu03, dlst
+      logical :: bound
+
+      ! Reach boundary of the array? Do linear integration there
+
+      if((k1 .eq. nlte%ndep) .OR. (k1 .eq. 1)) then
+         bound = .true.
+         kend = k1 - dk
+      Else
+         bound = .false.
+         kend = k1 
+      end if
+
+      !
+      ! Ray integration
+      !
+!      cmu05 = 0.5d0  / NLTE%XMu(imu)
+      cmu03 = 1.d0 / (3.0d0 * NLTE%XMu(imu))
+      !
+      do k = k0 + dk, kend, dk
+         ku = k - dk
+         kd = k + dk
+         
+         ! Source function values
+         S0 = s(k)
+         Su = s(ku)
+         Sd = s(kd)
+         
+         if(dk .eq. -1) then
+            dt = dtau_nu(k+1)
+            dt1 = dtau_nu(k)
+         else
+            dt = dtau_nu(k)
+            dt1 = dtau_nu(k+1)
+         end if
+
+         dt2 = dt**2    
+         
        
-       dx1 = x(k+1) ! x(k+1) - x(k)
-       der1 = (y(k+1) - y(k)) / dx1
-              
-       if(der*der1 .gt. 0.0d0) then 
-          lambda = (dx * dx) / (dx*dx + dx1*dx1)!(1.d0 + dx1 / (dx1 + dx)) / 3.d0
-          yp(k) = lambda * der + (1.d0-lambda) * der1
-       Else
-          yp(k) = 0
-       end if
-    enddo
-    
-    yp(1) =  (y(2) - y(1)) / (x(2)) ! (x(1) - x(2))
-    yp(n) = (y(n) - y(n-1)) / (x(n)) ! (x(n-1) - x(n))
+         !
+         ! Introduce formulation based on the control point
+         !
+         if(dt .ge. 5.d-3) then
+            if(dt .gt. 100) then 
+               eps = 0.0d0
+            else
+               eps = exp(-dt)
+            endif
+            c0 = 1.0d0 - 2.0d0 * (dt + eps - 1.0d0) / dt2
+            cu = (2.0d0 - (2.0d0 + 2.0d0*dt + dt2)*eps) / dt2
+            cd = 2.d0*(dt - 2.0d0 + (dt + 2.0d0)*eps) / dt2
+           ! ome = 1.d0 + 2.d0 * (eps * (1.d0 - dt) - 1.d0) / dt2
+         Else
+            dt3 = dt * dt2
+            eps = 1.d0 - dt + 0.5d0 * dt2 - dt3/6.d0 + dt2*dt2/24.d0 - dt3*dt2/120.d0 + dt3*dt3/720.d0
 
-    return
-  end subroutine cent_deriv_d2
+            c0 = -dt * (-120 + 30*dt - 6*dt2 + dt3 + 2*dt2*dt2) / 360.d0
+            
+            cu = -dt *(-60 + 45*dt - 18*dt2 + 5*dt3) / 180.d0
+            
+            cd = dt*(120 + (-2 + dt)*dt*(30 + dt*(6 + 5*dt))) / 360.d0
+         endif
+         
+         der = (S0-Su) / dt
+         der1= (Sd-S0) / dt1
+
+
+         if(der*der1 .le. 0.0d0) then
+            !Max/Min in the source function
+            cp = S0
+         Else
+            sp = (dt*der1 + dt1 * der) / (dt + dt1)
+            cp = S0 - 0.5d0 * dt * sp
+            !
+            if((cp .le. max(S0,Su)) .AND. (cp .ge. min(S0,Su))) then  ! Normal case
+               cp1 = S0 + 0.5d0 * dt1 * sp 
+               if(cp1 .gt. max(S0,Sd) .or. (cp1 .lt. min(S0,Sd))) then ! Overshooting in downwind interval
+                  !
+                  sp = 2.d0 * (Sd - S0)/dt1
+                  cp = S0 - dt * 0.5d0 * sp
+               endif
+            Else ! Overshooting in the upwind interval
+               cp = Su
+            endif
+         endif
+
+         dI = S0 * c0 + Su * cu + cp * cd
+
+         ! Integrate and define lambda operator
+         if(dk .eq. 1) then
+            iminus(k) = iminus(ku) * eps + dI
+         else
+            iplus(k) = iplus(ku) * eps + dI
+         endif
+         
+         ome = c0 + cd
+
+         LStMuNu(k) = LStMuNu(k) + ome * (1.d0-rnu(k))
+      end do
+
+      ! Do last point of the array? Use linear
+      if(bound) call linear_ray(k1-dk, k1, dk)
+
+    end subroutine bezier_ray
 !
     Subroutine ShortCharacteristics
 !
@@ -3476,13 +3603,13 @@ subroutine cent_deriv_d2(n,x,y,yp)
 !
       LStMuNu(1:NLTE%NDEP)=0.
 !
-! It could happen that DTP was not deffined and nicole crashed.
+! It could happen that DTP was not defined and nicole crashed.
 ! Better to initialize it...
 !
       DTP=0.
 !
       T=Tau_Nu(BoundUp)
-      If (T .lt. OptThin) then ! Optically thin
+      If (T .lt. 1e-3) then ! Optically thin
          Ex1=T*(1.-T*(.5-T*(0.1666667-T*0.041666667)))
       Else
          if (T .lt. 20) then
@@ -3526,7 +3653,7 @@ subroutine cent_deriv_d2(n,x,y,yp)
                   DTM=DTau_Nu(K+1)
                   DTP=DTau_Nu(K)
                End if
-               If (DTM .ge. OptThin) then
+               If (DTM .ge. 1e-3) then
                   EXPDTM=Exp(-DTM)
                   E0=1.-EXPDTM
                   E1=DTM-E0
@@ -3605,7 +3732,7 @@ subroutine cent_deriv_d2(n,x,y,yp)
                End if
             End do ! Do in K
 ! USE LINEAR INTERPOLATION FOR THE LAST POINT
-            IF (DTP .ge. OptThin) then ! DELTA-TAU BETWEEN THE LAST TWO POINTS
+            IF (DTP .ge. 1e-3) then ! DELTA-TAU BETWEEN THE LAST TWO POINTS
                EXPDTP=Exp(-DTP)        ! IS DTP
                E0=1.-EXPDTP 
                E1=DTP-E0      
@@ -3633,7 +3760,8 @@ subroutine cent_deriv_d2(n,x,y,yp)
 !      print *,'iminus bottom=',iminus(boundlow-3:boundlow)
 !      print *,'lst bottom=',lstmunu(boundlow-3:boundlow)
 !      stop
-      Iplus(1:BoundUp)=Iplus(BoundUp)
+      If (boundup .ge. 2) &
+           Iplus(1:BoundUp)=Iplus(BoundUp)
       P(1:NLTE%NDEP)=(Iplus(1:NLTE%NDEP)+Iminus(1:NLTE%NDEP))/2.
       Iplus(0)=2.*(Ex*P(1)+S(1)*0.5*Ex1**2)
       LStMuNu(1:NLTE%NDEP)=LStMuNu(1:NLTE%NDEP)/2.
@@ -3660,7 +3788,6 @@ subroutine cent_deriv_d2(n,x,y,yp)
 !      print *,'SCiminus=',iminus(:)
 !      print *,'SClambda=',lstmunu(:)
 !      stop
-
       Return
 
     End Subroutine ShortCharacteristics
@@ -3779,11 +3906,6 @@ Subroutine FreqQuad(Atom, NLTEInput)
     Do ix=2, Atom%NQ(itran)-1
        Atom%WQ(ix,itran)=0.5*(Atom%Q(ix+1,itran)-Atom%Q(ix-1,itran))
     End do
-!
-!    print *,'itran=',itran,' **************************************'
-!    print *,'frq=',atom%frq(0:atom%nq(itran),itran)
-!    print *,'q=',atom%q(1:atom%nq(itran),itran)
-!    print *,'alphac=',atom%alphac(1:atom%nq(itran),itran)
 !
  End do
 !
@@ -4337,7 +4459,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 ! Do we need to redo the whole calculation?
   Call time_routine('solvestat',.True.)
   UseLinear(:)=.False.
-  UseLinear(:)=.True.
+  If (NLTE%Linear .eq. 1) UseLinear(:)=.True.
   Debug_errorflags(flag_NLTE)=0
   Debug_warningflags(flag_NLTE)=0
   If (FirstTime) then
@@ -4510,34 +4632,41 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
               End if
            End do ! Do in imu
 !
-           If (MaxVal(LStar(:)) .gt. 1) then
+           If (MaxVal(LStar(:)) .gt. 1.) then
               Do idepth=1, NLTE%NDEP
-                 If (LStar(idepth) .gt. 1) LStar(idepth)=1.
-                 If (lstar(idepth) .gt. 1) then
-                    print *,'lstar .gt. 1'
+                 If (lstar(idepth) .gt. 1.000) then
+                    print *,'lstar .gt. 1',lstar(idepth)
+                    pause
                  endif
+                 LStar(idepth)=1.
               End do
            End if
            If (MinVal(LStar(:)) .lt. 0) then
               Do idepth=1, NLTE%NDEP
-                 If (LStar(idepth) .lt. 0) LStar(idepth)=0.
                  If (lstar(idepth) .lt. 0) then
                     print *,'lstar .lt. 0'
                  endif
+                 If (LStar(idepth) .lt. 0) LStar(idepth)=0.
               End do
            End if
 
-           If (Cont) then ! b-f transitions
+           Do idepth=1, NLTE%NDEP
+              If (Lstar(idepth) .gt. 1.D0 .or. Lstar(idepth) .lt. 0.D0) print *,'Lst(',idepth,')=',Lstar(idepth) ! debug
+              If (P(idepth) .lt. 0.D0) print *,'P(',idepth,')=',P(idepth) ! debug
+           End do
+
+           If (Cont) then ! b-f transitions              
               Jeff(:)=Jnu(:)-LStar(:)*NLTE%Sl(:,itran)*1.00 ! debug
               If (MinVal(Jeff) .lt. 0) then 
                  Do idepth=1, NLTE%NDEP
-                    If (Lstar(idepth) .gt. 1.D0 .or. Lstar(idepth) .lt. 0.D0) print *,'Lst(',idepth,')=',Lstar(idepth)
-                    If (Jeff(idepth) .lt. 0) Jeff(idepth)=Jnu(idepth)
-                    If (Jeff(idepth) .lt. 0) then
-                       print *,'i,jnu,lst,sl=',idepth,jnu(idepth),lstar(idepth),nlte%sl(idepth,itran)
-                       print *,'jeff .lt. 0'
-                       stop
-                    endif
+                    If (Jeff(idepth) .lt. 0) Jeff(idepth)=0.
+!                    If (Lstar(idepth) .gt. 1.D0 .or. Lstar(idepth) .lt. 0.D0) print *,'Lst(',idepth,')=',Lstar(idepth)
+!                    If (Jeff(idepth) .lt. 0) then
+!                       print *,'i,jnu,lst,sl=',idepth,jnu(idepth),lstar(idepth),nlte%sl(idepth,itran)
+!                       print *,'jeff .lt. 0'
+!                       stop
+!                    endif
+!                    If (Jeff(idepth) .lt. 0) Jeff(idepth)=Jnu(idepth)
                  End do
               End if
 
@@ -4565,6 +4694,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
            End if
            Call WriteJ(irec,Jnu)
         End do ! Do in inu
+
         If (.not. Cont) then ! b-b transitions
            Jeff(:)=Phij(:)-LStar(:)*NLTE%Sl(:,itran)
            if (MinVal(Jeff(:)) .lt. 0) then
@@ -4638,7 +4768,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 !
 ! Ok. Matrices are now ready. Update populations
 !
-
+     
      NOld(:,:)=NLTE%N(:,:)
      Do idepth=1,NLTE%NDEP
         If (.not. Depth_converged(idepth)) then 
@@ -4715,19 +4845,20 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      End if
 
      RelChg=MaxVal(Abs((NOLD(:,:)-NLTE%N(:,:))/NLTE%N(:,:)))
+
      If (CheckNaN(RelChg)) then
         RelChg=0.
         NLTE%Error=.True.
      End if
 
-!     Do idepth=1, NLTE%NDEP
-!        If (MaxVal(Abs((NOLD(:,idepth)-NLTE%N(:,idepth))/ &
-!             NLTE%N(:,idepth))) .lt. NLTEInput%elim2) then 
-!            Depth_converged(idepth)=.True. 
+     Do idepth=1, NLTE%NDEP
+        If (MaxVal(Abs((NOLD(:,idepth)-NLTE%N(:,idepth))/ &
+             NLTE%N(:,idepth))) .lt. NLTEInput%elim2) then 
+            Depth_converged(idepth)=.True. 
 !!           This doesn't work because W contains the populations
-!           LU(:,:,idepth)=NLTE%W(:,:,idepth)
-!        End if
-!     End do
+!!           LU(:,:,idepth)=NLTE%W(:,:,idepth)
+        End if
+     End do
 
 ! NG acceleration
      If (iter .eq. 1) & ! Reset NG acceleration
