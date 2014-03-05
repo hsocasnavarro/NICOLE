@@ -17,13 +17,14 @@ Module UV_opacity_TOPbase
 
 Contains
 
-  Real Function UVopacity_TOPbase(T, Pe, Lambda, Scat)
+  Real Function UVopacity_TOPbase(T, Pe, Lambda, Scat, ignore)
     Real, Parameter :: megabarn_to_cm2=1.e-18
     Real :: T, Pe, Lambda, Scat, Opacity
     Real, Dimension(1) :: TT, U1, U2, U3, dU1, dU2, dU3, n0overn1, Ne
     Real :: Eioniz, Excit, Ab, novernh, Opac
     Integer :: ilam, iz, ilev
-    Logical :: FirstTime=.True.
+    Logical, Save :: FirstTime=.True.
+    Logical, Dimension(92) :: ignore
 
     If (FirstTime) then ! Read data from file the first time
        Call UVopacity_TOPbase_init
@@ -32,6 +33,7 @@ Contains
 
     TT(1)=T
     Ne(1)=Pe/BK/T
+
     ilam=Lambda-500.+.5
     
     If (ilam .lt. 1) ilam=1
@@ -39,7 +41,7 @@ Contains
 
     Opac=0.0
     Do iz=1,nz ! Loop in elements
-       If (ilam .le. Maxval(nlambda(iz,:))) then ! Is at least one level relevant?
+       If (ilam .le. Maxval(nlambda(iz,:)) .and. .not. ignore(iz)) then ! Is at least one level relevant?
           Ab=10**(At_abund(zs(iz))-12.)
           Call Partition_f(zs(iz),TT(1),U1(1),U2(1),U3(1),dU1(1),dU2(1),dU3(1))
           Eioniz=At_ioniz1(zs(iz))

@@ -537,6 +537,16 @@ for icycle in range(int(ncycles)):
         abundances[element]=override
     numab=list()
     for el in elements: numab.append(float(abundances[el]))
+    # Elements to ignore in background opac
+    elneglectopac=get_value(config,'Elements to ignore in background opacities',' ','NICOLE.input')
+    elneglectopac=elneglectopac.lower()
+    elneglectopac=re.sub(',',' ',elneglectopac)
+    elneglectopac=elneglectopac.split()
+    elneglectopacidx=list()
+    for el in elements:
+        el=el.lower()
+        if elneglectopac.count(el) >= 1:
+            elneglectopacidx.append(int([elements.index(el)][0])+1)
     #
     # NLTE
     #
@@ -593,8 +603,8 @@ for icycle in range(int(ncycles)):
         ngacc = 'T'
     else:
         ngacc = 'F'
-    nlteoptthin=get_value(config,'optically thin','1e-5','NICOLE.input','NLTE')
-    nlteoptthick=get_value(config,'optically thick','1e2','NICOLE.input','NLTE')
+    nlteoptthin=get_value(config,'optically thin','1e-3','NICOLE.input','NLTE')
+    nlteoptthick=get_value(config,'optically thick','1e3','NICOLE.input','NLTE')
     nltelinear=get_value(config,'linear formal solution','0','NICOLE.input','NLTE')
     nltemaxiters=get_value(config,'max iters','-','NICOLE.input','NLTE')
     if nltemaxiters == '-': nltemaxiters='500'
@@ -1138,6 +1148,10 @@ for icycle in range(int(ncycles)):
             '       ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ \n')
     f.write(hscale+'          ! hscale \n')
     f.write(opacities+'  '+opacitiesUV+'  ! opac, opacUV \n')
+    l=len(elneglectopacidx)
+    f.write(str(l)+' ! elements to ignore in opac\n')
+    if l > 0:
+        for el in elneglectopacidx: f.write(str(el)+'\n')
     f.write(eqstate+'  '+eqstateH+' '+peconsistency+'          ! Eq state, Eq state for H, Pe_consistency \n')
     f.write(sethydro+'     '+setnH+'   '+restart+'   ! sethydro, setnH, restart \n')
     f.write(depcoef+'   ! depcoef \n')

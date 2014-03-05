@@ -992,6 +992,15 @@ is below this value.
 \item Formal Solution: (Optional, default=1). Switch to control the
   formal solution routine to be employed. Set to 1 to use Delo bezier
   splines or 2 for short characteristics.
+\item Linear formal solution: (Optional, default=0). If set to 1
+  forces the solution of the radiative transfer in the NLTE module to
+  use the linear approximation. This is usually more stable but somewhat
+  less accurate than the default.
+\item Optically thin: (Optional, default=1e-3). Monochromatic optical
+  depth above which we consider the atmosphere to be transparent.
+\item Optically thick: (Optional, default=1e3). Monochromatic optical
+  depth below which we consider the atmosphere to be thick and use the
+  diffusion approximation (but neglecting the source function gradient)
 \item Vel Free: (Optional, default='y'). Whether or not to use the
   velocity free approximation.
 \item NGACC: (Optional, default='y'). Whether or not to use NG acceleration.
@@ -1005,6 +1014,16 @@ is below this value.
   over the finite number of levels considered in the model atom. In
   the NICOLE approach, tabulated partition functions are used to
   determine an approximate sum over an infinite number of levels.
+\item Elements to ignore in backgroudn opacities: (Optional,
+  default=''). If the NLTE calculation includes the bound-free
+  transitions treated in detail, we might want to exclude that element
+  in the calculation of background opacities. A typical example is
+  the H atom. All background opacity packages in NICOLE consider the
+  opacity produced by bound-free transitions of neutral hydrogen. If
+  we are computing a H atom that includes those transitions then it's
+  a good idea to put H in this field. The background opacity package
+  would then skip the computation of opacities due to neutral H
+  bound-free transitions.
 \end{itemize}
 
 Finally, we can optionally have a section about abundances in

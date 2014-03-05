@@ -4439,7 +4439,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
   Type (NLTE_variables) :: NLTE
   Type (NLTE_variables), Save :: Saved_NLTE 
   Type (NLTE_input) :: NLTEInput
-  Real, Dimension (Atom%NK, NLTE%NDEP) :: E, NOld
+  Real, Dimension (Atom%NK, NLTE%NDEP) :: E, NOld, Save_N
   Real, Dimension (Atom%NK, Atom%NK, NLTE%NDEP) :: LU
   Real, Dimension (NLTE%NDEP) :: Phi, Xcont, Scat, Sc, Jnu, Gij, Z, &
        LStar, PhiJ, SBck, Alpha, X, Rnu, S, P, &
@@ -4861,6 +4861,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      End do
 
 ! NG acceleration
+     Save_N=NLTE%N
      If (iter .eq. 1) & ! Reset NG acceleration
           Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .false., .false.)
 
@@ -4868,9 +4869,10 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
         Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .true., NLTEInput%Verbose .ge. 4)
      End if
      If (minval(nlte%n) .lt. 0) then
-        print *,'negativ pop after NG!!'
-        NLTE%Error=.True.
-        NLTE%N=Abs(NLTE%N)
+        print *,'negativ pop after NG!!' 
+        NLTE%N=Save_N ! Revert to previous and reset NG
+        Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .false., .false.)
+!        NLTE%Error=.True.
      end if
 !
      If (NLTEInput%Verbose .ge. 4) &

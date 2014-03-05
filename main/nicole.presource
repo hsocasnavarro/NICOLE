@@ -20,7 +20,7 @@ Program Nicole
   Use File_operations
   Use debug_module
   Use Profiling
-  Use Background_opacity_module, Only: Opacity_Package, Opacity_Package_UV
+  Use Background_opacity_module, Only: Opacity_Package, Opacity_Package_UV, elneglectopac
   Use Eq_state, Only: eqstate_switch_others, eqstate_switch, eqstate_pe_consistency
   Implicit None
   Type (Parameters) :: Params
@@ -170,6 +170,12 @@ Program Nicole
   Read (headerunit, *) KeepVars(1:8)
   Read (headerunit, '(A)') Input%hscale
   Read (headerunit, *) Opacity_package, Opacity_Package_UV
+  Read (headerunit, *) i0
+  elneglectopac(:)=.False.
+  Do ivar=1, i0
+     Read (headerunit, *) i1
+     elneglectopac(i1)=.True.
+  End do
   Read (headerunit, *) eqstate_switch, eqstate_switch_others, eqstate_pe_consistency
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
   Read (headerunit, *) Input%depcoef_mode

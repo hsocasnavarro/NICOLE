@@ -13,12 +13,13 @@ Module UV_opacity_DM
 
 Contains
 
-  Real Function UVopacity_DM(T, Pe, Lambda, Scat)
+  Real Function UVopacity_DM(T, Pe, Lambda, Scat, ignore)
     Real :: T, Pe, Lambda, Scat, Opacity
     Real, Dimension(1) :: TT, U1, U2, U3, dU1, dU2, dU3, n0overn1, Ne
     Real :: Eioniz, Excit, Ab, novernh, Opac, nu, s, A, nul, alpha, alphal
     Integer :: ilev, z, n0
     Real :: Theta, Sum, gff, helium, hydrogen
+    Logical, Dimension(92) :: ignore
 
     TT(1)=T
     Ne(1)=Pe/BK/T
@@ -41,6 +42,7 @@ Contains
           s=DM_s(ilev)
           alphal=DM_alphal(ilev)*1e-18 ! cm 2
           alpha=alphal*( A*((nul/nu)**s) + (1.-A)*((nul/nu)**(s+1.)) )
+          If (ignore(z)) alpha=0.
           Opac=Opac+novernh*alpha
        End if
     End do
@@ -48,6 +50,9 @@ Contains
 ! Add H and He
 
 ! Neutral H photoionization
+    Call Partition_f(1,TT(1),U1(1),U2(1),U3(1),dU1(1),dU2(1),dU3(1))
+    Eioniz=At_ioniz1(1)
+    Eioniz=Eioniz*ev_to_cgs
     Theta=1.5777216E5/T
     n0 = 1 + floor(sqrt(1.096776d-3*lambda))
     If (n0 .le. 8) then
@@ -63,8 +68,10 @@ Contains
     hydrogen=1.045E-26*gff*Sum
     n0overn1=Saha(1, TT, Ne, U1, U2, Eioniz)
     hydrogen=hydrogen*(1./(1.+1./n0overn1(1))) ! Convert from cm2 per neutral H to cm2 per H particle
+    If (ignore(1)) hydrogen=0.
 !    
     Helium=0. ! debug
+    If (ignore(2)) Helium=0.
 !
     Opac=Opac+hydrogen+helium
 

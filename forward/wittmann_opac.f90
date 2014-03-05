@@ -8,7 +8,7 @@ Module Wittmann_opac_module
 Contains
 
  function Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24,  &
-       PH2plus4, lambda_in4, Scat)
+       PH2plus4, lambda_in4, Scat, ignore)
                        
 ! Note: Htot=H + H+ + H- + 2H + 2H+ 
 ! pp(1)=  p(h)/p(h'), that is n(neutral H)/n(Htot)
@@ -47,6 +47,7 @@ Contains
       real, dimension(15,9) :: ccatom
       real, dimension(20,8) :: cmatom
       real, dimension(21,8) :: csodiu
+      Logical, Dimension(92) :: ignore
 
       data ghel/1.,3.,1.,9.,9.,3.,3.,3.,1.,9.,20.,3./
       data chihel/0.,19.819,20.615,20.964,20.964,21.217,21.217, &
@@ -140,18 +141,22 @@ Contains
       iel=2
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(2)=(10.**(At_abund(iel)-12.))*n0overn(1)
+      if (ignore(iel)) p(2)=0.
 ! Neutral C
       iel=6
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(3)=(10.**(At_abund(iel)-12.))*n0overn(1)
+      if (ignore(iel)) p(3)=0.
 ! Neutral Na
       iel=11
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(4)=(10.**(At_abund(iel)-12.))*n0overn(1)
+      if (ignore(iel)) p(4)=0.
 ! Neutral Mg
       iel=12
       Call Saha123(1,iel, T1, Ne1, n0overn, n1overn, n2overn)
       p(5)=(10.**(At_abund(iel)-12.))*n0overn(1)
+      if (ignore(iel)) p(5)=0.
 ! Others
       p(6)=PHPlus4/PHtot
       p(7)=PH24/PHtot
@@ -344,6 +349,7 @@ Contains
 
       if (lambda_in4 .le. 4000) & ! For UV, neutral H and Mg are computed in the UV package
            hneutr=0.
+      if (ignore(1)) hneutr=0.
 
 !-----------------------------------------------------------------------
                ! *** h2- ***                                            

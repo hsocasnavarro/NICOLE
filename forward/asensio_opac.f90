@@ -579,7 +579,7 @@ contains
   !   Rayleign scattering by H and H2
   !   Mg bound-free + free-free
   !-----------------------------------------------------------------
-  function asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
+  function asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat, ignore)
     real :: asensio_background_opacity, T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat
     real :: nu, chi_0, chi_e, eta, tmp
     real(kind=8) :: T, Pe, Pg, PH, PHminus, PHplus, PH2, PH2plus, lambda_in
@@ -589,6 +589,7 @@ contains
     real, Parameter :: Min_Lambda=300., Max_Lambda=120000
     Logical, Save :: FirstTime=.True.
     Character (Len=512) :: String
+    Logical, Dimension(92) :: ignore
     ! Convert default Real to kind=8	
 
     T=T4
@@ -660,6 +661,13 @@ contains
             (contrib1 + contrib2 + contrib3 + contrib4 + contrib5 + contrib6 + contrib7)
        Scat=1. / (PK*T) * (contrib4+contrib5+contrib6)
     End if
+
+    If (ignore(1)) then ! Ignore H
+       contrib5=0.
+       contrib3=0.
+    endif
+    If (ignore(12)) & ! Ignore Mg
+       contrib7=0.
 
     If (Scat .lt. 0) then
        Write (String,*) 'T, Pe, PH, PHminus, PHplus, PH2, PH2plus, lambda, c1, c2, c3=', &

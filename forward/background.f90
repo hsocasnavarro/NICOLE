@@ -8,6 +8,7 @@ module background_opacity_module
   Use Eq_state
   Implicit None
   Integer :: Opacity_package=1, Opacity_Package_UV=1 ! Default, will be overwritten in main program
+  Logical, Dimension(92) :: elneglectopac
 
 Contains
   Function Background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
@@ -16,27 +17,21 @@ Contains
     Real :: nu, chi_0, chi_e, eta, num, den, Rho
     Integer :: i
 
-! debug
-!    if (lambda_in4 .lt. 4000) then
-!       print *,'Capping UV opacities'
-!       lambda_in4 = 4e3+1
-!    endif
-
     Call Time_routine('background_opac',.True.)
 
     TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
     If (Opacity_Package .eq. 1) then ! Use Wittmann'
-       Opac=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
+       Opac=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat, elneglectopac)
        Background_opacity=Opac
        ! If lambda .le. 4000 use specific module for UV
        if (lambda_in4 .le. 4000) then
           If (Opacity_Package_UV .eq. 1) then ! TOPbase
              Background_opacity=Opac+ &
-                  UVopacity_TOPbase(T4, Pe4, lambda_in4, Scat2)*TotH/BK/T4
+                  UVopacity_TOPbase(T4, Pe4, lambda_in4, Scat2, elneglectopac)*TotH/BK/T4
              Scat=Scat+Scat2*TotH/BK/T4
           Else If (Opacity_Package_UV .eq. 2) then ! Dragon-Mutschlecner (1980)
              Background_opacity=Opac+ &
-                  UVopacity_DM(T4, Pe4, lambda_in4, Scat2)*TotH/BK/T4
+                  UVopacity_DM(T4, Pe4, lambda_in4, Scat2, elneglectopac)*TotH/BK/T4
              Scat=Scat+Scat2*TotH/BK/T4
           Else
              Print *,'Unknow UV Opacity Package'
@@ -45,17 +40,17 @@ Contains
        End if
 
     Else if (Opacity_Package .eq. 2) then ! Use Asensio's
-       Opac=Asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
+       Opac=Asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat, elneglectopac)
        Background_opacity=Opac
        ! If lambda .le. 4000 use specific module for UV
        if (lambda_in4 .le. 4000) then
           If (Opacity_Package_UV .eq. 1) then ! TOPbase
              Background_opacity=Opac+ &
-                  UVopacity_TOPbase(T4, Pe4, lambda_in4, Scat2)*TotH/BK/T4
+                  UVopacity_TOPbase(T4, Pe4, lambda_in4, Scat2, elneglectopac)*TotH/BK/T4
              Scat=Scat+Scat2*TotH/BK/T4
           Else If (Opacity_Package_UV .eq. 2) then ! Dragon-Mutschlecner (1980)
              Background_opacity=Opac+ &
-                  UVopacity_DM(T4, Pe4, lambda_in4, Scat2)*TotH/BK/T4
+                  UVopacity_DM(T4, Pe4, lambda_in4, Scat2, elneglectopac)*TotH/BK/T4
              Scat=Scat+Scat2*TotH/BK/T4
           Else
              Print *,'Unknow UV Opacity Package'
@@ -66,7 +61,7 @@ Contains
     Else if (Opacity_Package .eq. 3) then ! Use SOPAS
        TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
        nu=cc/(lambda_in4*1e-8) ! s^-1
-       Call Sopas(1, 2, nu, TotH, Pe4, T4, Pg4, chi_0, chi_e, eta)
+       Call Sopas(1, 2, nu, TotH, Pe4, T4, Pg4, chi_0, chi_e, eta, elneglectopac)
        Background_opacity=chi_0+chi_e
        Scat=chi_e
     endif
