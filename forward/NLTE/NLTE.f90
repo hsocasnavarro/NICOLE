@@ -3244,7 +3244,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
 
   If (iformal .eq. 1) then
      Call Bezier_NLTE
-  Else
+ Else
      Call ShortCharacteristics
   End If
 !
@@ -3262,6 +3262,9 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
       !
       ! Init variables
       !
+      iplus(:)=0.
+      iminus(:)=0.
+      p(:)=0.
       Rlu(1:boundup)=0.
       Rlu(boundlow:NLTE%ndep)=1.
       Rlu(boundup:boundlow) = 1.0d0 - Rnu(boundup:boundlow)
@@ -3292,23 +3295,23 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
       ! Boundary conditions at the bottom
       !
          do k = boundlow, NLTE%ndep
-            If (k .gt. 1 .and. k .lt. NLTE%NDEP) then
+!            If (k .gt. 1 .and. k .lt. NLTE%NDEP) then
                ! sgrad=(S(k+1)-S(k-1)) &
                !      /(DTau_Nu(k+1)+DTau_Nu(k))
             
                !
-               der = (s(k) - s(k-1)) / dtau_nu(k)
-               der1 = (s(k + 1) - s(k)) / dtau_nu(k+1)
-               If(der*der1 .lt. 0.0d0) then
-                  sgrad = 0
-               Else
-                  !
-                  sgrad = (der * dtau_nu(k+1) + der1 * dtau_nu(k)) / (dtau_nu(k+1) + dtau_nu(k))
-               endif
-            Else 
-               sgrad=(S(k)-S(k-1))/DTau_nu(k)
-            End if
-            Iplus(k) = S(k) + sgrad * NLTE%XMu(imu)
+!               der = (s(k) - s(k-1)) / dtau_nu(k)
+!               der1 = (s(k + 1) - s(k)) / dtau_nu(k+1)
+!               If(der*der1 .lt. 0.0d0) then
+!                  sgrad = 0
+!               Else
+!                  !
+!                  sgrad = (der * dtau_nu(k+1) + der1 * dtau_nu(k)) / (dtau_nu(k+1) + dtau_nu(k))
+!               endif
+!            Else 
+!               sgrad=(S(k)-S(k-1))/DTau_nu(k)
+!            End if
+            Iplus(k) = S(k) ! + sgrad * NLTE%XMu(imu)
             Iminus(k) = Iplus(k)
          end do
 
@@ -3318,13 +3321,21 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
          k0 = boundlow
          k1 = boundup
          dk = -1
-         call bezier_ray(k0, k1, dk)
+         if (UseLinear(k0)) then ! debug . Entire ray is linear
+            call linear_ray(k0, k1, dk)
+         Else
+            call bezier_ray(k0, k1, dk)
+         End if
          
          ! Downwards integration
          k0 = boundup
          k1 = boundlow
          dk = 1
-         call bezier_ray(k0, k1, dk)
+         if (UseLinear(k0)) then ! debug . Entire ray is linear
+            call linear_ray(k0, k1, dk)
+         Else
+            call bezier_ray(k0, k1, dk)
+         End if
       end if
       
       !
@@ -3625,15 +3636,15 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
       If (Iminus(1) .lt. 0) Iminus(1)=0.
 ! Bottom boundary condition: S+dS/dTau_Nu
       Do k=BoundLow, NLTE%NDEP
-         If (k .ge. 2 .and. k .le. NLTE%NDEP-1) then
-            sgrad=(S(k+1)-S(k-1)) &
-                 /(DTau_Nu(k+1)+DTau_Nu(k))
-         Else if (k .le. NLTE%NDEP-1) then
-            sgrad=(S(k+1)-S(k))/DTau_nu(k+1)
-         Else if (k .ge. 2) then
-            sgrad=(S(k)-S(k-1))/DTau_nu(k)
-         End if
-         Iplus(K)=S(K) +sgrad ! Max(sgrad,-S(K)*.9)
+!         If (k .ge. 2 .and. k .le. NLTE%NDEP-1) then
+!            sgrad=(S(k+1)-S(k-1)) &
+!                 /(DTau_Nu(k+1)+DTau_Nu(k))
+!         Else if (k .le. NLTE%NDEP-1) then
+!            sgrad=(S(k+1)-S(k))/DTau_nu(k+1)
+!         Else if (k .ge. 2) then
+!            sgrad=(S(k)-S(k-1))/DTau_nu(k)
+!         End if
+         Iplus(K)=S(K) !+sgrad ! Max(sgrad,-S(K)*.9)
          Iminus(K)=Iplus(k)
       End do
       If (BoundLow .ge. 2) then ! Do the transfer if not all optically thick
@@ -4650,11 +4661,6 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
               End do
            End if
 
-           Do idepth=1, NLTE%NDEP
-              If (Lstar(idepth) .gt. 1.D0 .or. Lstar(idepth) .lt. 0.D0) print *,'Lst(',idepth,')=',Lstar(idepth) ! debug
-              If (P(idepth) .lt. 0.D0) print *,'P(',idepth,')=',P(idepth) ! debug
-           End do
-
            If (Cont) then ! b-f transitions              
               Jeff(:)=Jnu(:)-LStar(:)*NLTE%Sl(:,itran)*1.00 ! debug
               If (MinVal(Jeff) .lt. 0) then 
@@ -4868,8 +4874,8 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      If (iter .gt. 5 .and. NLTEInput%NGacc) then
         Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .true., NLTEInput%Verbose .ge. 4)
      End if
-     If (minval(nlte%n) .lt. 0) then
-        print *,'negativ pop after NG!!' 
+     If (minval(nlte%n) .lt. 0 .or. checknan(Sum(nlte%n))) then
+        print *,'negativ or NaN pop after NG!!' 
         NLTE%N=Save_N ! Revert to previous and reset NG
         Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .false., .false.)
 !        NLTE%Error=.True.

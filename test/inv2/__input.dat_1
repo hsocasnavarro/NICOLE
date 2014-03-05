@@ -31,6 +31,7 @@ pel       ! inputdens
  -1   -1   -1   -1   -1   -1   -1   -1        ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ 
 t          ! hscale 
 1  1  ! opac, opacUV 
+0 ! elements to ignore in opac
 0  0 1e-1          ! Eq state, Eq state for H, Pe_consistency 
 T     T   -1   ! sethydro, setnH, restart 
 1   ! depcoef 
@@ -70,5 +71,6 @@ T     T   -1   ! sethydro, setnH, restart
 3 0 1 NMU, usecolswitch, formalsolution 
 10 1.0 QNORM, CPER 
 T T 3 velfree, ngacc,lambdaiters 
+1e-3 1e3 0 nlte opt thin, opt thick, linear 
 500 nltemaxiters 
 1 NLTE ltepop 

@@ -689,7 +689,7 @@ Subroutine Scalar_hermite(npoints, tau_nu, S, Intensity)
 !
 ! Set boundary condition (I=S + dS/d(tau_nu)) at ibound
 !
-  Intensity(ibound:npoints)=S(ibound:npoints)+S_p(ibound:npoints)
+  Intensity(ibound:npoints)=S(ibound:npoints)!+S_p(ibound:npoints)
 !
 ! Ray propagation
 !
@@ -1134,7 +1134,7 @@ Subroutine myold_Hermite(npoints, ltau_500, Ab, S, Emergent_stokes)
 !
 ! Set boundary condition (I=S + dS/dtau) at ibound
 !
-  Stokes(ibound, 1)=S(ibound) + S_p(ibound)/ & ! Boundary cond.
+  Stokes(ibound, 1)=S(ibound) + 0.*S_p(ibound)/ & ! Boundary cond.
        Ab(ibound,1, 1) ! Note that S_p is with respect to
                         ! tau_500 and we need it with tau_nu
   Stokes(ibound,2:4)=0.
