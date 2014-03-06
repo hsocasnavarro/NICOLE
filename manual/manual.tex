@@ -543,7 +543,12 @@ is marked by a string enclosed in square brackets ([ ]).
 
 In each line the field label is separated from the value by the symbol
 = (e.g., Mode=Synthesis). The parsing is insensitive to case and
-indentation. The various sections and the lines within each section
+indentation. If you don't remember exactly the field label, just write
+your best guess. The Python wrapper run\_nicole.py will produce an
+error if it encounters an incorrect line and will show one or more
+helpful suggestions.
+
+The various sections and the lines within each section
 can appear in any order.  The main body of the file (before the
 beginning of any sections) has the main parameters that control the
 behavior of the code. Some of them are optional and have default
