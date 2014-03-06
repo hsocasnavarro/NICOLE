@@ -1281,6 +1281,7 @@ and for each level write the populations divided by the statistical weight
 ($g$) as explained above (remember: starting from the top of the atmosphere).
 
 \subsection{Running NICOLE in synthesis mode}
+\label{sec:runsyn}
 
 Ok, so now that we know all the input files, what they do and how they 
 are written, we only have to run the Python wrapper:
@@ -1324,6 +1325,32 @@ worked fine and now you have a new file in your directory with the
 synthetic data.  Congratulations! You have run your first calculation
 with NICOLE!
 
+If you specified an output model file in NICOLE.input, NICOLE will
+output the actual model that it used to do the synthesis. This might
+not coincide exactly with the model you supplied due to a number of
+reasons. First of all, if you have the optimize grid option set,
+NICOLE has reinterpolated your model to a more suitable
+grid. Moreover, some of the variables defining the plasma state are
+computed by NICOLE's equation of state routines, possibly overriding any values
+you might have supplied. For instance, if you set input density to
+electron pressure, all variables will be recomputed from T and Pe:
+density, gas pressure and number densities of neutral hydrogen,
+ionized hydrogen, negative hydrogen ion, hydrogen molecule and singly
+ionized hydrogen molecule. You can instruct NICOLE to retain the
+original values you supplied in the input model for any of these
+parameters by setting the various keep flags, as explained in
+section~\ref{nicinput}. So, for instance, if you wish to use the gas
+density, gas pressure and neutral hydrogen density provided in your
+input file, you would need to set {\em Keep Rho}, {\em Keep Gas\_p}
+and {\em Keep nH} to 1 in NICOLE.input (see section~\ref{nicinput}).
+
+If the NLTE inversion does not converge (to see this you may need to
+have the printout parameter set to 3 or greater in NICOLE.input) try
+playing around with the parameters in the NLTE section of
+NICOLE.input. The first thing to try would be to use linear
+interpolation by setting {\em linear formal solution} to 1. You can
+then try changing the formal solution from 1 to 2 or viceversa.
+
 The format of the file that you have just obtained, HSRA.pro, is
 explained in section~\ref{profilefile} below. You can read it in IDL
 with the read\_profile.pro procedure. On exit, NICOLE produces a file
@@ -1336,7 +1363,6 @@ profiled are actually called by others. For example, solvestat is
 called by forward, which in turn is called by
 compute\_dchisq\_dx. Because of this the percentages don't add up to
 100\%.
-
 
 \subsection{The profile file}
 \label{profilefile}
@@ -3044,6 +3070,14 @@ Be sure that the --mpi flag is NOT specified in this case.
   problem.  Then, edit the file and check with the corresponding
   section in this manual to make sure that the format is exactly the
   one expected by NICOLE.
+\item {\bf The NLTE iteration doesn't converge.} Try playing around
+  with the parameters in the NLTE section of NICOLE.input. The first
+  thing to try would be to use linear formal solution. If that doesn't
+  work, try changing the formal solution.
+\item {\bf My synthesis doesn't produce the results I expect.} Perhaps
+  NICOLE is modifying some of the model parameters that you are
+  supplying in the model (pressure, density, Hydrogen level
+  populations, etc). Check the discussion at the end of section~\ref{sec:runsyn}. 
 \item {\bf I can't get a good fit to my profiles.} Check the tips on
   section~\ref{sec:tips}. If that doesn't help, make sure that your
   profiles are properly normalized.
