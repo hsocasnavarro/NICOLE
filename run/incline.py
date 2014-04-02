@@ -12,8 +12,10 @@ import sys
 
 def usage():
     print 'Usage:'
-    print "incline.py [-h, --help] [-q, --quiet] [-v, --verbose] [--xang=xxx] [--yang=xxx] [--dx=xxx] [--dy=xxx] [--modelin=filename] [--modelout=filename]"
+    print "incline.py [-h, --help] [-q, --quiet] [-v, --verbose] [--xang=xxx] [--yang=xxx] [--dx=xxx] [--dy=xxx] [--model_in=filename] [--model_out=filename]"
     print "By default xang=0, yang=0"
+    print "dx and dy in the same units as z"
+    print "z scale is mandatory!!"
     print "modelin and modelout both default to __inputmodel.bin"
 
 """
@@ -38,7 +40,7 @@ USAGE:
 DEPENDENCIES: numpy 
 --------------
 MODIFICATIONS:
-
+               2014-04-02, JdlCR: added support for model 2.6 and corrected buggy behaviour in tilt_model. 
 """
 #
 # MODEL CLASS
@@ -51,6 +53,7 @@ class model:
         # Read header
         self.s1,self.s2,self.npix,self.nz  = n.fromfile(name, dtype = 'int64', count = 4)
         if self.s1 == 3328834590979877230 and self.s2 == 2314885530823516723: self.xy+=1
+        if self.s1 == 3328834590979877230 and self.s2 == 2314885530823516726: self.xy+=2
         self.s1,self.s2,self.s1,self.s2,self.nx, self.ny  = n.fromfile(name, dtype = 'int32', count = 6)
         self.npix=self.nx*self.ny
         [nx,ny,npix,nz]=[self.nx,self.ny,self.npix,self.nz]
@@ -59,10 +62,11 @@ class model:
         if verbose:
             print 'class::model::init : nz =   ', self.nz
             print 'class::model::init : npix = ', self.npix
-        if (self.xy == 1 ):
+        if (self.xy >= 1 ):
             if verbose:
                 print 'class::model::init : nx = ', self.nx
                 print 'class::model::init : ny = ', self.ny
+                print 'class::model::init : mtype = ', self.xy
             self.reshape = [self.nx, self.ny, self.nz]
             reshape2 = [self.nx, self.ny]
         else:
@@ -80,17 +84,35 @@ class model:
         self.vx = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.vy = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.vz = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
-        self.blong = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
+        self.bz = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.bx = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.by = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
-        self.bz = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.blx = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.bly = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.blz = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.v_mic = n.zeros(self.nz * self.npix, dtype = 'float32').reshape(self.reshape)
         self.v_mac = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
         self.stray = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
-        self.expansion = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.ffactor = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.nH = n.zeros(self.nz *self.npix, dtype = 'float32').reshape(self.reshape)
+        self.nHminus =  n.zeros(self.nz *self.npix, dtype = 'float32').reshape(self.reshape)
+        self.nHplus =  n.zeros(self.nz *self.npix, dtype = 'float32').reshape(self.reshape)
+        self.nH2 =  n.zeros(self.nz *self.npix, dtype = 'float32').reshape(self.reshape)
+        self.nh2plus =  n.zeros(self.nz *self.npix, dtype = 'float32').reshape(self.reshape)
+        self.keep_el_p = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_gas_p = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_rho = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_nH = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_nHminus = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_nHplus = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_nH2 = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        self.keep_nH2plus = n.zeros(self.npix, dtype = 'float32').reshape(reshape2)
+        if(self.xy >= 1):
+            self.abundance = n.zeros(self.npix*92, dtype = 'float32').reshape([self.nx,self.ny,92])
+        else:
+            self.abundance = n.zeros(self.npix*92, dtype = 'float32').reshape([self.npix,92])
+
+#        self.abundance = n.zeros
 #            
 
     def check_types(self):
@@ -133,7 +155,11 @@ class model:
         return [int4f,intf,flf]
 
     def read(self,verbose=1):
-        ndat  = (17 * self.nz + 3)
+        [int4f,intf,flf]=self.check_types()
+        if(self.xy == 1): sizerec = 17 * self.nz + 3
+        if(self.xy == 2): sizerec = 22 * self.nz + 11 + 92
+            
+        ndat  = sizerec
         form = str(ndat)+'f8'
         #
         if verbose:
@@ -143,10 +169,11 @@ class model:
         fd.seek(0)
         #
         # discard header
-        sizerec=17*self.nz+3
+ 
+        
         tmp = struct.unpack('<'+str(sizerec)+flf,fd.read(sizerec*8))
         # loop and read
-        if(self.xy):
+        if(self.xy == 1):
             for jj in n.arange(self.nx):
                 for ii in n.arange(self.ny):
                     #
@@ -163,7 +190,7 @@ class model:
                     self.el_p[jj,ii,:] =    tmp[5 * self.nz : 6 * self.nz]
                     self.vlos[jj,ii,:] =    tmp[6 * self.nz : 7 * self.nz]
                     self.v_mic[jj,ii,:] =   tmp[7 * self.nz : 8 * self.nz]
-                    self.blong[jj,ii,:] =   tmp[8 * self.nz : 9 * self.nz]
+                    self.bz[jj,ii,:] =      tmp[8 * self.nz : 9 * self.nz]
                     self.bx[jj,ii,:] =      tmp[9 * self.nz : 10 * self.nz]
                     self.by[jj,ii,:] =      tmp[10 * self.nz: 11 * self.nz]
                     self.blx[jj,ii,:] =     tmp[11 * self.nz: 12 * self.nz]
@@ -174,7 +201,51 @@ class model:
                     self.vz[jj,ii,:] =      tmp[16 * self.nz: 17 * self.nz]
                     self.v_mac[jj,ii] =     tmp[17 * self.nz    ]
                     self.stray[jj,ii] =     tmp[17 * self.nz + 1]
-                    self.expansion[jj,ii] = tmp[17 * self.nz + 2]
+                    self.ffactor[jj,ii] =   tmp[17 * self.nz + 2]
+        elif(self.xy == 2):
+         for jj in n.arange(self.nx):
+                for ii in n.arange(self.ny):
+                    #
+                    # Read pixel
+                    tmp = struct.unpack('<'+str(sizerec)+flf,fd.read(sizerec*8))
+                    
+                    #
+                    # Copy to vars
+                    self.z[jj,ii,:] =       tmp[0 : self.nz]
+                    self.tau[jj,ii,:] =     tmp[1 * self.nz : 2 * self.nz]
+                    self.t[jj,ii,:] =       tmp[2 * self.nz : 3 * self.nz]
+                    self.gas_p[jj,ii,:] =   tmp[3 * self.nz : 4 * self.nz]
+                    self.rho[jj,ii,:] =     tmp[4 * self.nz : 5 * self.nz]
+                    self.el_p[jj,ii,:] =    tmp[5 * self.nz : 6 * self.nz]
+                    self.vlos[jj,ii,:] =    tmp[6 * self.nz : 7 * self.nz]
+                    self.v_mic[jj,ii,:] =   tmp[7 * self.nz : 8 * self.nz]
+                    self.bz[jj,ii,:] =      tmp[8 * self.nz : 9 * self.nz]
+                    self.bx[jj,ii,:] =      tmp[9 * self.nz : 10 * self.nz]
+                    self.by[jj,ii,:] =      tmp[10 * self.nz: 11 * self.nz]
+                    self.blx[jj,ii,:] =     tmp[11 * self.nz: 12 * self.nz]
+                    self.bly[jj,ii,:] =     tmp[12 * self.nz: 13 * self.nz]
+                    self.blz[jj,ii,:] =     tmp[13 * self.nz: 14 * self.nz]
+                    self.vx[jj,ii,:] =      tmp[14 * self.nz: 15 * self.nz]
+                    self.vy[jj,ii,:] =      tmp[15 * self.nz: 16 * self.nz]
+                    self.vz[jj,ii,:] =      tmp[16 * self.nz: 17 * self.nz]
+                    self.nH[jj,ii,:] =      tmp[17 * self.nz: 18 * self.nz]
+                    self.nHminus[jj,ii,:] = tmp[18 * self.nz: 19 * self.nz]
+                    self.nHplus[jj,ii,:] =  tmp[19 * self.nz: 20 * self.nz]
+                    self.nH2[jj,ii,:] =     tmp[20 * self.nz: 21 * self.nz]
+                    self.nh2plus[jj,ii,:] = tmp[21 * self.nz: 22 * self.nz]
+                    self.v_mac[jj,ii] =     tmp[22*self.nz]
+                    self.stray[jj,ii] =     tmp[22*self.nz+1]
+                    self.ffactor[jj,ii] =   tmp[22*self.nz+2]
+                    self.keep_el_p[jj,ii] = tmp[22*self.nz+3]
+                    self.keep_gas_p[jj,ii]= tmp[22*self.nz+4]
+                    self.keep_rho[jj,ii] =  tmp[22*self.nz+5]
+                    self.keep_nH[jj,ii] =   tmp[22*self.nz+6]
+                    self.keep_nHminus[jj,ii] = tmp[22*self.nz+7]
+                    self.keep_nHplus[jj,ii] =  tmp[22*self.nz+8]
+                    self.keep_nH2[jj,ii] =     tmp[22*self.nz+9]
+                    self.keep_nH2plus[jj,ii] = tmp[22*self.nz+10]
+                    self.abundance[jj,ii,:] = tmp[22*self.nz+11:22*self.nz+11+92]
+                    
         else:
             for ii in n.arange(self.npix):
                 #
@@ -210,13 +281,15 @@ class model:
 
         [int4f,intf,flf]=self.check_types()
         [nx,ny,nz]=[self.nx,self.ny,self.nz]
+        sizerec = 22 * nz + 11 + 92
+
         fd = open(filename, 'wb')
         ndat  = (17 * self.nz + 3)
-        fd.write(struct.pack('<16s'+int4f+int4f+intf,'nicole2.3bm     ',nx,ny,nz))
-        for i in range(17*nz+3-16/8-1-1): 
+        fd.write(struct.pack('<16s'+int4f+int4f+intf,'nicole2.6bm     ',nx,ny,nz))
+        for i in range(sizerec-16/8-1-1): 
                 fd.write(struct.pack('<'+flf,0.)) # Fill record
         #
-        Vector=range(17*nz+3)
+        Vector=range(sizerec)
         percent=-1
         for ix in range(nx):
             for iy in range(ny):
@@ -228,7 +301,7 @@ class model:
                 Vector[5*nz:6*nz]=self.el_p[ix,iy,0:nz]
                 Vector[6*nz:7*nz]=self.vlos[ix,iy,0:nz]
                 Vector[7*nz:8*nz]=self.v_mic[ix,iy,0:nz]
-                Vector[8*nz:9*nz]=self.blong[ix,iy,0:nz]
+                Vector[8*nz:9*nz]=self.bz[ix,iy,0:nz]
                 Vector[9*nz:10*nz]=self.bx[ix,iy,0:nz]
                 Vector[10*nz:11*nz]=self.by[ix,iy,0:nz]
                 Vector[11*nz:12*nz]=self.blx[ix,iy,0:nz]
@@ -237,9 +310,23 @@ class model:
                 Vector[14*nz:15*nz]=self.vx[ix,iy,0:nz]
                 Vector[15*nz:16*nz]=self.vy[ix,iy,0:nz]
                 Vector[16*nz:17*nz]=self.vz[ix,iy,0:nz]
-                Vector[17*nz]=self.v_mac[ix,iy]
-                Vector[17*nz+1]=self.stray[ix,iy]
-                Vector[17*nz+2]=self.expansion[ix,iy]
+                Vector[17 * self.nz: 18 * self.nz] =      self.nH[ix,iy,:] 
+                Vector[18 * self.nz: 19 * self.nz] =      self.nHminus[ix,iy,:] 
+                Vector[19 * self.nz: 20 * self.nz] =      self.nHplus[ix,iy,:] 
+                Vector[20 * self.nz: 21 * self.nz] =      self.nH2[ix,iy,:] 
+                Vector[21 * self.nz: 22 * self.nz] =      self.nh2plus[ix,iy,:] 
+                Vector[22*self.nz] =		       self.v_mac[ix,iy] 
+                Vector[22*self.nz+1] =		       self.stray[ix,iy] 
+                Vector[22*self.nz+2] =		       self.ffactor[ix,iy] 
+                Vector[22*self.nz+3] =		       self.keep_el_p[ix,iy] 
+                Vector[22*self.nz+4] = 		       self.keep_gas_p[ix,iy]
+                Vector[22*self.nz+5] =		       self.keep_rho[ix,iy] 
+                Vector[22*self.nz+6] =		       self.keep_nH[ix,iy] 
+                Vector[22*self.nz+7] =		       self.keep_nHminus[ix,iy]
+                Vector[22*self.nz+8] =		       self.keep_nHplus[ix,iy] 
+                Vector[22*self.nz+9] =		       self.keep_nH2[ix,iy]
+                Vector[22*self.nz+10] =		       self.keep_nH2plus[ix,iy]
+                Vector[22*self.nz+11:22*self.nz+11+92] =  self.abundance[ix,iy,:] 
                 for d in Vector: fd.write(struct.pack('<'+flf,d))
         if verbose:
           if (int((ix*ny+(iy+1))*100./nx/ny) > percent):
@@ -248,6 +335,7 @@ class model:
             sys.stdout.flush()
         fd.close() # Done with input model  
         print ''
+
 
 #
 # PROFILE CLASS
@@ -341,6 +429,7 @@ def tilt_model(m, xang = 0.0, yang = 0.0, dx = 0, dy = 0, verbose = 1):
     xmu = n.cos(dtor * xang)
     ymu = n.cos(dtor * yang)
     if verbose: print 'funct::tilt_model : mu = ', mu
+    print 'funct::tilt_model : tilting model assuming periodic boundary conditions!'
     #
     zx2 = (z - z[0]) / abs(xmu) + z[0]
     zy2 = (z - z[0]) / abs(ymu) + z[0]
@@ -350,39 +439,53 @@ def tilt_model(m, xang = 0.0, yang = 0.0, dx = 0, dy = 0, verbose = 1):
     percent = int(-1)
     ntot = 100. / (m.nz - 1.0 + 1e-4)
     #
+    # Temporary storage for vector fields
+    tmpz = n.copy(m.vlos)
+    tmpx = n.copy(m.vx)
+    tmpy = n.copy(m.vy)
+    tmpz1 = n.copy(m.bz)
+    tmpx1 = n.copy(m.bx)
+    tmpy1 = n.copy(m.by)
+    #
     for k in range(m.nz):
         #
         # X-axis grid (compute displacement of current layer)
         #
-#        dx = -n.sign(xang) * n.abs(zx2[k] - zx2[0]) * \
-#             n.sqrt(1.0 - xmu * xmu) / mmax * (m.nx - 1.0)
-#        dy = -n.sign(yang) * n.abs(zy2[k] - zy2[0]) * \
-#             n.sqrt(1.0 - ymu * ymu) / mmay * (m.ny - 1.0)
+        ddx = -n.sign(xang) * n.abs(zx2[k] - zx2[0]) * \
+            n.sqrt(1.0 - xmu * xmu) / mmax * (m.nx - 1.0)
+        ddy = -n.sign(yang) * n.abs(zy2[k] - zy2[0]) * \
+            n.sqrt(1.0 - ymu * ymu) / mmay * (m.ny - 1.0)
         #                
         # Interpolate variables
         #
-        m.t[:,:,k] = n.exp(bilint(n.log(m.t[:,:,k]), dx, dy))
+        m.t[:,:,k] = bilint(m.t[:,:,k], ddx, ddy)
         #
-        if(n.min(m.rho[:,:,k]) > 0.0):
-            m.rho[:,:,k] = n.exp(bilint(n.log(m.rho[:,:,k]), dx, dy))
-        else:
-            m.rho[:,:,k] = bilint(m.rho[:,:,k], dx, dy)
+        #if(n.min(m.rho[:,:,k]) > 0.0):
+        #    m.rho[:,:,k] = n.exp(bilint(n.log(m.rho[:,:,k]), dx, dy))
+        #else:
+        m.rho[:,:,k] = bilint(m.rho[:,:,k], ddx, ddy)
         #
-        if(n.min(m.el_p[:,:,k]) > 0.0):
-            m.el_p[:,:,k] = n.exp(bilint(n.log(m.el_p[:,:,k]), dx, dy))
-        else:
-            m.el_p[:,:,k] = bilint(m.el_p[:,:,k], dx, dy)
+        #if(n.min(m.el_p[:,:,k]) > 0.0):
+        #    m.el_p[:,:,k] = n.exp(bilint(n.log(m.el_p[:,:,k]), dx, dy))
+        #else:
+        m.el_p[:,:,k] = bilint(m.el_p[:,:,k], ddx, ddy)
         #
-        if(n.min(m.gas_p[:,:,k]) > 0.0):
-            m.gas_p[:,:,k] = n.exp(bilint(n.log(m.gas_p[:,:,k]), dx, dy))
-        else:
-            m.gas_p[:,:,k] = bilint(m.gas_p[:,:,k], dx, dy)
+        #if(n.min(m.gas_p[:,:,k]) > 0.0):
+        #    m.gas_p[:,:,k] = n.exp(bilint(n.log(m.gas_p[:,:,k]), dx, dy))
+        #else:
+        m.gas_p[:,:,k] = bilint(m.gas_p[:,:,k], ddx, ddy)
         #
-        m.vz[:,:,k] = bilint(m.vz[:,:,k], dx, dy)
-        m.bz[:,:,k] = bilint(m.bz[:,:,k], dx, dy)
-        m.bx[:,:,k] = bilint(m.bx[:,:,k], dx, dy)
-        m.by[:,:,k] = bilint(m.by[:,:,k], dx, dy)
-        m.v_mic[:,:,k] = bilint(m.v_mic[:,:,k], dx, dy)
+
+        tmpz[:,:,k] = bilint(tmpz[:,:,k], ddx, ddy)
+        tmpx[:,:,k] = bilint(tmpx[:,:,k], ddx, ddy)
+        tmpy[:,:,k] = bilint(tmpy[:,:,k], ddx, ddy)
+        
+        tmpz1[:,:,k] = bilint(tmpz1[:,:,k], ddx, ddy)
+        tmpx1[:,:,k] = bilint(tmpx1[:,:,k], ddx, ddy)
+        tmpy1[:,:,k] = bilint(tmpy1[:,:,k], ddx, ddy)
+
+        
+        m.v_mic[:,:,k] = bilint(m.v_mic[:,:,k], ddx, ddy)
         #
         # counter
         #
@@ -391,6 +494,24 @@ def tilt_model(m, xang = 0.0, yang = 0.0, dx = 0, dy = 0, verbose = 1):
             sys.stdout.write('\r'+'funct::tilt_model : slanting 3D model: '+str(percent)+'%')
             sys.stdout.flush()
     print(' ')
+    sys.stdout.flush()
+    
+    # Proyect vectors
+    print 'funct::tilt_model : projecting velocities and the magnetic field to the new LOS'
+    xsign = n.sign(xmu)
+    ysign = n.sign(ymu)
+    #
+    ymu2 = n.sqrt(1.0 - ymu * ymu)
+    xmu2 = n.sqrt(1.0 - xmu * xmu)
+    #
+    m.bz[:,:,:] = tmpz1 * xmu * ymu - ysign * tmpy1 * xmu * ymu2 - xsign * tmpx1 * xmu2
+    m.by[:,:,:] = tmpy1 * ymu + tmpz1 * ymu2 * ysign
+    m.bx[:,:,:] = tmpx1 * xmu + (tmpz1 * ymu - ysign * tmpy1 * ymu2) * xmu2 * xsign
+    #
+    m.vlos[:,:,:] = tmpz * xmu * ymu - ysign * tmpy * xmu * ymu2 - xsign * tmpx * xmu2
+    m.vy[:,:,:] =   tmpy * ymu + tmpz * ymu2 * ysign
+    m.vx[:,:,:] =   tmpx * xmu + (tmpz * ymu - ysign * tmpy * ymu2) * xmu2 * xsign
+    
     #
     # new height scale
     #
@@ -463,7 +584,7 @@ def bilint(var, dx, dy):
 try:
     opts, args = getopt.getopt(sys.argv[1:],"hqv", ["help","quiet",
                       "verbose","xang=","yang=","dx=","dy=",
-                      "model_in","model_out"])
+                      "model_in=","model_out="])
 except:
     print 'Command-line option not recognized'
     usage()
@@ -472,8 +593,8 @@ except:
 verbose=1
 xang=0.
 yang=0.
-dx=1e5
-dy=1e5
+dx=1
+dy=1
 modelin='__inputmodel.bin'
 modelout='__inputmodel.bin'
 for o,a in opts:
@@ -502,6 +623,7 @@ if verbose == 2:
     print '           Horizontal scales: dx=',dx,' dy=',dy
 
 m_in=model(modelin,verbose=verbose)
+m_in.read()
 tmdl=tilt_model(m_in, xang, yang, dx, dy,verbose=verbose)
 tmdl.write(modelout)
 

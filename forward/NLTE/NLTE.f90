@@ -4645,10 +4645,10 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 !
            If (MaxVal(LStar(:)) .gt. 1.) then
               Do idepth=1, NLTE%NDEP
-                 If (lstar(idepth) .gt. 1.000) then
-                    print *,'lstar .gt. 1',lstar(idepth)
-                    pause
-                 endif
+!                 If (lstar(idepth) .gt. 1.000) then
+!                    print *,'lstar .gt. 1',lstar(idepth)
+!                    pause
+!                 endif
                  LStar(idepth)=1.
               End do
            End if
