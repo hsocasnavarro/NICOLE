@@ -285,7 +285,13 @@ for icycle in range(int(ncycles)):
     hscale=hscale.lower()
     opacities=get_value(config,'Opacity package','wittmann','NICOLE.input')
     opacities=opacities.lower()
-    opacitiesUV=get_value(config,'Opacity package UV','top','NICOLE.input')
+    opacitiesUV=get_value(config,'Opacity package UV','','NICOLE.input')
+    opacitiesUV=opacitiesUV.lower()
+    if opacitiesUV == '':
+        if opacities == 'sopa' or opacities == 'sopas' or opacities == 'shchukina': 
+            opacitiesUV = 'sopa'
+        else:
+            opacitiesUV = 'top'
     eqstate=get_value(config,'Eq state','0','NICOLE.input')
     eqstate=eqstate.lower()
     if (eqstate == '0' or eqstate == 'nicole'):
@@ -362,7 +368,7 @@ for icycle in range(int(ncycles)):
     if opacities != 'andres' and opacities != 'sopa' and opacities != 'wittmann':
         print 'Error in NICOLE.input. Unknown opacity package:',opacities
         sys.exit(1)
-    if opacitiesUV != 'top' and opacitiesUV != 'dm':
+    if opacitiesUV != 'top' and opacitiesUV != 'dm' and opacitiesUV != 'sopa':
         print 'Error in NICOLE.input. Unknown opacity package UV:',opacitiesUV
         sys.exit(1)
     if opacities == 'wittmann': opacities = '1'
@@ -370,6 +376,11 @@ for icycle in range(int(ncycles)):
     if opacities == 'sopa': opacities = '3'
     if opacitiesUV == 'top': opacitiesUV = '1'
     if opacitiesUV == 'dm': opacitiesUV = '2'
+    if opacitiesUV == 'sopa': opacitiesUV = '3'
+    if opacities == '3' and opacitiesUV != '3':
+        print 'If you select SOPA as opacity package, you cannot select a different'
+        print 'opacity package for the UV. Leave it blank or set it to SOPA as well'
+        sys.exit(1)
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':
