@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2013.11.11)  6 MAR 2014 15:17
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2014.3.17)  14 APR 2014 15:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **manual
 (./manual.tex
 LaTeX2e <2011/06/27>
-Babel <3.9f> and hyphenation patterns for 2 languages loaded.
+Babel <3.9f> and hyphenation patterns for 4 languages loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/latex209.def
 File: latex209.def 1998/05/13 v0.52 Standard LaTeX file
 
@@ -311,12 +311,12 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 463 strings out of 495032
- 5393 string characters out of 6181556
- 82814 words of memory out of 5000000
- 3704 multiletter control sequences out of 15000+600000
+ 463 strings out of 494989
+ 5393 string characters out of 6180416
+ 82964 words of memory out of 5000000
+ 3711 multiletter control sequences out of 15000+600000
  19815 words of font info for 72 fonts, out of 8000000 for 9000
- 14 hyphenation exceptions out of 8191
+ 36 hyphenation exceptions out of 8191
  23i,7n,21p,169b,252s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on manual.dvi (84 pages, 208792 bytes).
+Output written on manual.dvi (84 pages, 208788 bytes).

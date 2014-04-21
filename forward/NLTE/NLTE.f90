@@ -4875,7 +4875,8 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
         Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .true., NLTEInput%Verbose .ge. 4)
      End if
      If (minval(nlte%n) .lt. 0 .or. checknan(Sum(nlte%n))) then
-        print *,'negativ or NaN pop after NG!!' 
+        If (NLTEInput%Verbose .ge. 3) &
+             print *,'Negative or NaN pop after NG!!' 
         NLTE%N=Save_N ! Revert to previous and reset NG
         Call NG(NLTE%N, ATOM%NK, NLTE%NDEP, .false., .false.)
 !        NLTE%Error=.True.
