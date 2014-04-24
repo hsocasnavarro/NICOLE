@@ -285,9 +285,9 @@ for icycle in range(int(ncycles)):
     hscale=hscale.lower()
     opacities=get_value(config,'Opacity package','wittmann','NICOLE.input')
     opacities=opacities.lower()
-    opacitiesUV=get_value(config,'Opacity package UV','','NICOLE.input')
+    opacitiesUV=get_value(config,'Opacity package UV','-','NICOLE.input')
     opacitiesUV=opacitiesUV.lower()
-    if opacitiesUV == '':
+    if opacitiesUV == '-':
         if opacities == 'sopa' or opacities == 'sopas' or opacities == 'shchukina': 
             opacitiesUV = 'sopa'
         else:
