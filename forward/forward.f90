@@ -1986,7 +1986,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Integer :: iregion, i, j, nw, istart, iend, NMu, imu, itran, imin, irec, iostat
   Integer, Parameter :: nformalsolutions=8
   Integer, Dimension(nformalsolutions) :: nformal
-  Logical, Save :: FirstTime=.TRUE., do_NLTE
+  Logical, Save :: do_NLTE
   Logical :: NLTE_done
   Logical :: CheckNaN
   Character (len=256) :: String
@@ -2020,53 +2020,37 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Debug_warningflags(flag_forward)=0
   Debug_errorflags(flag_forward)=0
   NLTE_done=.FALSE.
-  If (FirstTime) then
-     ! Check if abundances are default (check only first 30 elements)
-     Params%def_abund=1
-     Do i=1, 30
-        if (Abs(At_abund(i)-At_Greveese_abund(i)) .gt. 0.03) Params%def_abund=0
-     End do
-     If (Params%speed .lt. 2) &
-          Params%def_abund=0 ! Force to not use ANN. Need to revise this
+!
+  Params%def_abund=0 ! Force to not use ANN. Need to revise this
 
-     If (Params%def_abund .ge. 1 .and. Params%printout .gt. 0) then
-        Print *,'Abundances are known. Using Neural Network to compute gas pressure'
-     End if
+  Do iline=1, Params%n_lines
      ! Complete line information
-     Do iline=1, Params%n_lines
-        Line(iline)%Atomic_number=1
-        Do While (Atom_char(Line(iline)%Atomic_number) .ne. Line(iline)%Elem &
-             .and. Line(iline)%Atomic_number .le. N_elements)
-          Line(iline)%Atomic_number=Line(iline)%Atomic_number+1
-        End Do
-        Line(iline)%Atomic_weight=At_weight(Line(iline)%Atomic_number)
-        If (Line(iline)%Atomic_number .gt. N_elements) then
-           Print *,'Error with element identification in forward.f90'
-           Stop
-        End if
-     End do
-     ! Need to do NLTE calculation or are we in pure LTE mode?
-     do_NLTE=.False.
-     Do iline=1, Params%n_lines
-        If (Line(iline)%NLTEtransition .ne. 0) do_NLTE=.True.
-     End do
-     !
-     If (do_NLTE) then
-        NLTEInput%Hydro=Hydro
-        NLTE%Atmo=Atmo
-        Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
-        Call Read_NLTE_lines(Params, NLTEInput, NLTE, Atom, Line)
+     Line(iline)%Atomic_weight=At_weight(Line(iline)%Atomic_number)
+     If (Line(iline)%Atomic_number .gt. N_elements) then
+        Print *,'Error with element identification in forward.f90'
+        Stop
      End if
-     If (.not. Allocated(Line(1)%b_low) ) then
-        Do iline=1, Params%n_lines
-           Allocate (Line(iline)%b_low(Params%n_points))
-           Line(iline)%b_low(:)=1.
-           Allocate (Line(iline)%b_up(Params%n_points))
-           Line(iline)%b_up(:)=1.
-        End do
-     End if
+  End do
+  ! Need to do NLTE calculation or are we in pure LTE mode?
+  do_NLTE=.False.
+  Do iline=1, Params%n_lines
+     If (Line(iline)%NLTEtransition .ne. 0) do_NLTE=.True.
+  End do
+  !
+  If (do_NLTE) then
+     NLTEInput%Hydro=Hydro
+     NLTE%Atmo=Atmo
+     Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+     Call Read_NLTE_lines(Params, NLTEInput, NLTE, Atom, Line)
   End if
-  FirstTime=.FALSE.
+  If (.not. Allocated(Line(1)%b_low) ) then
+     Do iline=1, Params%n_lines
+        Allocate (Line(iline)%b_low(Params%n_points))
+        Line(iline)%b_low(:)=1.
+        Allocate (Line(iline)%b_up(Params%n_points))
+        Line(iline)%b_up(:)=1.
+     End do
+  End if
   If (do_NLTE) then
      NLTEInput%Hydro=Hydro
      NLTE%Atmo=Atmo

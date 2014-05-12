@@ -54,7 +54,7 @@ Program Nicole
   Integer :: myrank, nprocs, SizeModel, isize, islave
   Integer ::  TaskComing, serialmode=0
   Integer, allocatable :: inverted_host(:), host_busy(:), pixel_to_do(:)
-  Integer :: ierr, NotifyWhenFinished, request
+  Integer :: ierr, NotifyWhenFinished, request, ioldnl=-1, ioldnr=-1
 !MPI  Include 'mpif.h'
 !MPI  Integer :: stat(MPI_STATUS_SIZE)
 !MPI Integer :: My_MPI_Real
@@ -179,13 +179,26 @@ Program Nicole
   Read (headerunit, *) eqstate_switch, eqstate_switch_others, eqstate_pe_consistency
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
   Read (headerunit, *) Input%depcoef_mode
+  if (ioldnl .ge. 0) ioldnl=Params%n_lines
   Read (headerunit, *) Params%n_lines
+  if (ioldnr .ge. 0) ioldnr=Params%n_regions
   Read (headerunit, *) Params%n_regions
   Call Set_params(Input, Params)
   Params%nPix=nPix_x*nPix_y
   !
   ! Allocate memory for line and region arrays
   !
+  print *,'ioldnl=',ioldnl
+  If (ioldnl .ge. 0) then ! It is not the first cycle
+     print *,'iol,ior=',ioldnl,ioldnr,params%n_lines,params%n_regions
+     If (ioldnl .ne. Params%n_lines .or. ioldnr .ne. Params%n_regions) then !
+        ! Reset dimensions for Line and Region arrays below
+        Deallocate(Line)
+        Deallocate(Region)
+     End if
+  End if
+  ioldnl=Params%n_lines
+  ioldnr=Params%n_regions
   If (.not. Allocated(Line)) then
      Allocate(Line(Params%n_lines), stat=status)
      Allocate(Region(Params%n_regions), stat=status)
@@ -213,6 +226,12 @@ Program Nicole
           Line(iline)%HF_Aup, Line(iline)%HF_Bup, Line(iline)%SpinI, &
           Line(iline)%Extra_vmic
      If (Input%depcoef_mode .eq. 2) Line(iline)%DepCoefMode=2
+!
+     Line(iline)%Atomic_number=1
+     Do While (Atom_char(Line(iline)%Atomic_number) .ne. Line(iline)%Elem &
+          .and. Line(iline)%Atomic_number .le. N_elements)
+        Line(iline)%Atomic_number=Line(iline)%Atomic_number+1
+     End Do
   End do
   ! Read abundances
   Read (headerunit, *) Starting_at_abund

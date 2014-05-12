@@ -153,7 +153,7 @@ Contains
      Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Trial_model%Comp1)
      If (Params%TwoComp) &
           Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Trial_model%Comp2)
-     Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.)
+     Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.) 
      Call Compute_chisq(Params, Obs_profile, Trial_profile, Sigma, &
           Nodes, Trial_model, Chisq, NWChisq, Regul)
      If (Debug_errorflags(flag_forward) .ge. 1) Chisq=1e10

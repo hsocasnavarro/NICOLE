@@ -76,7 +76,7 @@ Subroutine Select_number_of_nodes(Params, Atmo, Nodes, icall)
   If (Nodes%n_nodes_by2 .eq. -1) Nodes%n_nodes_by2=0
 
 !  
-  If (icall .eq. 1) then
+  If (icall .eq. 1) then 
 !
 ! For the moment, set 4 nodes in temperature and v, and 1 in the others
 !
