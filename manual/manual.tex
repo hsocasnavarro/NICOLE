@@ -21,7 +21,7 @@ the Lorien Engine}
 e-mail: \mbox{hsocas@iac.es; jaime@astro.su.se; aasensio@iac.es}\\
 }
 
-\date{Version 14.03}
+\date{Version 14.05}
 
 \maketitle
 
@@ -1691,7 +1691,8 @@ interesting variables at the time of the crash and the current model
 atmosphere being used by the code.
 
 In addition to the debug mode, we can set a number of other flags in
-NICOLE.input to output some further information:
+NICOLE.input to output some further information. Do NOT use these options
+in MPI mode:
 \begin{itemize}
 \item {\bf Output populations:} At the end of each synthesis, create a
   binary file named Populations.dat. This file is overwritten after

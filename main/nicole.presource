@@ -1,4 +1,4 @@
-!                      N I C O L E   v 14.03
+!                      N I C O L E   v 14.05
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 14.03 ******************'
+     Print *,'*************** N I C O L E   v 14.05 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -188,9 +188,7 @@ Program Nicole
   !
   ! Allocate memory for line and region arrays
   !
-  print *,'ioldnl=',ioldnl
   If (ioldnl .ge. 0) then ! It is not the first cycle
-     print *,'iol,ior=',ioldnl,ioldnr,params%n_lines,params%n_regions
      If (ioldnl .ne. Params%n_lines .or. ioldnr .ne. Params%n_regions) then !
         ! Reset dimensions for Line and Region arrays below
         Deallocate(Line)
