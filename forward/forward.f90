@@ -2489,15 +2489,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            End if
         End do
 
-
-        if (iwave/10 .eq. iwave/10.) then ! debug
-!           print *,'ab=',absorp_height(60,1,1)
-!           print *,'s=',source_f(60)
-           print*,iwave,absorp_height(60,1,1),source_f(60),stokes(1)/243568265230809.
-        endif
-
-
-
         If (ichoice .gt. nformalsolutions) then
            Print *,'Error in formal solution. Unknown formal solution method'
            Stop
