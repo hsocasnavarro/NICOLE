@@ -265,13 +265,6 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
 !
   Call Time_routine('Fill densities',.true.)
 !
-! Check atmosphere for sanity
-  Do idepth=1, Params%n_points
-     If (Atmo%El_p(idepth) .lt. Min_Pe) then
-        Call Debug_log('In fill_densities. Pe .lt. Min_Pe parameter. Clipping it',2)
-        Atmo%El_p(idepth)=Min_Pe
-     End if
-  End do
 !
   Atmo_in=Atmo
 !
@@ -326,6 +319,13 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
      Print *,'File NICOLE.input. Found:',Input_dens
      Stop
   End if
+! Check atmosphere for sanity
+  Do idepth=1, Params%n_points
+     If (Atmo%El_p(idepth) .lt. Min_Pe) then
+        Call Debug_log('In fill_densities. Pe .lt. Min_Pe parameter. Clipping it',2)
+        Atmo%El_p(idepth)=Min_Pe
+     End if
+  End do
 !
   Call Reset_densities(Atmo, Atmo_in) ! Reset densities in keep switches
 !
@@ -2204,6 +2204,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Line_op(iline, 1:npoints)=Line_op(iline, 1:npoints) / &
           Atmo%Rho(1:npoints) ! cm^2/cm^3 to cm^2/g
   End do ! End line loop
+
 !
 ! Start loop in spectral regions and wavelengths.
 !
@@ -2487,6 +2488,16 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               End if
            End if
         End do
+
+
+        if (iwave/10 .eq. iwave/10.) then ! debug
+!           print *,'ab=',absorp_height(60,1,1)
+!           print *,'s=',source_f(60)
+           print*,iwave,absorp_height(60,1,1),source_f(60),stokes(1)/243568265230809.
+        endif
+
+
+
         If (ichoice .gt. nformalsolutions) then
            Print *,'Error in formal solution. Unknown formal solution method'
            Stop

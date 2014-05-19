@@ -4302,7 +4302,6 @@ Subroutine LTE_pop_2(NLTE, Atom)
            Stop
         End if
      End if
-
      NLTE%Nstar(ilev,1:npoints)=N_ion(1:npoints)*Atom%g(ilev)* & ! Boltzmann
           exp(-E_exc/bk/NLTE%Atmo%Temp(1:npoints))/U_ion(1:npoints)
   End do

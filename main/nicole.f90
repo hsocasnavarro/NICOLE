@@ -174,9 +174,7 @@ Program Nicole
   !
   ! Allocate memory for line and region arrays
   !
-  print *,'ioldnl=',ioldnl
   If (ioldnl .ge. 0) then ! It is not the first cycle
-     print *,'iol,ior=',ioldnl,ioldnr,params%n_lines,params%n_regions
      If (ioldnl .ne. Params%n_lines .or. ioldnr .ne. Params%n_regions) then !
         ! Reset dimensions for Line and Region arrays below
         Deallocate(Line)

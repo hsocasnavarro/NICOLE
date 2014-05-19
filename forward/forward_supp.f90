@@ -194,7 +194,7 @@ Subroutine damping(Line, Temp, El_p, Pg, Dldop, Damp, GA, GQ)
   End if
 
 ! Stark damping
-  If (GQ .le. 0) then
+  If (GQ .le. 0) then ! debug
 ! Formula used: gamma_4=38.8*(v**(1./3.))*(C4**(2./3.))*N , from
 !   Unsold 1955, "Physik der Sternatmospharen", 2nd ed., 
 !   Springer-Verlag, pp. 326 and 331. According to Gray (ref above), 
@@ -204,12 +204,19 @@ Subroutine damping(Line, Temp, El_p, Pg, Dldop, Damp, GA, GQ)
      gamma_s = 19.4 + 2./3.*(-14.) + log10(El_p) - 5./6.*log10(Temp)
      gamma_s = 10.**(gamma_s)
   Else
-     gamma_s = GQ*El_p/bk/Temp ! Same as MULTI
+!     gamma_s = GQ*El_p/bk/Temp ! Same as MULTI
+     gamma_s = GQ*((El_p/bk/Temp)**0.6666666)*4.*Pi*0.426*0.6*(3**2-2**2) ! Same as MULTI for i=2 to i=3 transition
   End if
   If (Line%collisions .eq. 3 .and. gamma_s .ge. 0) then ! Explicit Stark coefficient
      gamma_s = Line%Gamma_Strk_12*(El_P/BK/Temp/1D12)/(1D4**0.17)*(Temp**0.17)
      gamma_s = gamma_s * 1D8
   End if
+  
+!  if (el_p .gt. 38 .and. el_p .lt. 80) then ! debug
+!     print *,'gamma=',gamma_r,gamma_vdw,gamma_s
+!     pause
+!  endif
+
 
   Damp=(gamma_r+gamma_vdw+gamma_s)/4./Pi/dldopHz
 

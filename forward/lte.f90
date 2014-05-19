@@ -161,7 +161,6 @@ Subroutine LTE_pop(Params, Line, Atmo, ng_i, ng_j)
      Warning=.TRUE.
      If (Params%Printout .ge. 1) Print *,'Warning. Ionization stage gt 3. Assuming 3 in LTE pop'
   End if
-
 !
 ! Boltzmann excitation equations
 !
@@ -172,6 +171,7 @@ Subroutine LTE_pop(Params, Line, Atmo, ng_i, ng_j)
        U_ion(1:npoints)
   ng_j(1:npoints)=N_ion(1:npoints)*exp(-E_exc_j/bk/Atmo%Temp(1:npoints))/ &
        U_ion(1:npoints)
+
   Return
 End Subroutine LTE_pop
 !
