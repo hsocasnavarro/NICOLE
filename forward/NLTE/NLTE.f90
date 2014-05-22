@@ -982,6 +982,7 @@ Subroutine GenCol(Atom, NLTE)
       Real, Dimension(:), Allocatable :: TEMP, PE, NE, CEA, CT
       Real, Dimension(:,:), Allocatable :: NH
       Integer :: unit
+      Character (Len=256) :: ColString
       Character (Len=80) :: text
       Character (Len=20) :: Atomid
 !  ALPRD IS TRUE IF INITIA HAS BEEN CALLED TO CALCULATE ALPHA COLLISIONS
@@ -1021,12 +1022,14 @@ Subroutine GenCol(Atom, NLTE)
  NH(6,:)=NLTE%Atmo%nHplus(:) ! Ionized H
 
  Atomid=ATOM%element
- Call Open_file(unit,'__scratch.dat')
- Do ipcount=1, Atom%NColStrings
-    Write (unit,'(A256)') Atom%ColStr(ipcount)
- End do
- Call Close_file (unit)
- Open (unit,File='__scratch.dat')
+! Call Open_file(unit,'__scratch.dat')
+! Do ipcount=1, Atom%NColStrings
+!    Write (unit,'(A256)') Atom%ColStr(ipcount)
+! End do
+! Call Close_file (unit)
+! Open (unit,File='__scratch.dat')
+ unit=-1
+ ipcount=1
 
  If (FirstTime) then ! MULTI routine rcoll
 !
@@ -1048,7 +1051,11 @@ Subroutine GenCol(Atom, NLTE)
 !  (il and ih not converted in gencol to ilo and ihi as for other
 !  rates)
 !
-        read(unit,'(a)',end=1998) text
+!        read(unit,'(a)',end=1998) text
+        If (ipcount .gt. Atom%NColStrings) Goto 1998
+        ColString=Atom%Colstr(ipcount)
+        ipcount=ipcount+1
+        Read(ColString,'(a)') text
         call lcase(text)
         k0=1
         call getwrd(text,k0,k1,k2)
@@ -1065,7 +1072,10 @@ Subroutine GenCol(Atom, NLTE)
         if (key(i) .eq. 'end     ') then
           goto 1999
         else if (key(i) .eq. 'temp    ') then
-          read(unit,*) ntemp,(tgrid(it),it=1,min(ntemp,mtgrd))
+!          read(unit,*) ntemp,(tgrid(it),it=1,min(ntemp,mtgrd))
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+           Read(ColString,*) ntemp,(tgrid(it),it=1,min(ntemp,mtgrd))
           if(ntemp .gt. mtgrd) then
             Print *,' rcoll: ntemp.gt.mtgrd'
             Stop
@@ -1086,7 +1096,10 @@ Subroutine GenCol(Atom, NLTE)
             print *,'rcoll: calp not implemented in _3d'
             Stop
           endif
-          read(unit,*) il(i),ih(i),(cgrid(it),it=1,ntemp)
+!          read(unit,*) il(i),ih(i),(cgrid(it),it=1,ntemp)
+          ColString=Atom%Colstr(ipcount)
+          ipcount=ipcount+1
+          Read(ColString,*) il(i),ih(i),(cgrid(it),it=1,ntemp)
 ! 
           if(key(i) .eq. 'ch+     ' .or. key(i) .eq. 'ch0     ') then
             do jt=1,ntemp
@@ -1122,30 +1135,52 @@ Subroutine GenCol(Atom, NLTE)
 !  additional key-words from philip judge
 !
         else if (key(i) .eq. 'semi    ') then
-          read(unit,*) il(i),ih(i),coeff(1,i)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+           read(ColString,*) il(i),ih(i),coeff(1,i)
         else if (key(i) .eq. 'ltdr    ') then
-          read(unit,*) il(i),ih(i),(coeff(j,i),j=1,5)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) il(i),ih(i),(coeff(j,i),j=1,5)
         else if (key(i) .eq. 'corona  ') then
-          read(unit,*) il(i),ih(i)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) il(i),ih(i)
         else if (key(i) .eq. 'ar85-rr ') then
-          read(unit,*) il(i),ih(i),(coeff(j,i),j=1,2)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+           read(ColString,*) il(i),ih(i),(coeff(j,i),j=1,2)
         else if (key(i) .eq. 'ar85-cdi') then
-          read(unit,*) il(i),ih(i),ncoeff(i)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+           read(ColString,*) il(i),ih(i),ncoeff(i)
           if(ncoeff(i) .gt. mshell) then
              Print *,'gencol: ncdi .gt. mshell'
              Stop
           endif
-          read(unit,*) ((cdi(j,l,i),j=1,5),l=1,ncoeff(i))
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) ((cdi(j,l,i),j=1,5),l=1,ncoeff(i))
         else if (key(i) .eq. 'ar85-cea') then
-          read(unit,*) il(i),ih(i),coeff(1,i)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) il(i),ih(i),coeff(1,i)
         else if (key(i)(1:7) .eq. 'ar85-ch') then
-          read(unit,*) il(i),ih(i)
-          read(unit,*) (coeff(j,i),j=1,6)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) il(i),ih(i)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) (coeff(j,i),j=1,6)
         else if (key(i) .eq. 'shull82 ') then
-          read(unit,*) il(i),ih(i), &
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) il(i),ih(i), &
             (coeff(j,i),j=1,8)
         else if (key(i) .eq. 'burgess ') then
-          read(unit,*) il(i),ih(i),coeff(1,i)
+           ColString=Atom%Colstr(ipcount)
+           ipcount=ipcount+1
+          read(ColString,*) il(i),ih(i),coeff(1,i)
 !
         else if(key(i)(1:1).ne.' ')then
           Print *,'rcoll:  unknown keyword '//key(i)// &
@@ -1608,7 +1643,7 @@ Subroutine GenCol(Atom, NLTE)
 !
   999 continue
 
-        Close (unit,Status='DELETE')
+!        Close (unit,Status='DELETE')
       If (ctneg) then
          print *,'gencol: ct negative'
          Stop
