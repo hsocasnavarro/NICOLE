@@ -1064,17 +1064,17 @@ Contains
           End if
           If (Params%Printout .ge. 1) &
                Print *,' Chisq=',Chisq,'. Best so far=',BestChisq
-          If (debug_level .ge. 1) then
-             Call MyFlush(Debug_FileUnit)
-             Close (Debug_FileUnit,Status='DELETE')
-             Debug_FileUnit=-1
-          End if
           i_inv=i_inv+1
           Chisq=BestChisq
           Guess_Model=Best_Model
           Call Forward(Params, Line, Region, Guess_model, Syn_profile, &
                .TRUE.)
           Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2,KeepVars, -1)
+          If (debug_level .ge. 1) then
+             Call MyFlush(Debug_FileUnit)
+             Close (Debug_FileUnit,Status='DELETE')
+             Debug_FileUnit=-1
+          End if
        End Do ! End while
 
        ! }}}

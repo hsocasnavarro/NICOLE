@@ -137,25 +137,29 @@ Subroutine Hydrostatic(Params, Atmo)
   If (dif .gt. Precision) Warning2=.TRUE.
   If (Warning1 .or. Warning2) then 
      If (Debug_level .ge. 1) then
-        If (Warning1) &
-             Write (Debug_FileUnit,*) '  ** Clipped T in forward/hydrostatic'
-        If (Warning2) &
-             Write (Debug_FileUnit,*) '  ** Error in forward/hydrostatic'
-        Write (Debug_FileUnit,*) '     Atmosphere that caused the error follows'
-        Write (Debug_FileUnit,*) '     ------   Z   ------'
-        Write (Debug_FileUnit,*) Atmo%Z_scale
-        Write (Debug_FileUnit,*) '     ------   tau_500  ------'
-        Write (Debug_FileUnit,*) Atmo%ltau_500
-        Write (Debug_FileUnit,*) '     ------   T  ------'
-        Write (Debug_FileUnit,*) Atmo%Temp
-        Write (Debug_FileUnit,*) '     ------   Electron pressure  ------'
-        Write (Debug_FileUnit,*) Atmo%El_p
-        Write (Debug_FileUnit,*) '     ------   Gas pressure  ------'
-        Write (Debug_FileUnit,*) Atmo%Gas_p
-        Write (Debug_FileUnit,*) '     ------   Density  ------'
-        Write (Debug_FileUnit,*) Atmo%Rho
-        Call Debug_Log('Error in forward/hydrostatic',2)
-        Debug_warningflags(flag_hydrostatic)=1
+        If (Debug_FileUnit .lt. 0) then
+           Print *,'Error in hydrostatic.f90 writing debug info. This should not happen!!'
+        Else
+           If (Warning1) &
+                Write (Debug_FileUnit,*) '  ** Clipped T in forward/hydrostatic'
+           If (Warning2) &
+                Write (Debug_FileUnit,*) '  ** Error in forward/hydrostatic'
+           Write (Debug_FileUnit,*) '     Atmosphere that caused the error follows'
+           Write (Debug_FileUnit,*) '     ------   Z   ------'
+           Write (Debug_FileUnit,*) Atmo%Z_scale
+           Write (Debug_FileUnit,*) '     ------   tau_500  ------'
+           Write (Debug_FileUnit,*) Atmo%ltau_500
+           Write (Debug_FileUnit,*) '     ------   T  ------'
+           Write (Debug_FileUnit,*) Atmo%Temp
+           Write (Debug_FileUnit,*) '     ------   Electron pressure  ------'
+           Write (Debug_FileUnit,*) Atmo%El_p
+           Write (Debug_FileUnit,*) '     ------   Gas pressure  ------'
+           Write (Debug_FileUnit,*) Atmo%Gas_p
+           Write (Debug_FileUnit,*) '     ------   Density  ------'
+           Write (Debug_FileUnit,*) Atmo%Rho
+           Call Debug_Log('Error in forward/hydrostatic',2)
+           Debug_warningflags(flag_hydrostatic)=1
+        End if
      End if
   End if
 
