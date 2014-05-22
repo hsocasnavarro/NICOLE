@@ -4141,8 +4141,12 @@ Subroutine Read_NLTE_lines(Params, NLTEInput, NLTE, Atom, Line)
 !
   Line(:)%NLTEgridsize=1
   Do iline=1, Params%n_lines
+     If (Allocated(Line(iline)%NLTEgrid)) &
+          Deallocate(Line(iline)%NLTEgrid)
      Allocate (Line(iline)%NLTEgrid(1))
      Line(iline)%NLTEgrid(1)=0.
+     If (Allocated(Line(iline)%NLTESource_f)) &
+          Deallocate(Line(iline)%NLTESource_f)
      Allocate (Line(iline)%NLTESource_f(NLTE%NDEP,1))
      Line(iline)%NLTESource_f(NLTE%NDEP,1)=0.
      i2=Line(iline)%NLTEtransition
