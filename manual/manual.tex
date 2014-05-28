@@ -382,7 +382,17 @@ are signaled by an exclamation mark (!)  instead of an asterisk
 (*). If the ionization stage is in roman numbers, you might have to
 change that too (i.e., replace ``Ca~II'' with ``Ca~2''). So if you got
 your ATOM file from MULTI, make sure to edit it and replace the
-asterisks with exclamation marks.
+asterisks with exclamation marks. Some model atoms have a GENCOL
+section at the end, which supplies the parameters for the collisional
+routine GENCOL. That section contains a grid of temperatures under the
+key TEMP, which specifies the number of temperatures in the grid
+(ntemp), and then the temperature grid itself, T(1:ntemp). Unlike
+MULTI, NICOLE requires that ntemp and the temperature grid T(1:ntemp)
+be all in one line, without any line breaks. Keep in mind that each
+line in the model atom is limited to a maximum of 500 characters (this
+limit can be changed in the declaration of array ColStr in
+forward/NLTE.f90). Similarly, the rest of the temperature dependent
+data in the GENCOL section must be in one line.
 
 There are some MULTI features that are not supported in the current
 NICOLE version. For example, you cannot have bound-bound transitions

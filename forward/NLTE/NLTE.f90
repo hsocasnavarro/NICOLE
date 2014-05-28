@@ -108,7 +108,7 @@ Module NLTE_Atom_structure
 !
      Character (Len=6) :: ColRoutine
      Integer :: NColStrings
-     Character (Len=256), Dimension(MaxNColStrings) :: ColStr
+     Character (Len=500), Dimension(MaxNColStrings) :: ColStr
   End Type NLTE_Atom
 !
 End Module NLTE_Atom_structure
