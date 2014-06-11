@@ -1,5 +1,5 @@
 2        ! ncycles 
-1        ! cycle0 
+2        ! cycle0 
 1        ! nx 
 1        ! ny 
 95        ! nz 
@@ -49,9 +49,9 @@ T     T   0   ! sethydro, setnH, restart
 4 ! Nodes in T 
 3 ! Nodes in v_los 
 1 ! Nodes in v_mic 
-0 ! Nodes in B_long 
-0 ! Nodes in B_x 
-0 ! Nodes in B_y 
+1 ! Nodes in B_long 
+1 ! Nodes in B_x 
+1 ! Nodes in B_y 
 1 ! Nodes in Stray light 
 1 ! Nodes in v_mac 
 1 ! Nodes in ffactor 

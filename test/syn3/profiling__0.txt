@@ -1,18 +1,18 @@
- Code execution started on: 2014/03/05 at 18:15:06.667
-   Code execution ended on: 2014/03/05 at 18:15:08.033
- Total execution time (s):           1
- Total execution time (hours):  3.795277777777778E-004
+ Code execution started on: 2014/06/04 at 15:29:33.496
+   Code execution ended on: 2014/06/04 at 15:29:37.649
+ Total execution time (s):           4
+ Total execution time (hours):  1.153583333333333E-003
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   1.36630000000000        100.000000000000     
-    forward           1   1.34810000000000        98.6679352997146     
-    background_opac        1616  0.996600000000000        72.9415208958501     
-    solvestat           1  0.207300000000000        15.1723633169875     
-    NLTE_formalsolution       13200  0.158700000000000     
-   11.6153114250165     
-    formalsolution         400  1.320000000000000E-002  0.966112859547683     
-    profiles           4  1.140000000000000E-002  0.834370196882090     
-    Fill densities           1  2.200000000000000E-003  0.161018809924614     
-    compute_pg           1  2.100000000000000E-003  0.153699773109859     
-    eneq         860  7.000000000000000E-004  5.123325770328625E-002
-    compute_others_from_T_Pe_Pg          85  4.000000000000000E-004
-  2.927614725902071E-002
+    main           1   4.15290000000000        100.000000000000     
+    forward           1   4.08770000000000        98.4300127621662     
+    background_opac        1616   2.78080000000000        66.9604372847890     
+    solvestat           1  0.754800000000000        18.1752510294011     
+    NLTE_formalsolution       13200  0.601900000000000     
+   14.4934864793277     
+    formalsolution         400  5.210000000000000E-002   1.25454501673529     
+    profiles           4  4.110000000000000E-002  0.989669869247995     
+    Fill densities           1  9.400000000000000E-003  0.226347853307327     
+    compute_pg           1  9.299999999999999E-003  0.223939897421079     
+    eneq         860  3.500000000000000E-003  8.427845601868575E-002
+    compute_others_from_T_Pe_Pg          85  1.800000000000000E-003
+  4.334320595246695E-002

@@ -20,8 +20,8 @@ function new_model,nx,ny,nz
      keep_nHminus: fltarr(nx,ny), keep_nHplus: fltarr(nx,ny), $
      keep_nH2: fltarr(nx,ny), keep_nh2plus: fltarr(nx,ny), $
      ffactor: fltarr(nx,ny), abundance: fltarr(nx,ny,92)}
-
-  m.abundance=[ 12.00,10.93,1.10,1.40,2.55,8.52,7.92,8.83,4.56,8.08,6.33,7.58,$
+  for ix=0,nx-1 do for iy=0,ny-1 do $
+     m.abundance[ix,iy,*]=[ 12.00,10.93,1.10,1.40,2.55,8.52,7.92,8.83,4.56,8.08,6.33,7.58,$
                 6.47,7.55,5.45,7.33,5.5,6.40,5.12,6.36,3.17,5.02,4.00,5.67,$
                 5.39,7.50,4.92,6.25,4.21,4.60,2.88,3.41,-10,-10,-10,-10,$
                 2.60,2.97,2.24,2.60,1.42,$

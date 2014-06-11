@@ -3,6 +3,7 @@
 Command=../../main/nicole
 Mode = i
 Cycles=2
+start cycle=2
 #
 # Fields required for both modes, synthesis and inversion:
 #
@@ -23,6 +24,7 @@ Acceptable Chi-square=10
 Maximum number of inversions=1
 Debug mode= 3
 Restart=-1
+Regularization=0
 #
 Impose hydrostatic equilibrium= Y # Y/N (Only for synthesis)
 Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
@@ -56,7 +58,7 @@ Line=SiI 10827
 #Abundances
 [Abundances]
 [[Override]]
-Fe=5.1
+Fe=7.2
 O=8.5
 Ni=6.3
 

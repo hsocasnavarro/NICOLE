@@ -308,8 +308,12 @@ Program Nicole
   ! Some initializations
   !
   If (Starting_at_abund(1) .gt. 0) then ! Starting abunds
-     Guess_model%Comp1%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
-     Guess_model%Comp2%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
+     ! Copy starting abunds to model if it doesn't have its own abundances
+     ! (flagged by whether abundance(H)=12)
+     If (Abs(Guess_model%Comp1%abundance(1)-12.0) .gt. 0.001) &
+          Guess_model%Comp1%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
+     If (Abs(Guess_model%Comp1%abundance(1)-12.0) .gt. 0.002) &
+          Guess_model%Comp2%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
   Endif
   If (KeepVars(1) .gt. -.01) Guess_model%comp1%Keep_El_p=KeepVars(1)
   If (KeepVars(2) .gt. -.01)   Guess_model%comp1%Keep_Gas_p=KeepVars(2)
@@ -668,11 +672,15 @@ Program Nicole
            Call Read_direct(LittleEndian,modelinunit2,irec+1,TmpModel2, & 
                 nvarsdepth*Params%n_points+nvarssingle,iost1)           
            SizeModel=Size(TmpModel)
-           If (Starting_at_abund(1) .gt. 0) &
+           If (Starting_at_abund(1) .gt. 0) then
+              If (Abs(TmpModel(SizeModel-N_elements+1)-12.0) .gt. 0.001) & 
                 TmpModel(SizeModel-N_elements+1:SizeModel)=Starting_At_Abund(1:N_elements)
+           End if
            If (Params%TwoComp) then
-              If (Starting_at_abund(1) .gt. 0) &
-                   TmpModel2(SizeModel-N_elements+1:SizeModel)=Starting_At_Abund(1:N_elements)
+              If (Starting_at_abund(1) .gt. 0) then
+                 If (Abs(TmpModel2(SizeModel-N_elements+1)-12.0) .gt. 0.001) & 
+                      TmpModel2(SizeModel-N_elements+1:SizeModel)=Starting_At_Abund(1:N_elements)
+              End if
            End if
            Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars, 1)
            If (.not. Params%TwoComp) then

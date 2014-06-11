@@ -58,9 +58,9 @@ Line=SiI 10827
 #   Commented in parenthesis are default values for different cycles
 Temperature=4       # (4, 8, 10)
 Velocity=3          # (1, 4, 6)
-Bz=0                # (1, 4, 4)
-Bx=0                # (1, 2, 2)
-By=0                # (1, 2, 2)
+Bz=1                # (1, 4, 4)
+Bx=1                # (1, 2, 2)
+By=1                # (1, 2, 2)
 Microturbulence=1   # (0, 2, 2)
 Macroturbulence=1   # (0, 1, 1)
 Abundances=Fe O Ni        # (0, 0, 0)

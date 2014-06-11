@@ -106,7 +106,9 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
         Node_values(idx)=Guess_model%Abundance(Nodes%i_nodes_ab(idx)) - &
              Ref%Abundance(Nodes%i_nodes_ab(idx))
         X(ifree)=Node_values(idx)/Norm_ab
-        X_max(ifree)=(Max_ab-Ref%Abundance(Nodes%i_nodes_ab(idx)))/Norm_ab
+        X_max(ifree)=Max_ab
+!        X_max(ifree)=(Max_ab-Ref%Abundance(Nodes%i_nodes_ab(idx)))/Norm_ab
+        print *,'ref 1=',ref%abundance(nodes%i_nodes_ab(idx)),x(ifree),x_max(ifree)
         ifree=ifree+1
      End do
   End if
@@ -280,6 +282,7 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
      Do idx=1, Nodes%n_nodes_ab
         New_model%abundance(Nodes%i_nodes_ab(idx))=Ref%Abundance(Nodes%i_nodes_ab(idx)) + &
              X(ifree)*Norm_ab
+        print *,'ref 2=',ref%abundance(nodes%i_nodes_ab(idx)),x(ifree),x_max(ifree)
         ifree=ifree+1
      End do
   End if

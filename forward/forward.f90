@@ -289,7 +289,9 @@ Subroutine Fill_densities(Params, Input_dens, Atmo)
         Atmo%Rho(idepth)=Atmo%Gas_p(idepth)*Avmolweight/Avog/bk/Atmo%Temp(idepth)
      End do
   Else if (Input_dens .eq. 'pgas') then
+     atmo%el_p(1)=8.604173938626516E-003 ! debug
      Call Compute_Pe(Params%n_points, Atmo%Temp, Atmo%Gas_p, Atmo%El_p)
+     print *,'computing pe. T, Pg, pe=',atmo%temp(1),atmo%gas_p(1),atmo%el_p(1)
      Atmo%ne=Atmo%el_p/bk/Atmo%temp
      Do idepth=1, Params%n_points
         Avmolweight=Wsum/(Asum+ &
@@ -2002,6 +2004,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Print *,"Something's wrong with the abundance scale. Aborting (in forward)"
      Stop
   End if
+
+
+  print *,'ab1=',atmo%abundance(8)
+
 !  First re-interpolate tau grid according to de la Cruz Rodriguez
 !   (adapterd from Carlsson'¡s MULTI_3D). Changes are not propagated outside
   If (Params%Reinterpolate .gt. 0) & 
