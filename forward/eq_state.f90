@@ -2184,9 +2184,6 @@ Contains
     Debug_errorflags(flag_computepe)=0
     Debug_warningflags(flag_computepe)=0
 
-    if (pt_in(1) .lt. 300) & ! debug
-         print *,'T,Pg,m=',temper_in(1),pt_in(1),at_abund(26)-7.5
-
     If (eqstate_switch .eq. 0 .or. eqstate_switch .eq. 1) then ! Use ANNs only
        metalicity=At_abund(26)-7.5
        T4=temper_in
@@ -2195,9 +2192,6 @@ Contains
           Call ann_pefrompg(T4(loop), Pg4(loop), metalicity, Pe4(loop))
        End do
     End if
-
-    if (pt_in(1) .lt. 300) & ! debug
-         print *,'T2=',temper_in(1),pt_in(1),pe4(1)
 
     If (eqstate_switch .eq. 2) then ! Use Wittmann's EoS
        Call wittmann_compute_pe(n_grid, temp4, PT4, Pe4)
@@ -2212,10 +2206,6 @@ Contains
           Peold=1e15
           Call Compute_Pg(1, T4(loop), Pe4(loop), Pg4(loop))
 
-          if (Pg4(loop) .lt. 300) then ! debug
-             print *,'**pe,peold,pg,pt=',pe4(loop),peold,pg4(loop),pt_in(loop)
-          endif
-
           niters=0
           Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
           Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
@@ -2228,12 +2218,6 @@ Contains
              niters=niters+1
              Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
              Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
-
-             if (Pg4(loop) .lt. 300) then ! debug
-                print *,'pe,peold,pg,pt=',pe4(loop),peold,pg4(loop),pt_in(loop)
-                print *,'n,dif=',niters,diff1,diff2
-             endif
-
           End do
        End do
     End if
