@@ -6,7 +6,7 @@ Use Model_structure
 ! v_mac is in cm/s, stray and ffactor are dimensionless (0 < stray < 1).
   real, parameter :: Norm_t=500., Norm_v=1.e5, Norm_mic=1.e5, &
        Norm_blong=500., Norm_bx=500., Norm_by=500., Norm_mac=1.e5, &
-       Norm_stray=0.10, Norm_ffactor=0.10, Norm_ab=8.0
+       Norm_stray=0.10, Norm_ffactor=0.10, Norm_ab=0.5
 !  real, parameter :: Max_t=30000., Max_v=2.e6, Max_mic=2.e6, &
 !       Max_b=10000., Max_inc=180., Max_azi=360., Max_mac=5.e5, &
 !       Max_stray=1., Max_ffactor=1.
