@@ -6,7 +6,7 @@ Subroutine Randomize_Model(Params, Nodes, ModelIn, ModelOut)
   Type (Nodes_info) :: Nodes
   Type (Parameters) :: Params
   Type (Model) :: ModelIn, ModelOut
-  Integer :: i, j
+  Integer :: i, j, idx
   Real :: kk
   Logical, save :: firsttime = .TRUE.
 !
@@ -60,6 +60,14 @@ Subroutine Randomize_Model(Params, Nodes, ModelIn, ModelOut)
   If (Nodes%n_nodes_mac .gt. 0) then
      Call Random_number(kk)
      ModelOut%v_mac=kk*2.e5
+  End if
+
+  If (Nodes%n_nodes_ab .gt. 0) then
+     Do idx=1, Nodes%n_nodes_ab
+        Call Random_number(kk)
+        ModelOut%abundance(Nodes%i_nodes_ab(idx))= &
+             ModelOut%abundance(Nodes%i_nodes_ab(idx))+(kk-0.5)*.2
+     End do
   End if
 
 End Subroutine Randomize_Model
