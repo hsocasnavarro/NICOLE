@@ -15,8 +15,7 @@
 !   beginning of your code and call time_routine('main',.False.) near the end
 ! 
 ! For MPI:
-!   To compile in MPI mode, uncomment the  lines. Then, the process
-!   number is appended to the name of each routine with a double underscore
+!   To compile in MPI mode, uncomment the !   number is appended to the name of each routine with a double underscore
 !   (e.g., if process 3 makes a call time_routine('myroutine',.True.) 
 !    this will actually get translated as myroutne__0003)
 ! 
@@ -35,7 +34,6 @@ Module Profiling
   Integer, Dimension(:), Allocatable, Save, Private :: RoutineAccumulated, TmpA
   Integer, Dimension(:), Allocatable, Save, Private :: RoutineNCalls, TmpNC
   !
-  Include 'mpif.h'
   !
   Contains 
     Subroutine Time_routine(Name, Start)
@@ -141,7 +139,6 @@ Module Profiling
       If (.not. Do_profile) Return
       !
       myrank=0
-     Call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, status)
       Write(Suffix,'("__",i0)') myrank
       !
       ! Find available unit to write file

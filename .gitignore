@@ -6,7 +6,6 @@ convlv.f90
 four1.f90
 fourrow.f90
 nr.f90
-nrtype.*
 nrutil.f90
 pythag.f90
 realft.f90
