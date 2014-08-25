@@ -191,7 +191,7 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
 ! Construct the profile to convolve (one for each Stokes profiles)
 !
      n=Region(iregion)%nwavelengths ! Number of points
-     If (m .ge. n) then
+     If (m .gt. n) then
         Print *,'Error in Convolve_profile. m .gt. n !!!'
         Return
      Else
