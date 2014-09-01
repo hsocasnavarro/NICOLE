@@ -603,7 +603,10 @@ mpirun -n 8 ./nicole
   one cycle to feed the input of another, or even if you use a file to
   serve simultaneously as input and output (both of which are
   legitimate strategies), you need to have at least a dummy file that
-  exists and contains the right dimensions before you start the run.
+  exists and contains the right dimensions before you start the run. Also,
+  all input files for cycles two and above must be in NICOLE's native format.
+  This is because the format conversion is performed by the Python wrapper
+  run\_nicole.py and it only works on the first cycle. 
 \item Start cycle (Optional, default=1): You may want to skip one or
   more cycles. For instance, assume that your run was terminated
   halfway during the second cycle and you wish to resume it. You would
