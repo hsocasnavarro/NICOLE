@@ -255,12 +255,12 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
      ifree=ifree+Nodes%n_nodes_by
   End if
 ! Force Bx to be always positive by choosing that disambiguation direction
-  Do ind=1, Params%n_points
-     If (New_model%b_x(ind) .lt. 0) then
-        New_model%b_x(ind)=-New_model%b_x(ind)
-        New_model%b_y(ind)=-New_model%b_y(ind)
-     End if
-  End do
+!  Do ind=1, Params%n_points
+!     If (New_model%b_x(ind) .lt. 0) then
+!        New_model%b_x(ind)=-New_model%b_x(ind)
+!        New_model%b_y(ind)=-New_model%b_y(ind)
+!     End if
+!  End do
 ! Macroturbulence
   If (Nodes%n_nodes_mac .eq. 1) then
      New_model%v_mac=Ref%v_mac+X(ifree)*Norm_mac
@@ -345,12 +345,12 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
      ifree=ifree+Nodes%n_nodes_by2
   End if
 ! Force Bx to be always positive by choosing that disambiguation direction
-  Do ind=1, Params%n_points
-     If (New_model%b_x(ind) .lt. 0) then
-        New_model%b_x(ind)=-New_model%b_x(ind)
-        New_model%b_y(ind)=-New_model%b_y(ind)
-     End if
-  End do
+!  Do ind=1, Params%n_points
+!     If (New_model%b_x(ind) .lt. 0) then
+!        New_model%b_x(ind)=-New_model%b_x(ind)
+!        New_model%b_y(ind)=-New_model%b_y(ind)
+!     End if
+!  End do
 ! Abundances
   If (Nodes%n_nodes_ab2 .gt. 0) then
      Do idx=1, Nodes%n_nodes_ab2

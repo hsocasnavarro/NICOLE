@@ -451,7 +451,7 @@ Program Nicole
      Do iregion=1, Params%n_regions
         Params%mm(iregion)=Params%IProf(iregion)
      End do
-     If (Params%Printout .ge. 2) &
+     If (Params%Printout .ge. 2 .and. myrank .eq. 0) &
           Print *,'Reading Instrumental Profile'
      Call Close_File(IProfUnit)
   Endif
@@ -855,7 +855,7 @@ Program Nicole
 !MPI        Call MPI_Recv(DepCoefExists, 1, MPI_LOGICAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
 !MPI        If (DepCoefExists) then
 !MPI           Call MPI_Recv(isize, 1, MPI_INTEGER, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-!MPI           Call MPI_Recv(Tmp3, isize, MPI_INTEGER, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
+!MPI           Call MPI_Recv(Tmp3, isize, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
 !MPI        End if
         ! Got data. Do calculations now
         Call Do_Task ! Routine included with Contains, has access to all variables here
