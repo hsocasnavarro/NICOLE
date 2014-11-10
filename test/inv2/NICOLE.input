@@ -14,7 +14,7 @@ Heliocentric angle= 1.0 # Cos(mu)
 # Fields required only for the inversion mode:
 #
 Observed profiles= observed.bin
-Output model= inversion.mod
+Output model= inversion.model
 #
 # Other misc optional fields
 #

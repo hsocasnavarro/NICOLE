@@ -1,16 +1,16 @@
- Code execution started on: 2014/06/24 at 23:19:07.965
-   Code execution ended on: 2014/06/24 at 23:20:41.781
- Total execution time (s):          93
- Total execution time (hours):   2.6060000000000000E-002
+ Code execution started on: 2014/11/10 at 16:40:28.833
+   Code execution ended on: 2014/11/10 at 16:40:37.296
+ Total execution time (s):           8
+ Total execution time (hours):   2.35111103E-03
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   93.816000000000003        100.00000000000000     
-    forward         151   89.128000000000000        95.002984565532529     
-    compute_dchisq_dx           8   82.790000000000006        88.247207299394560     
-    formalsolution       30200   47.506999999999998        50.638483840709469     
-    profiles        1476   32.329000000000001        34.460006821864077     
-    hydrostatic         300   4.3849999999999998        4.6740428071970666     
-    compute_pe        8106   4.0300000000000002        4.2956425343225035     
-    compute_pg       29927   3.7000000000000002        3.9438901679884029     
-    background_opac       89925   3.6280000000000001        3.8671441971518714     
-    compute_others_from_T_Pe_Pg       78147   1.2370000000000001        1.3185384156220687     
-    Fill densities           1   1.4999999999999999E-002   1.5988743924277311E-002
+    main           1   8.46399975       100.000000    
+    forward         188   7.61000013       89.9102173    
+    compute_dchisq_dx          10   7.34499979       86.7793045    
+    profiles        1910   2.49499989       29.4777870    
+    formalsolution       37600   2.42300010       28.6271267    
+    hydrostatic         374  0.736000001       8.69565201    
+    compute_pe        7902  0.643000007       7.59688091    
+    background_opac      110386  0.609000027       7.19517994    
+    compute_pg       28164  0.591000021       6.98251438    
+    compute_others_from_T_Pe_Pg       95722  0.270999998       3.20179582    
+    Fill densities           1   2.00000009E-03   2.36294921E-02

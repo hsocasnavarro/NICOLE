@@ -7,11 +7,11 @@
 10000000   10000000      ! pixx2, pixy2 
 1          ! irec0 
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
-inversion.mod
+inversion.model
 
 observed.bin
 inversion.pro
-inversion.mod_2
+inversion.model_2
 
 0      ! formal 
 1.0    ! helio 

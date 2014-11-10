@@ -6,14 +6,14 @@ Cycles=2
 #
 # Fields required for both modes, synthesis and inversion:
 #
-Input model= inversion.mod
+Input model= inversion.model
 Output profiles= inversion.pro # Output profiles
 Heliocentric angle= 1.0 # Cos(mu)
 #
 # Fields required only for the inversion mode:
 #
 Observed profiles= observed.bin
-Output model= inversion.mod_2
+Output model= inversion.model_2
 #
 # Other misc optional fields
 #

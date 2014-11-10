@@ -1,4 +1,4 @@
-!                      N I C O L E   v 14.07
+!                      N I C O L E   v 14.09
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -72,7 +72,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 14.07 ******************'
+     Print *,'*************** N I C O L E   v 14.09 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -437,7 +437,7 @@ Program Nicole
      Do iregion=1, Params%n_regions
         Params%mm(iregion)=Params%IProf(iregion)
      End do
-     If (Params%Printout .ge. 2) &
+     If (Params%Printout .ge. 2 .and. myrank .eq. 0) &
           Print *,'Reading Instrumental Profile'
      Call Close_File(IProfUnit)
   Endif
@@ -554,7 +554,7 @@ Program Nicole
      Else
         Inquire (File='Instrumental_profile.dat'//Cyclesuffix, Exist=Params%IProfExists)
         If (Params%IProfExists) &
-             Call Open_file_direct(IProfUnit,'Instrumental_profile.dat'//CycleSuffix, RealBytes*Params%n_data)
+             Call Open_file_direct(IProfUnit,'Instrumental_profile.dat'//CycleSuffix, RealBytes*Params%n_data/4)
            
      End if
      ! Open stray light profile unit (leave it open, we'll read it as we go)
