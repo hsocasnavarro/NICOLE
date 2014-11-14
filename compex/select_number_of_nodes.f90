@@ -179,7 +179,7 @@ Subroutine Select_number_of_nodes(Params, Atmo, Nodes, icall)
      Nodes%n_nodes_t=UserNodeLocations(ivar,1)
      Do inode=1, Nodes%n_nodes_t
         Nodes%i_nodes_t(inode)=Find_index(Params%n_points, Atmo%ltau_500, &
-             UserNodeLocations(ivar,inode))
+             UserNodeLocations(ivar,inode+1))
      End do
   Else
      Call place_nodes(Params%n_points, Nodes%n_nodes_t, Atmo%ltau_500, &
