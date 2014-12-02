@@ -2031,6 +2031,19 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         Stop
      End if
   End do
+!
+  Do iregion=1, Params%n_regions ! Set background opacity enhancement factors
+     nfudge=nfudge+1
+     If (nfudge .gt. 1000) then
+        Print *,'maxnfudge too low in forward/background.f90. Need at least:',Params%n_regions
+        Stop
+     End if
+     Fudge_start(nfudge)=Region(iregion)%First_wlength
+     Fudge_end(nfudge)=Region(iregion)%First_wlength+ &
+          (Region(iregion)%nwavelengths-1)*Region(iregion)%Wave_step
+     Fudge(nfudge)=Region(iregion)%Opacity_enh
+  End do
+
   ! Need to do NLTE calculation or are we in pure LTE mode?
   do_NLTE=.False.
   Do iline=1, Params%n_lines

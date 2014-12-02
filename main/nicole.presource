@@ -207,7 +207,8 @@ Program Nicole
   Do iregion=1, Params%n_regions
      Read (headerunit, *) Region(iregion)%First_wlength, &
           Region(iregion)%Wave_step, Region(iregion)%nwavelengths, &
-          Region(iregion)%Macro_enh, Region(iregion)%layer
+          Region(iregion)%Macro_enh, Region(iregion)%layer, &
+          Region(iregion)%Opacity_enh
   End do
   Do iline=1, Params%n_lines
      Read (headerunit, *) Line(iline)%Width, &

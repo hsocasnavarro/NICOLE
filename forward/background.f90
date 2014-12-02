@@ -7,8 +7,11 @@ module background_opacity_module
   Use UV_opacity_DM, Only: UVopacity_DM
   Use Eq_state
   Implicit None
+!  Integer, Parameter :: maxnfudge=1000
   Integer :: Opacity_package=1, Opacity_Package_UV=1 ! Default, will be overwritten in main program
   Logical, Dimension(92) :: elneglectopac
+  Integer :: nfudge=0
+  Real :: Fudge_start(1000), Fudge_end(1000), Fudge(1000)
 
 Contains
   Function Background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat)
@@ -65,6 +68,14 @@ Contains
        Background_opacity=chi_0+chi_e
        Scat=chi_e
     endif
+
+! Apply fudge factors?
+    Do i=1, nfudge
+       If (lambda_in4 .ge. Fudge_start(i) .and. lambda_in4 .le. Fudge_end(i)) then
+          Background_opacity=Background_opacity*Fudge(i)
+          Scat=Scat*Fudge(i)
+       End if
+    End do
 
     Call Time_routine('background_opac',.False.)
     Return

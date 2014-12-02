@@ -1,4 +1,4 @@
-!                      N I C O L E   v 14.09
+!                      N I C O L E   v 14.11
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -72,7 +72,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 14.09 ******************'
+     Print *,'*************** N I C O L E   v 14.11 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -193,7 +193,8 @@ Program Nicole
   Do iregion=1, Params%n_regions
      Read (headerunit, *) Region(iregion)%First_wlength, &
           Region(iregion)%Wave_step, Region(iregion)%nwavelengths, &
-          Region(iregion)%Macro_enh, Region(iregion)%layer
+          Region(iregion)%Macro_enh, Region(iregion)%layer, &
+          Region(iregion)%Opacity_enh
   End do
   Do iline=1, Params%n_lines
      Read (headerunit, *) Line(iline)%Width, &

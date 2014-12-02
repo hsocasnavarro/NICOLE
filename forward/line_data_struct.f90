@@ -46,6 +46,7 @@ Module Line_data_structure
      Real :: First_wlength ! in Angstroms
      Real :: Wave_step ! in Angstroms
      Real :: Macro_enh ! Macroturbulence enhancement factor (dimensionless)
+     Real :: Opacity_enh ! Fudge factor to enhance background opacities
      Integer :: nwavelengths ! number of wavelengths
      Integer :: layer ! 1->Photospheric region; 2->Chromospheric region
   End Type Region_data

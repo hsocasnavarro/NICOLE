@@ -153,13 +153,7 @@ def printsubtree(source_files,requires,ifile,irecurs):
 
 # Main program
 
-import sys
-import os
-import shutil
-import getopt
-import datetime
-import re
-import subprocess
+import sys, os, shutil, getopt, datetime, re, subprocess, tempfile
 
 compiler=None
 cswitch=None
@@ -174,8 +168,6 @@ mpi=0
 sopa=0
 showtree=0
 
-scratch_dir='000crmak' # Directory for temporary scratch files
-shutil.rmtree(scratch_dir,ignore_errors=True)
 cwd=os.getcwd()
 
 fnull = open(os.devnull, 'w') # Null file
@@ -291,9 +283,6 @@ else:
         print 'You may need to edit it manually'
         sys.exit(1)
 
-scratch_dir=scratch_dir+dirsep
-
-
 if (compiler == None):
     # Search for F90 compiler
     print 'User did not specify a F90 compiler. Searching for available options...'
@@ -392,7 +381,8 @@ if (compiler == None):
     sys.exit(1)
 
 if cswitch == None: # Try to autodetect cswitch option
-    os.mkdir(scratch_dir)
+    scratch_dir=tempfile.mkdtemp()
+    scratch_dir=scratch_dir+dirsep
     f=open(scratch_dir+'test.f90','w')
     f.write('end\n')
     f.close()    
@@ -412,8 +402,8 @@ if cswitch == None: # Try to autodetect cswitch option
     print 'Autodetected cswitch:',cswitch
             
 if modsuf == None: # Try to autodetect modsuf option
-    shutil.rmtree(scratch_dir,ignore_errors=True)
-    os.mkdir(scratch_dir)
+    scratch_dir=tempfile.mkdtemp()
+    scratch_dir=scratch_dir+dirsep
     f=open(scratch_dir+'test.f90','w')
     f.write('module test\nend module test\n')
     f.close()    
@@ -427,7 +417,7 @@ if modsuf == None: # Try to autodetect modsuf option
     for option in testfor:
         if os.path.exists(scratch_dir+'test'+option):
             modsuf=option
-            os.remove(scratch_dir+'test'+option)
+            os.remove(scratch_dir+'test'+option,ignore_errors=True)
             print 'Autodetected modsuf:',modsuf
     if modsuf == None or retcode != 0:
         print 'Failed to auto-detect modsuf flag for compiler:'+compiler
@@ -436,8 +426,7 @@ if modsuf == None: # Try to autodetect modsuf option
     shutil.rmtree(scratch_dir,ignore_errors=True)
 
 if modpath == None: # Try to autodetect modpath option
-    shutil.rmtree(scratch_dir,ignore_errors=True)
-    os.mkdir(scratch_dir)
+    scratch_dir=tempfile.mkdtemp()
     os.mkdir(scratch_dir+dirsep+'modu')
     f=open(scratch_dir+dirsep+'modu/modu.f90','w')
     f.write('module modu\nend module modu\n')
@@ -492,8 +481,9 @@ if endianness != 'little' and endianness != 'big':
 # Check that compiler/flags work
 print ''
 print 'Testing compiler and flags with Hello World program'
-shutil.rmtree(scratch_dir,ignore_errors=True)
-os.mkdir(scratch_dir)
+
+scratch_dir=tempfile.mkdtemp()
+scratch_dir=scratch_dir+dirsep
 f=open(scratch_dir+'test.f90','w')
 f.write('print *,"Hello World"\nend\n')
 f.close()
@@ -515,13 +505,12 @@ print 'Ok. Compiler and flags seem to work'
 os.chdir(cwd)
 shutil.rmtree(scratch_dir,ignore_errors=True)
 
-
 # Find recl for current architecture
 print ''
 print 'Trying to determine recl parameter'
 if recl == -1:
-    shutil.rmtree(scratch_dir,ignore_errors=True)
-    os.mkdir(scratch_dir)
+    scratch_dir=tempfile.mkdtemp()
+    scratch_dir=scratch_dir+dirsep
     f=open(scratch_dir+'test.f90','w')
     f.write('integer::i\nreal(kind=8)::number\nnumber=1.\ndo i=1,257\nopen (35,file=\'test.dat\',access=\'direct\',recl=i)\nwrite (35,rec=1,err=100) number\nclose (35)\nprint *,i\nstop\n100  close (35)\nend do\nprint *,-1\nend\n')
     f.close()
@@ -612,8 +601,8 @@ f.close()
 # Check if the FLUSH statement is available
 print 'Testing availability of FLUSH statement...'
 flush=0
-shutil.rmtree(scratch_dir,ignore_errors=True)
-os.mkdir(scratch_dir)
+scratch_dir=tempfile.mkdtemp()
+scratch_dir=scratch_dir+dirsep
 f2=open(scratch_dir+'test.f90','w')
 f2.write('call flush(1)\nend')
 f2.close()
