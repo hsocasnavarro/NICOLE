@@ -165,6 +165,11 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
      If (ExistsInstrumProf) then
         ! Use instrumental profile from file
         m=Params%mm(iregion)
+        if (m/2 .ne. m/2.) then
+           Print *,'Error. Instrumental profile for region ',iregion
+           Print *,'should be an odd number. It is ',m
+           Stop
+        End if
         gauss(1:m)=Params%IProf(indreg1:indreg1+m-1)
         indreg1=indreg1+m
      Else

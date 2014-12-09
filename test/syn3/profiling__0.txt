@@ -1,16 +1,16 @@
- Code execution started on: 2014/06/24 at 23:17:23.661
-   Code execution ended on: 2014/06/24 at 23:17:32.093
- Total execution time (s):           8
- Total execution time (hours):   2.3422222222222225E-003
+ Code execution started on: 2014/12/02 at 14:29:11.965
+   Code execution ended on: 2014/12/02 at 14:29:13.649
+ Total execution time (s):           1
+ Total execution time (hours):   4.68055543E-04
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   8.4320000000000004        100.00000000000000     
-    forward           1   8.3209999999999997        98.683586337760914     
-    solvestat           1   4.1010000000000000        48.636148007590130     
-    NLTE_formalsolution       13200   3.8700000000000001        45.896584440227699     
-    background_opac        1616   2.4760000000000000        29.364326375711574     
-    formalsolution         400  0.47399999999999998        5.6214421252371913     
-    profiles           4  0.15400000000000000        1.8263757115749524     
-    Fill densities           1   1.4000000000000000E-002  0.16603415559772297     
-    compute_pg           1   1.4000000000000000E-002  0.16603415559772297     
-    compute_others_from_T_Pe_Pg          85   3.0000000000000001E-003   3.5578747628083489E-002
-    eneq         860   2.0000000000000000E-003   2.3719165085388991E-002
+    main           1   1.68499994       100.000000    
+    forward           1   1.67600000       99.4658737    
+    background_opac        1616   1.36699998       81.1275940    
+    solvestat           1  0.222000003       13.1750746    
+    NLTE_formalsolution       13200  0.192000002       11.3946590    
+    formalsolution         400   1.89999994E-02   1.12759650    
+    profiles           4   1.09999999E-02  0.652818978    
+    Fill densities           1   1.00000005E-03   5.93471862E-02
+    compute_pg           1   1.00000005E-03   5.93471862E-02
+    eneq         882   1.00000005E-03   5.93471862E-02
+    compute_others_from_T_Pe_Pg          85   0.00000000       0.00000000    
