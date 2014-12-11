@@ -165,7 +165,7 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
      If (ExistsInstrumProf) then
         ! Use instrumental profile from file
         m=Params%mm(iregion)
-        if (m/2 .ne. m/2.) then
+        if (m/2 .eq. m/2.) then
            Print *,'Error. Instrumental profile for region ',iregion
            Print *,'should be an odd number. It is ',m
            Stop
