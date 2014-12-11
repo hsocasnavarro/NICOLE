@@ -2454,8 +2454,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice) ! Formal solution
-           Stokes(1)=Stokes(1)+Region(iregion)%Bias ! Add spectrally-flat bias
-
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point
@@ -2464,6 +2462,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 
               End if
            End if
+           Stokes(1)=Stokes(1)+Region(iregion)%Bias ! Add spectrally-flat bias
            Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3) + &
                 WMu(imu)*Stokes(1:4)
            If (CheckNaN(Sum(Syn_profile(idata:idata+3)))) then

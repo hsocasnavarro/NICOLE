@@ -417,7 +417,10 @@ if modsuf == None: # Try to autodetect modsuf option
     for option in testfor:
         if os.path.exists(scratch_dir+'test'+option):
             modsuf=option
-            os.remove(scratch_dir+'test'+option,ignore_errors=True)
+            try:
+                os.remove(scratch_dir+'test'+option,ignore_errors=True)
+            except:
+                pass
             print 'Autodetected modsuf:',modsuf
     if modsuf == None or retcode != 0:
         print 'Failed to auto-detect modsuf flag for compiler:'+compiler
@@ -617,7 +620,10 @@ pipe.wait()
 os.chdir(cwd)
 if os.path.exists(scratch_dir+'a.out'):
     flush=1
-    os.remove(scratch_dir+'a.out')
+    try:
+        os.remove(scratch_dir+'a.out')
+    except:
+        pass
     print '   Flush is available'
 else:
     print '   Flush is not available'
