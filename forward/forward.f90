@@ -2454,6 +2454,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice) ! Formal solution
+           Stokes(1)=Stokes(1)+Region(iregion)%Bias ! Add spectrally-flat bias
 
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont

@@ -10,7 +10,7 @@ module background_opacity_module
 !  Integer, Parameter :: maxnfudge=1000
   Integer :: Opacity_package=1, Opacity_Package_UV=1 ! Default, will be overwritten in main program
   Logical, Dimension(92) :: elneglectopac
-  Integer :: nfudge=0 # These are defined in forward.f90
+  Integer :: nfudge=0 ! These are defined in forward.f90
   Real :: Fudge_start(1000), Fudge_end(1000), Fudge(1000)
 
 Contains

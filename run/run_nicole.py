@@ -1186,7 +1186,9 @@ for icycle in range(int(ncycles)):
                       ,'Region '+str(iregion+1))
         tmp6=get_value(config,'Opacity enhancement','1.0','NICOLE.input'
                       ,'Region '+str(iregion+1))
-        f.write(tmp1+' '+tmp2+' '+tmp3+' '+tmp4+' '+tmp5+' '+tmp6+'\n')
+        tmp7=get_value(config,'Bias','1.0','NICOLE.input'
+                      ,'Region '+str(iregion+1))
+        f.write(tmp1+' '+tmp2+' '+tmp3+' '+tmp4+' '+tmp5+' '+tmp6+' '+tmp7+'\n')
     # Parse spectral line database file
     fl=open('LINES')
     LINES_lines=fl.readlines()
