@@ -2037,6 +2037,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      End if
   End do
 !
+  nfudge=0
   Do iregion=1, Params%n_regions ! Set background opacity enhancement factors
      nfudge=nfudge+1
      If (nfudge .gt. 1000) then
