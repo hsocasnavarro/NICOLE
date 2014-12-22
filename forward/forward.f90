@@ -2463,7 +2463,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 
               End if
            End if
-           Stokes(1)=Stokes(1)+Region(iregion)%Bias ! Add spectrally-flat bias
            Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3) + &
                 WMu(imu)*Stokes(1:4)
            If (CheckNaN(Sum(Syn_profile(idata:idata+3)))) then
@@ -2513,7 +2512,9 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Stop
         End if
         nformal(ichoice)=nformal(ichoice)+1 ! How many solutions of each type
-        Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/reference_cont
+        Stokes(1)=Stokes(1)+Region(iregion)%Bias*reference_cont
+        Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/ &
+             (reference_cont*(1.+Region(iregion)%Bias))
         idata=idata+4*Params%Skip_lambda ! Update the data index
      End do !$$ PARALLEL LOOP END
 

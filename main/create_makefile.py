@@ -431,13 +431,15 @@ if modsuf == None: # Try to autodetect modsuf option
 if modpath == None: # Try to autodetect modpath option
     scratch_dir=tempfile.mkdtemp()
     os.mkdir(scratch_dir+dirsep+'modu')
-    f=open(scratch_dir+dirsep+'modu/modu.f90','w')
+    f=open(scratch_dir+dirsep+'modu'+dirsep+'modu.f90','w')
     f.write('module modu\nend module modu\n')
     f.close()    
-    f=open(scratch_dir+'test.f90','w')
+    f=open(scratch_dir+dirsep+'test.f90','w')
     f.write('use modu\nend\n')
     f.close()    
     os.chdir(scratch_dir+dirsep+'modu')
+    print 'tm=',scratch_dir
+    a=raw_input('aaa')
     try:
         retcode=subprocess.call([compiler,cswitch,'modu.f90'],stdout=fnull,stderr=fnull)
     except:
@@ -498,7 +500,7 @@ cmd.append('test.f90')
 print 'Command:'," ".join(cmd)
 try:
     retcode=subprocess.call(cmd,stdout=fnull,stderr=fnull)
-    pipe=subprocess.Popen('./a.out',stdout=subprocess.PIPE)
+    pipe=subprocess.Popen('.'+dirsep+'a.out',stdout=subprocess.PIPE)
 except:
     print '*** ERROR! Your compiler did not produce a suitable executable!'
     os.chdir(cwd)
@@ -523,7 +525,7 @@ if recl == -1:
     cmd.extend(otherflags.split())
     cmd.append('test.f90')
     retcode=subprocess.call(cmd,stdout=fnull,stderr=fnull)
-    pipe=subprocess.Popen('./a.out',stdout=subprocess.PIPE)
+    pipe=subprocess.Popen('.'+dirsep+'a.out',stdout=subprocess.PIPE)
     recl=pipe.stdout.read()
     recl=recl[0:len(recl)-1] # Drop the newline at the end
     os.chdir(cwd)
