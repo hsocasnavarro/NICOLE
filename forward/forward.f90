@@ -740,13 +740,15 @@ Real function syn_hsra(lambda, theta)
   Real :: lambda, theta, metal
   Real :: Wave_cm, nu, nu500, n2P, Scat
   Real, Parameter :: cc = 2.99792458D10, hh = 6.62618D-27, bk = 1.38066D-16
-  Integer :: idepth
+  Integer :: idepth, i
   Integer, Parameter :: npoints=44
   Real, Dimension (npoints) :: Temp, el_p, ltau_500, ltau_nu, gas_p
   Real, Dimension (npoints) :: Source_f, Cont_op, cont_op_500, &
-       tau_nu, tau_500, Intensity
+       tau_nu, tau_500, Intensity, dtau_nu
   Real, Dimension (npoints) :: nH, nHminus, nHplus, nH2, nH2plus
+  Real, Dimension (npoints, 4, 4) :: Ab
   Real, Dimension (10) :: Pp
+  Real, Dimension (4) :: Stokes
 ! HSRA model around ltau_500=1
   Data ltau_500/  -2.900000     ,   -2.800000     ,   -2.700000     ,   -2.600000     , &
    -2.500000     ,   -2.400000     ,   -2.300000     ,   -2.200000     , &
@@ -859,15 +861,29 @@ Real function syn_hsra(lambda, theta)
 !
   tau_500(1:npoints)=10**(ltau_500(1:npoints)-alog10(theta))
   tau_nu(1)=tau_500(1)*Cont_op(1)
+  dtau_nu(1)=tau_nu(1)
+  Ab(:,:,:)=0.
+  Do idepth=1, npoints
+!     Do i=1, 4
+!        Ab(idepth, i, i)=Cont_op(idepth)
+        Ab(idepth, 1, 1)=Cont_op(idepth)
+!     End do
+  End do
   Do idepth=2, npoints
      tau_nu(idepth)=tau_nu(idepth-1)+ &
           (tau_500(idepth)-tau_500(idepth-1))* &
           0.5*(Cont_op(idepth)+Cont_op(idepth-1))
+     dtau_nu(idepth)=tau_nu(idepth)-tau_nu(idepth-1)
   End do
+
+!  Call Scalar_hermite(npoints, tau_nu, Source_f, Intensity)
+!  syn_hsra=Intensity(1)
+
 !
-  Call Scalar_hermite(npoints, tau_nu, Source_f, Intensity)
 !
-  syn_hsra=Intensity(1)
+  Call delobezier3(npoints, dtau_nu, Ab, Source_f, Stokes)
+  syn_hsra=Stokes(1)
+!
   Return 
 !
 End function syn_hsra
@@ -2512,7 +2528,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Stop
         End if
         nformal(ichoice)=nformal(ichoice)+1 ! How many solutions of each type
-        Stokes(1)=Stokes(1)+Region(iregion)%Bias*reference_cont
+        Syn_profile(idata)=Syn_profile(idata)+Region(iregion)%Bias*reference_cont
         Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/ &
              (reference_cont*(1.+Region(iregion)%Bias))
         idata=idata+4*Params%Skip_lambda ! Update the data index
