@@ -226,10 +226,10 @@ CONTAINS
        dx2 = dx * 0.5d0
 
        c = (y(k) + dx2 * yprime(k) + y(k1) - dx2 * yprime(k1)) * 0.5d0
-       mmi = min(y(k), y(k1))
-       mma = max(y(k), y(k1))
-       if(c .gt. mma)  c = mma
-       if(c .lt. mmi)  c = mmi
+     !  mmi = min(y(k), y(k1))
+     !  mma = max(y(k), y(k1))
+     !  if(c .gt. mma)  c = mma
+     !  if(c .lt. mmi)  c = mmi
 
        inte(k1) = inte(k) +  dx / 3.0d0 * (y(k) + y(k1) + c)
     end do
@@ -254,10 +254,10 @@ CONTAINS
        dx2 = dx * 0.5d0
        
        c = (y(k) + dx2 * yprime(k) + y(k+1) - dx2 * yprime(k+1)) * 0.5d0
-       mmi = min(y(k), y(k1))
-       mma = max(y(k), y(k1))
-       if(c .gt. mma)  c = mma
-       if(c .lt. mmi)  c = mmi
+   !    mmi = min(y(k), y(k1))
+   !    mma = max(y(k), y(k1))
+   !    if(c .gt. mma)  c = mma
+   !    if(c .lt. mmi)  c = mmi
 
        inte(k1) = dx * (y(k) + y(k+1) + c) / 3.0d0
     end do
@@ -283,10 +283,10 @@ CONTAINS
        c = y(k) + dx3 * yprime(k)
        c1 =  y(k1) - dx3 * yprime(k1)
        
-       mmi = min(y(k),y(k1))
-       mma = max(y(k),y(k1))
-       if(c  .LT. mmi .OR.  c .GT. mma) c = y(k)
-       if(c1 .LT. mmi .OR. c1 .GT. mma) c1 = y(k1)
+  !     mmi = min(y(k),y(k1))
+  !     mma = max(y(k),y(k1))
+  !     if(c  .LT. mmi .OR.  c .GT. mma) c = y(k)
+  !     if(c1 .LT. mmi .OR. c1 .GT. mma) c1 = y(k1)
 
        inte(k1) = inte(k) + dx * (y(k) + y(k1) + c + c1) * 0.25d0
     end do
@@ -312,10 +312,10 @@ CONTAINS
        c1 =  y(k1) - dx3 * yprime(k1)
        
        
-       mmi = min(y(k),y(k1))
-       mma = max(y(k),y(k1))
-       if(c  .LT. mmi .OR.  c .GT. mma) c = y(k)
-       if(c1 .LT. mmi .OR. c1 .GT. mma) c1 = y(k1)
+      ! mmi = min(y(k),y(k1))
+      ! mma = max(y(k),y(k1))
+      ! if(c  .LT. mmi .OR.  c .GT. mma) c = y(k)
+      ! if(c1 .LT. mmi .OR. c1 .GT. mma) c1 = y(k1)
 
        inte(k1) = dx * (y(k) + y(k1) + c + c1) * 0.25d0
     end do

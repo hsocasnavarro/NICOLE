@@ -1440,7 +1440,7 @@ Subroutine Delopar(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes)
 
 End Subroutine Delopar
 
-Subroutine Delolin(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes)
+Subroutine Delolin(npoints, dtau_nu, Ab_matrix, Source, Emergent_Stokes)
   Implicit None
   Integer :: npoints, ibound, ipoint, k, km, kp, i, j
   Real, Dimension (npoints) :: ltau_500, Source, tau_nu, dtau_nu, tau_500
@@ -1457,15 +1457,21 @@ Subroutine Delolin(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes)
 !
 ! First construct the tau_5000 depth scale
 !
-  tau_500(1:npoints)=10**ltau_500(1:npoints)
+!  tau_500(1:npoints)=10**ltau_500(1:npoints)
 !
-  Opac(1:npoints,1)=Ab_matrix(1:npoints,1,1)
-  tau_nu(1)=tau_500(1)*Opac(1,1)
-  Do ipoint=2, npoints
-     tau_nu(ipoint)=tau_nu(ipoint-1)+ &
-          (tau_500(ipoint)-tau_500(ipoint-1))* &
-          0.5*(Opac(ipoint,1)+Opac(ipoint-1,1))
-  End do   
+!  Opac(1:npoints,1)=Ab_matrix(1:npoints,1,1)
+!  tau_nu(1)=tau_500(1)*Opac(1,1)
+!  Do ipoint=2, npoints
+!     tau_nu(ipoint)=tau_nu(ipoint-1)+ &
+!          (tau_500(ipoint)-tau_500(ipoint-1))* &
+!          0.5*(Opac(ipoint,1)+Opac(ipoint-1,1))
+!  End do
+
+  tau_nu(1)=0.
+  do k=2, npoints
+     tau_nu(k)=tau_nu(k-1)+dtau_nu(k)
+  end do
+  
 !  Call Check_tau(tau_nu)
 !
   dtau_nu(2:npoints)=tau_nu(2:npoints)-tau_nu(1:npoints-1)
