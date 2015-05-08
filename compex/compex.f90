@@ -40,6 +40,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_t ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_t-1)=Node_values(1:Nodes%n_nodes_t)
   X_max(ifree:ifree+Nodes%n_nodes_t-1)=Max_t/Norm_t
+  X_min(ifree:ifree+Nodes%n_nodes_t-1)=Min_t/Norm_t
   ifree=ifree+Nodes%n_nodes_t
 ! Velocity
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%v_los, &
@@ -48,6 +49,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_v ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_v-1)=Node_values(1:Nodes%n_nodes_v)
   X_max(ifree:ifree+Nodes%n_nodes_v-1)=Max_v/Norm_v
+  X_min(ifree:ifree+Nodes%n_nodes_v-1)=Min_v/Norm_v
   ifree=ifree+Nodes%n_nodes_v
 ! Microturbulence
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%v_mic, &
@@ -56,6 +58,8 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_mic ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_mic-1)=Node_values(1:Nodes%n_nodes_mic)
   X_max(ifree:ifree+Nodes%n_nodes_mic-1)=Max_mic/Norm_mic
+  X_min(ifree:ifree+Nodes%n_nodes_mic-1)=Min_mic/Norm_mic
+
   ifree=ifree+Nodes%n_nodes_mic
 ! Magnetic strength
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%b_long, &
@@ -64,6 +68,8 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_blong ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_blong-1)=Node_values(1:Nodes%n_nodes_blong)
   X_max(ifree:ifree+Nodes%n_nodes_blong-1)=Max_blong/Norm_blong
+  X_min(ifree:ifree+Nodes%n_nodes_blong-1)=Min_blong/Norm_blong
+
   ifree=ifree+Nodes%n_nodes_blong
 ! Field
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%b_x, &
@@ -72,6 +78,8 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_bx ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_bx-1)=Node_values(1:Nodes%n_nodes_bx)
   X_max(ifree:ifree+Nodes%n_nodes_bx-1)=Max_bx/Norm_bx
+  X_min(ifree:ifree+Nodes%n_nodes_bx-1)=Min_bx/Norm_bx
+
   ifree=ifree+Nodes%n_nodes_bx
 ! Field
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%b_y, &
@@ -80,17 +88,21 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_by ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_by-1)=Node_values(1:Nodes%n_nodes_by)
   X_max(ifree:ifree+Nodes%n_nodes_by-1)=Max_by/Norm_by
+  X_min(ifree:ifree+Nodes%n_nodes_by-1)=Min_by/Norm_by
+
   ifree=ifree+Nodes%n_nodes_by
 ! Macroturbulence
   If (Nodes%n_nodes_mac .eq. 1) then
      X(ifree)=(Guess_model%v_mac-Ref%v_mac)/Norm_mac
      X_max(ifree)=Max_mac/Norm_mac
+     X_min(ifree)=Min_mac/Norm_mac
      ifree=ifree+1
   End if
 ! Percentage of stray light
   If (Nodes%n_nodes_stray .eq. 1) then
      X(ifree)=(Guess_model%stray-Ref%stray)/Norm_stray
      X_max(ifree)=(Max_stray-Ref%stray)/Norm_stray
+     X_min(ifree)=(Min_stray/Norm_stray)
      ifree=ifree+1
   End if
 ! Field ffactor
@@ -98,6 +110,8 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
      X(ifree)=(Guess_model%ffactor-Ref%ffactor)/ &
           Norm_ffactor
      X_max(ifree)=(Max_ffactor-Ref%ffactor)/Norm_ffactor
+     X_min(ifree)=Min_ffactor/Norm_ffactor
+
      ifree=ifree+1
   End if
 ! Abundances
@@ -107,6 +121,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
              Ref%Abundance(Nodes%i_nodes_ab(idx))
         X(ifree)=Node_values(idx)/Norm_ab
         X_max(ifree)=Max_ab
+        X_min(ifree)=Min_ab
 !        X_max(ifree)=(Max_ab-Ref%Abundance(Nodes%i_nodes_ab(idx)))/Norm_ab
         ifree=ifree+1
      End do
@@ -125,6 +140,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_t ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_t2-1)=Node_values(1:Nodes%n_nodes_t2)
   X_max(ifree:ifree+Nodes%n_nodes_t2-1)=Max_t/Norm_t
+  X_min(ifree:ifree+Nodes%n_nodes_t2-1)=Min_t/Norm_t
   ifree=ifree+Nodes%n_nodes_t2
 ! Velocity
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%v_los, &
@@ -133,6 +149,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_v ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_v2-1)=Node_values(1:Nodes%n_nodes_v2)
   X_max(ifree:ifree+Nodes%n_nodes_v2-1)=Max_v/Norm_v
+  X_min(ifree:ifree+Nodes%n_nodes_v2-1)=Min_v/Norm_v
   ifree=ifree+Nodes%n_nodes_v2
 ! Microturbulence
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%v_mic, &
@@ -141,6 +158,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_mic ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_mic2-1)=Node_values(1:Nodes%n_nodes_mic2)
   X_max(ifree:ifree+Nodes%n_nodes_mic2-1)=Max_mic/Norm_mic
+  X_min(ifree:ifree+Nodes%n_nodes_mic2-1)=Min_mic/Norm_mic
   ifree=ifree+Nodes%n_nodes_mic2
 ! Magnetic strength
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%b_long, &
@@ -149,6 +167,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_blong ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_blong2-1)=Node_values(1:Nodes%n_nodes_blong2)
   X_max(ifree:ifree+Nodes%n_nodes_blong2-1)=Max_blong/Norm_blong
+  X_min(ifree:ifree+Nodes%n_nodes_blong2-1)=Min_blong/Norm_blong
   ifree=ifree+Nodes%n_nodes_blong2
 ! Field
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%b_x, &
@@ -157,6 +176,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_bx ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_bx2-1)=Node_values(1:Nodes%n_nodes_bx2)
   X_max(ifree:ifree+Nodes%n_nodes_bx2-1)=Max_bx/Norm_bx
+  X_min(ifree:ifree+Nodes%n_nodes_bx2-1)=Min_bx/Norm_bx
   ifree=ifree+Nodes%n_nodes_bx2
 ! Field
   Call Compress_variable(npoints, Guess_model%ltau_500, Guess_model%b_y, &
@@ -165,6 +185,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   Node_values=Node_values/Norm_by ! Normalize these values.
   X(ifree:ifree+Nodes%n_nodes_by2-1)=Node_values(1:Nodes%n_nodes_by2)
   X_max(ifree:ifree+Nodes%n_nodes_by2-1)=Max_by/Norm_by
+  X_min(ifree:ifree+Nodes%n_nodes_by2-1)=Min_by/Norm_by
   ifree=ifree+Nodes%n_nodes_by2
 ! Abundances
   If (Nodes%n_nodes_ab2 .gt. 0) then
@@ -173,6 +194,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
              Ref%Abundance(Nodes%i_nodes_ab2(idx))
         X(ifree)=Node_values(idx)/Norm_ab
         X_max(ifree)=(Max_ab-Ref%Abundance(Nodes%i_nodes_ab2(idx)))/Norm_ab
+        X_min(ifree)=(Min_ab)/Norm_ab
         ifree=ifree+1
      End do
   End if

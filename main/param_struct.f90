@@ -19,7 +19,7 @@ Module Param_structure
      Integer :: max_inv_iters
      Integer :: n_points, n_lines, n_regions, ncycles
      Integer :: formal_solution, printout
-     Integer :: nPix, def_abund, speed, always_compute_deriv
+     Integer :: nPix, def_abund, speed, always_compute_deriv, cent_der
      Integer :: recompute_deriv, reference_cont
      Integer :: Skip_lambda, Reinterpolate
      Real :: SVD_threshold, heliocentric, helioazim

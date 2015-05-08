@@ -161,7 +161,7 @@ Program Nicole
   Read (headerunit, *) Input%maxinv
   Read (headerunit, *) Input%acceptchisq
   Read (headerunit, *) Params%speed
-  Read (headerunit, *) Params%always_compute_deriv
+  Read (headerunit, *) Params%always_compute_deriv,  Params%cent_der
   Read (headerunit, *) Gravity
   Read (headerunit, *) Params%Regularization
   Read (headerunit, *) Params%update_opac
