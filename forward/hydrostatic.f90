@@ -18,7 +18,7 @@ Subroutine Hydrostatic(Params, Atmo)
   Type (Model), Save :: Saved_Atmo
   Integer :: ipoint, npoints, iatom, iters
   Integer, Dimension(1) :: imin
-  Real, Parameter :: niters=30, Precision=1e-3
+  Real, Parameter :: niters=30, Precision=1e-5
   Real, Dimension (Params%n_points) :: Kappa, Tau, temp
   Real, Dimension (10) :: Pp
   Real, Parameter :: nu500 = cc/(5000.*1.e-8), Min_temp = 2500., &
