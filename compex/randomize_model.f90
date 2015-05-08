@@ -19,12 +19,12 @@ Subroutine Randomize_Model(Params, Nodes, ModelIn, ModelOut)
 
   If (Nodes%n_nodes_t .gt. 0) then
      Call Random_number(kk)
-     ModelOut%temp=ModelOut%temp + kk*100.
+     ModelOut%temp=ModelOut%temp + (kk-0.5)*600.
   End if
 
   If (Nodes%n_nodes_v .gt. 0) then
      Call Random_number(kk)
-     ModelOut%v_los=ModelOut%v_los + (kk-.5)*3.e5
+     ModelOut%v_los=ModelOut%v_los + (kk-.5)*5.e5
   End if
 
   If (Nodes%n_nodes_mic .gt. 0) then
