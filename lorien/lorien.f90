@@ -117,7 +117,7 @@ Contains
   Adjusted=.False.
   Params%Skip_lambda=1
 !
-  Pertur=0.01
+  Pertur=0.04
   Params%recompute_deriv=1
   Call Forward(Params, Line, Region, Guess_model, Syn_profile, .TRUE.)
   If (Debug_errorflags(flag_forward) .ge. 1) then
@@ -172,7 +172,7 @@ Contains
         Params%Recompute_deriv=1
      End if
 ! Refine derivatives
-     If (n_iter .ge. 5) Pertur=0.01
+     If (n_iter .ge. 3) Pertur=0.01
 !
      If (Chisq .lt. Last_accepted_chisq .or. Adjusted) then
         Last_accepted_chisq=Chisq
@@ -205,7 +205,7 @@ Contains
         If (Lambda .gt. 1.) Lambda=1.
         Call Printout(n_iter, Lambda, Chisq, NWChisq, Params%regularization*Regul, &
              Params, Line, Region,Trial_model, Trial_errors, Syn_profile, .False.)
-        If (Pertur .lt. 0.009) n_failed=n_failed+1
+        If (Pertur .lt. 0.039) n_failed=n_failed+1
         If (n_failed .eq. 1 .and. Params%recompute_deriv .eq. 0) then
            Params%recompute_deriv=1
            Call Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
@@ -213,7 +213,7 @@ Contains
                 DchiDx, D2ChiD2x)
         End if
      End if
-     If (n_failed .gt. 3 .and. Pertur .lt. 0.09) StopIter=.True.
+     If (n_failed .gt. 3 .and. Pertur .lt. 0.039) StopIter=.True.
      If (n_iter .ge. Params%max_inv_iters) StopIter=.True.
      n_iter=n_iter+1
   End do
