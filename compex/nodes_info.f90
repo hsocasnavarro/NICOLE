@@ -4,8 +4,8 @@ Use Model_structure
 ! temp is in K, v_los and v_mic are in cm/s, el_p and gas_p are in dyn/cm^2, 
 ! rho is in g/cm^3, b_long, b_x and b_y are in gauss
 ! v_mac is in cm/s, stray and ffactor are dimensionless (0 < stray < 1).
-  real, parameter :: Norm_t=500., Norm_v=1.e5, Norm_mic=1.e5, &
-       Norm_blong=500., Norm_bx=500., Norm_by=500., Norm_mac=1.e5, &
+  real, parameter :: Norm_t=4000., Norm_v=5.e5, Norm_mic=1.e5, &
+       Norm_blong=1000., Norm_bx=1000., Norm_by=1000., Norm_mac=1.e5, &
        Norm_stray=0.10, Norm_ffactor=0.10, Norm_ab=0.1
 !  real, parameter :: Max_t=30000., Max_v=2.e6, Max_mic=2.e6, &
 !       Max_b=10000., Max_inc=180., Max_azi=360., Max_mac=5.e5, &
@@ -19,7 +19,7 @@ Use Model_structure
   real, parameter :: Min_t=2500., Min_v=-2.e6, Min_mic=0., &
        Min_blong=-1e4, Min_bx=-1e4, Min_by=-1e4, Min_mac=0., &
        Min_stray=0., Min_ffactor=0., Min_ab=3.0
-  real, dimension(100) :: X_max
+  real, dimension(100) :: X_max, X_min
   real, dimension(12,100) :: UserNodeLocations
   Type Nodes_info
      integer :: n_nodes_t, n_nodes_v, n_nodes_mic, & ! Number of nodes 

@@ -7,7 +7,7 @@ Non-LTE Inversion COde using \\
 the Lorien Engine}
 
 \author{Hector Socas-Navarro,
-    Jaime de la Cruz \& Andr\'es Asensio Ramos \\
+    Jaime de la Cruz R. \& Andr\'es Asensio Ramos \\
 %High Altitude Observatory\\
 %3080 Center Green Dr (CG-1)\\
 %Boulder, CO (USA) 80301\\
@@ -667,7 +667,7 @@ mpirun -n 8 ./nicole
   Bellot Rubio, Ruiz Cobo and Collados Vera (1998), the Weakly
   Polarizing Media (WPM) approximation described in Trujillo Bueno \&
   S\'anchez Almeida (1999), DELO (Rees et al 1989), Bezier splines (De
-  la Cruz Rodr\'\i guez and Piscunov 2012) and short characteristics
+  la Cruz Rodr\'\i guez and Piskunov 2013) and short characteristics
   (Kunasz and Auer 1987). See the comments in the header of subroutine
   {\em formal\_solution} in forward/forward.f90 for details. The WPM
   approximation is faster, but not always applicable, while the
@@ -677,7 +677,9 @@ mpirun -n 8 ./nicole
   implemented in NICOLE, which will check at each wavelength whether
   WPM is suitable or not. If it is, it will be used. Otherwise, the
   cubic Bezier method is chosen. We strongly recommend you to leave
-  this value set to 0 (auto).
+  this value set to 0 (auto). Otherwise: 1-Cubic DeloBezier,
+  2-Cuadratic DeloBezier, 3-Bezier scalar, 4-Hermitian, 5-WPM,
+  6-DeloLinear, 7-DeloParabolic, 8-SC.
 \item Stray light file: (Optional). In real observations, especially
   when observing relatively dark structures such as sunspots, one
   normally has some amount of scattered light from the surrounding
@@ -729,6 +731,10 @@ mpirun -n 8 ./nicole
   step fails to improve the $\chi^2$ then the derivatives are
   recalculated. This will save some time and often works almost as
   good as when recalculating the derivatives.
+\item Centered derivatives: (Optional, default=0). If set to 1, the
+  code will compute response functions using \emph{centered}
+  derivatives with respect to each parameter. It is more accurate, but
+  the inversion becomes almost a factor $\times2$ slower. 
 \item Gravity: (Optional, default= 2.7414e+4). Surface gravity (in
   cm~s$^{-2}$). If not specified, the solar value is adopted.
 \item Regularization: (Optional, default=1.0). During inversion

@@ -3418,9 +3418,9 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
          dt1 = dtau_nu(kd)
          der1 = (x(kd) - x(k)) / dt1
          if(der*der1 .gt. 0.0d0) then
-            !lambda = (1.0+dt1/(dt+dt1))/3.0d0
-            !xp(k) = DER/(LAMBDA*DER1+(1.0d0-LAMBDA)*DER)*DER1
-            xp(k) = (der * dt1 + der1*dt) / (dt+dt1)
+            lambda = (1.0+dt1/(dt+dt1))/3.0d0
+            xp(k) = DER/(LAMBDA*DER1+(1.0d0-LAMBDA)*DER)*DER1
+            !xp(k) = (der * dt1 + der1*dt) / (dt+dt1)
          else
             xp(k) = 0.0d0
          end if
@@ -3444,7 +3444,7 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
             ctu = ( (x0 - 0.5d0 * dt * xp(k))  +  (xu + 0.5d0 * dt * xp(ku)) ) * 0.5d0
          endif
 
-         if(ctu .gt. max(x0, xu) .or. (ctu .lt. min(x0,xu)) .or. (ctu .lt. 0.d0)) ctu = xu
+         !if(ctu .gt. max(x0, xu) .or. (ctu .lt. min(x0,xu)) .or. (ctu .lt. 0.d0)) ctu = xu
 
          dtau_nu(k) = dt * (ctu + x0 + xu) * cmu03
       enddo
@@ -3601,19 +3601,23 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
             !Max/Min in the source function
             cp = S0
          Else
-            sp = (dt*der1 + dt1 * der) / (dt + dt1)
+            !sp = (dt*der1 + dt1 * der) / (dt + dt1)
+            !double lambda = (1.0 + dzd / (dzd + dzu)) / 3.0;
+            ! dki = (deu / (lambda * ded + (1.0 - lambda) * deu)) * ded;
+            lambda = (1.0d0 + dt1 / (dt + dt1)) / 3.0d0;
+            sp = (der / (lambda * der1 + (1.0 - lambda) * der)) * der1;
             cp = S0 - 0.5d0 * dt * sp
             !
-            if((cp .le. max(S0,Su)) .AND. (cp .ge. min(S0,Su))) then  ! Normal case
-               cp1 = S0 + 0.5d0 * dt1 * sp 
-               if(cp1 .gt. max(S0,Sd) .or. (cp1 .lt. min(S0,Sd))) then ! Overshooting in downwind interval
-                  !
-                  sp = 2.d0 * (Sd - S0)/dt1
-                  cp = S0 - dt * 0.5d0 * sp
-               endif
-            Else ! Overshooting in the upwind interval
-               cp = Su
-            endif
+           ! if((cp .le. max(S0,Su)) .AND. (cp .ge. min(S0,Su))) then  ! Normal case
+           !    cp1 = S0 + 0.5d0 * dt1 * sp 
+           !    if(cp1 .gt. max(S0,Sd) .or. (cp1 .lt. min(S0,Sd))) then ! Overshooting in downwind interval
+           !       !
+           !       sp = 2.d0 * (Sd - S0)/dt1
+           !       cp = S0 - dt * 0.5d0 * sp
+           !    endif
+           ! Else ! Overshooting in the upwind interval
+           !    cp = Su
+           ! endif
          endif
 
          dI = S0 * c0 + Su * cu + cp * cd

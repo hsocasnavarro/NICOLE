@@ -117,7 +117,7 @@ Contains
   Adjusted=.False.
   Params%Skip_lambda=1
 !
-  Pertur=0.1
+  Pertur=0.04
   Params%recompute_deriv=1
   Call Forward(Params, Line, Region, Guess_model, Syn_profile, .TRUE.)
   If (Debug_errorflags(flag_forward) .ge. 1) then
@@ -172,7 +172,7 @@ Contains
         Params%Recompute_deriv=1
      End if
 ! Refine derivatives
-     If (n_iter .ge. 5) Pertur=0.01
+     If (n_iter .ge. 3) Pertur=0.01
 !
      If (Chisq .lt. Last_accepted_chisq .or. Adjusted) then
         Last_accepted_chisq=Chisq
@@ -205,7 +205,7 @@ Contains
         If (Lambda .gt. 1.) Lambda=1.
         Call Printout(n_iter, Lambda, Chisq, NWChisq, Params%regularization*Regul, &
              Params, Line, Region,Trial_model, Trial_errors, Syn_profile, .False.)
-        If (Pertur .lt. 0.09) n_failed=n_failed+1
+        If (Pertur .lt. 0.039) n_failed=n_failed+1
         If (n_failed .eq. 1 .and. Params%recompute_deriv .eq. 0) then
            Params%recompute_deriv=1
            Call Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
@@ -213,7 +213,7 @@ Contains
                 DchiDx, D2ChiD2x)
         End if
      End if
-     If (n_failed .gt. 3 .and. Pertur .lt. 0.09) StopIter=.True.
+     If (n_failed .gt. 3 .and. Pertur .lt. 0.039) StopIter=.True.
      If (n_iter .ge. Params%max_inv_iters) StopIter=.True.
      n_iter=n_iter+1
   End do
@@ -283,11 +283,19 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
   Real, Dimension (:), Allocatable, SAVE :: DChiDx_saved
   Real, Dimension (:,:), Allocatable, SAVE :: Dydx_saved, D2ChiD2x_saved
   Real, Dimension (Params%n_data) :: Obs_Profile, Syn_Profile, Pert_profile, &
-       Sigma
+       Sigma, pert_profile1
   Real, Dimension (Params%n_free_parameters) :: X
-  Real :: OldX, Chisq0, Chisq, NWChisq, Sigma2, Pertur, Regul, Pert_Regul
+  Real :: OldX, Chisq0, Chisq, NWChisq, Sigma2, Pertur, Regul, Pert_Regul, &
+       Xsave, Chisq1, pert_regul1
   Integer :: i_param, j_param, i_data, ndata
-  Logical :: ForwError
+  Logical :: ForwError, centder
+
+  if(Params%cent_der .EQ. 0) then
+     centder = .false.
+  else
+     centder = .true.
+  endif
+  
 !
   Call Time_routine('compute_dchisq_dx',.True.)
   Debug_errorflags(flag_dchisq_dx)=0
@@ -313,30 +321,90 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
      Do i_param=1,Params%n_free_parameters
         If (params%printout .ge. 3) print *,'Computing deriv of parameter:',i_param
         If (Brute_force(i_param)) then
-           OldX=X(i_param)
-           If (X(i_param)+Pertur .lt. X_max(i_param)) then
-              X(i_param)=X(i_param)+Pertur ! X is dimensionless and ~1
-           Else
-              X(i_param)=X(i_param)-Pertur 
-           End if
-           Call Expand(Params, Nodes, X, Pert_atmo)
-           Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
-           If (Params%TwoComp) & 
-                Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
-           Call Forward(Params, Line, Region, Pert_atmo, Pert_profile, &
-                .TRUE.)
-           If (Debug_errorflags(flag_forward) .ge. 1) &
-                Debug_errorflags(flag_dchisq_dx)=1
-           Call Compute_chisq(Params, Obs_profile, Pert_profile, Sigma, &
-                Nodes, Pert_atmo, Chisq, NWChisq, Pert_regul)
-           DChiDx(i_param)=(Chisq-Chisq0)/(X(i_param)-OldX)
-           Do i_data=1,Params%n_data
-              Dydx(i_data, i_param)=(Pert_profile(i_data)-Syn_Profile(i_data))/ &
-                   (X(i_param)-OldX)
-           End do
-           DRegulDx(i_param)=Params%regularization* &
-                (Pert_Regul-Regul)/(X(i_param)-OldX)
-           X(i_param)=OldX
+           if(.not.centder) then
+              OldX=X(i_param)
+              If (X(i_param)+Pertur .lt. X_max(i_param)) then
+                 X(i_param)=X(i_param)+Pertur ! X is dimensionless and ~1
+              Else
+                 X(i_param)=X(i_param)-Pertur 
+              End if
+              Call Expand(Params, Nodes, X, Pert_atmo)
+              Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
+              If (Params%TwoComp) & 
+                   Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
+              Call Forward(Params, Line, Region, Pert_atmo, Pert_profile, &
+                   .TRUE.)
+              If (Debug_errorflags(flag_forward) .ge. 1) &
+                   Debug_errorflags(flag_dchisq_dx)=1
+              Call Compute_chisq(Params, Obs_profile, Pert_profile, Sigma, &
+                   Nodes, Pert_atmo, Chisq, NWChisq, Pert_regul)
+              DChiDx(i_param)=(Chisq-Chisq0)/(X(i_param)-OldX)
+              Do i_data=1,Params%n_data
+                 Dydx(i_data, i_param)=(Pert_profile(i_data)-Syn_Profile(i_data))/ &
+                      (X(i_param)-OldX)
+              End do
+              DRegulDx(i_param)=Params%regularization* &
+                   (Pert_Regul-Regul)/(X(i_param)-OldX)
+              X(i_param)=OldX
+           else !cent_der
+              xsave = X(i_param)
+              !
+              ! perturb parameter "up"
+              !
+              X(i_param)=X(i_param) + Pertur * 0.5                
+              if(X(i_param) .LE. X_max(i_param)) then
+                 Call Expand(Params, Nodes, X, Pert_atmo)
+                 Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
+                 If (Params%TwoComp) & 
+                      Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
+                 Call Forward(Params, Line, Region, Pert_atmo, Pert_profile, &
+                      .TRUE.)
+                 If (Debug_errorflags(flag_forward) .ge. 1) &
+                      Debug_errorflags(flag_dchisq_dx)=1
+                 Call Compute_chisq(Params, Obs_profile, Pert_profile, Sigma, &
+                      Nodes, Pert_atmo, Chisq, NWChisq, Pert_regul)
+              else
+                 pert_profile = Syn_profile
+                 X(i_param) = Xsave
+                 Chisq = Chisq0
+                 pert_regul = regul
+              endif !up
+              OldX=X(i_param)
+              
+              !
+              ! perturb parameter "down"
+              !
+              X(i_param) = Xsave - Pertur * 0.5                
+              if(X(i_param) .GE. X_min(i_param)) then
+                 Call Expand(Params, Nodes, X, Pert_atmo)
+                 Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
+                 If (Params%TwoComp) & 
+                      Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
+                 Call Forward(Params, Line, Region, Pert_atmo, Pert_profile1, &
+                      .TRUE.)
+                 If (Debug_errorflags(flag_forward) .ge. 1) &
+                      Debug_errorflags(flag_dchisq_dx)=1
+                 Call Compute_chisq(Params, Obs_profile, Pert_profile1, Sigma, &
+                      Nodes, Pert_atmo, Chisq1, NWChisq, Pert_regul1)
+              else
+                 pert_profile1 = Syn_profile
+                 X(i_param) = Xsave
+                 Chisq1 = Chisq0
+                 pert_regul1 = regul
+              endif !down
+
+              DChiDx(i_param)=(Chisq-Chisq1)/(OldX - X(i_param))
+              Do i_data=1,Params%n_data
+                 Dydx(i_data, i_param)=(Pert_profile(i_data)-Pert_Profile1(i_data))/ &
+                      (OldX-X(i_param))
+              End do
+              DRegulDx(i_param)=Params%regularization* &
+                   (Pert_Regul-Pert_Regul1)/(OldX-X(i_param))
+              ! Restore value
+              X(i_param)=Xsave
+              
+              
+              endif !cent_der
         Else
            Print *,'Stop in compute_dydx'
            Stop
