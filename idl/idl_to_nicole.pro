@@ -40,8 +40,8 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
         ny=(size(m.t))(2)
         nz=(size(m.t))(3)
      endelse
-     if not keyword_set(indx) then indx=indgen(nx)
-     if not keyword_set(indy) then indy=indgen(ny)
+     if n_elements(indx) eq 0 then indx=indgen(nx)
+     if n_elements(indy) eq 0 then indy=indgen(ny)
      npix=long(nx)*long(ny)
      nnx=n_elements(indx)
      nny=n_elements(indy)
@@ -101,8 +101,8 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
      openw,iunit,fileprof,/get_lun,/swap_if_big
      nx=(size(i))(1)
      ny=(size(i))(2)
-     if not keyword_set(indx) then indx=indgen(nx)
-     if not keyword_set(indy) then indy=indgen(ny)
+     if n_elements(indx) eq 0 then indx=indgen(nx)
+     if n_elements(indy) eq 0 then indy=indgen(ny)
      npix=long(nx)*long(ny)
      nnx=n_elements(indx)
      nny=n_elements(indy)
