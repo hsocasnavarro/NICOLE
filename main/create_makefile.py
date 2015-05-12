@@ -438,8 +438,6 @@ if modpath == None: # Try to autodetect modpath option
     f.write('use modu\nend\n')
     f.close()    
     os.chdir(scratch_dir+dirsep+'modu')
-    print 'tm=',scratch_dir
-    a=raw_input('aaa')
     try:
         retcode=subprocess.call([compiler,cswitch,'modu.f90'],stdout=fnull,stderr=fnull)
     except:
