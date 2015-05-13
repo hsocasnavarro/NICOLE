@@ -14,24 +14,24 @@
 \contentsline {subsection}{\numberline {3.1.4}The model atmosphere file}{29}
 \contentsline {subsubsection}{ASCII}{29}
 \contentsline {subsubsection}{IDL savefile}{30}
-\contentsline {subsubsection}{NICOLE native format}{30}
-\contentsline {subsection}{\numberline {3.1.5}The instrumental profile file (optional)}{31}
+\contentsline {subsubsection}{NICOLE native format}{31}
+\contentsline {subsection}{\numberline {3.1.5}The instrumental profile file (optional)}{32}
 \contentsline {subsection}{\numberline {3.1.6}The departure coefficients file (optional)}{32}
 \contentsline {subsection}{\numberline {3.1.7}Running NICOLE in synthesis mode}{33}
-\contentsline {subsection}{\numberline {3.1.8}The profile file}{34}
-\contentsline {subsubsection}{ASCII}{34}
+\contentsline {subsection}{\numberline {3.1.8}The profile file}{35}
+\contentsline {subsubsection}{ASCII}{35}
 \contentsline {subsubsection}{IDL savefile}{35}
 \contentsline {subsubsection}{NICOLE native format}{35}
 \contentsline {section}{\numberline {3.2}The inversion mode}{36}
 \contentsline {subsection}{\numberline {3.2.1}Setting the input parameters}{36}
 \contentsline {subsection}{\numberline {3.2.2}Running NICOLE in inversion mode}{36}
-\contentsline {subsection}{\numberline {3.2.3}Inversion weights}{37}
+\contentsline {subsection}{\numberline {3.2.3}Inversion weights}{38}
 \contentsline {subsection}{\numberline {3.2.4}Changing the default number of nodes}{38}
 \contentsline {subsection}{\numberline {3.2.5}Monitoring the inversion}{38}
 \contentsline {subsection}{\numberline {3.2.6}The error bars}{38}
 \contentsline {subsection}{\numberline {3.2.7}The file maskinvert.dat}{39}
 \contentsline {subsection}{\numberline {3.2.8}Tips for successful inversions}{39}
-\contentsline {subsection}{\numberline {3.2.9}Restarting an inversion}{39}
+\contentsline {subsection}{\numberline {3.2.9}Restarting an inversion}{40}
 \contentsline {subsection}{\numberline {3.2.10}Debugging and profiling}{40}
 \contentsline {chapter}{\numberline {4}Compiling NICOLE}{43}
 \contentsline {section}{\numberline {4.1}Creating the makefile}{43}

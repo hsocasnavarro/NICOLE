@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2014.7.27)  9 DEC 2014 18:25
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2014.7.27)  13 MAY 2015 12:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -118,7 +118,7 @@ LaTeX Font Info:    Try loading font information for U+lasy on input line 26.
 (/usr/share/texlive/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-Overfull \hbox (27.83704pt too wide) in paragraph at lines 26--26
+Overfull \hbox (43.66466pt too wide) in paragraph at lines 26--26
  [][] 
  []
 
@@ -166,91 +166,93 @@ Overfull \hbox (0.91536pt too wide) in paragraph at lines 655--662
 on). Name
  []
 
-[19]
-Overfull \hbox (1.13759pt too wide) in paragraph at lines 732--734
+[19] [20]
+Overfull \hbox (1.13759pt too wide) in paragraph at lines 738--740
 []\OT1/cmr/m/n/10 Gravity: (Op-tional, de-fault= 2.7414e+4). Sur-face grav-ity 
 (in cm s$[]$).
  []
 
-[20]
 Missing character: There is no Ã in font cmr10!
 Missing character: There is no ¨ in font cmr10!
- [21] [22] [23] [24] [25]
-Overfull \hbox (31.78189pt too wide) in paragraph at lines 977--977
+[21] [22] [23] [24] [25]
+Overfull \hbox (31.78189pt too wide) in paragraph at lines 983--983
 []\OT1/cmtt/m/n/10 #   Commented in parenthesis are default values for differen
 t cycles[] 
  []
 
 [26]
-Overfull \hbox (2.27646pt too wide) in paragraph at lines 1008--1009
+Overfull \hbox (2.27646pt too wide) in paragraph at lines 1014--1015
 []\OT1/cmr/m/n/10 NMU: (Op-tional, de-fault=3). Num-ber of points in the an-gu-
 lar quadra-
  []
 
 [27]
-Overfull \hbox (21.92458pt too wide) in paragraph at lines 1047--1050
+Overfull \hbox (21.92458pt too wide) in paragraph at lines 1053--1056
 []\OT1/cmr/m/n/10 Finally, we can op-tion-ally have a sec-tion about abun-dance
 s in NICOLE.input.
  []
 
-[28]
-Overfull \hbox (5.38739pt too wide) in paragraph at lines 1144--1156
+[28] [29]
+Overfull \hbox (5.38739pt too wide) in paragraph at lines 1150--1162
 []\OT1/cmr/m/n/10 The fol-low-ing lines de-scribe the depth-dependence of the m
 odel. NICOLE
  []
 
-[29] [30]
-Overfull \hbox (15.28586pt too wide) in paragraph at lines 1196--1216
+[30]
+Overfull \hbox (15.28586pt too wide) in paragraph at lines 1202--1222
 \OT1/cmr/m/n/10 b[]local[]y(1:nz), b[]local[]z(1:nz), v[]local[]x(1:nz), v[]loc
 al[]y(1:nz), v[]local[]z(1:nz),
  []
 
 [31] [32]
 
-LaTeX Warning: Reference `nicinp' on page 33 undefined on input line 1334.
+LaTeX Warning: Reference `nicinp' on page 33 undefined on input line 1340.
 
 [33]
-Overfull \hbox (7.903pt too wide) in paragraph at lines 1372--1384
+Overfull \hbox (7.903pt too wide) in paragraph at lines 1378--1390
 \OT1/cmr/m/n/10 plained in sec-tion 3.1.8[] be-low. You can read it in IDL with
  the read[]profile.pro
  []
 
 [34] [35] [36]
-Overfull \hbox (9.45218pt too wide) in paragraph at lines 1549--1559
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [37]
+Overfull \hbox (9.45218pt too wide) in paragraph at lines 1555--1565
 []\OT1/cmr/m/n/10 The de-fault weights can be over-rid-den by cre-at-ing a file
  named Weights.pro
  []
 
-[37] [38] [39] [40] [41] [42]
+[38] [39] [40] [41] [42]
 Chapter 4.
 [43
 
 ]
-Overfull \hbox (14.88521pt too wide) in paragraph at lines 1852--1855
+Overfull \hbox (14.88521pt too wide) in paragraph at lines 1858--1861
 \OT1/cmr/m/n/10 This can make NICOLE crash un-der some cir-cum-stances. A sim-p
 le workaround
  []
 
 
-Overfull \hbox (5.53212pt too wide) in paragraph at lines 1857--1857
+Overfull \hbox (5.53212pt too wide) in paragraph at lines 1863--1863
 []\OT1/cmtt/m/n/10 ./create_makefile.py --otherflags='-fast -O3 -heap-arrays 16
 00'[] 
  []
 
 [44]
-Overfull \hbox (0.28217pt too wide) in paragraph at lines 1894--1894
+Overfull \hbox (0.28217pt too wide) in paragraph at lines 1900--1900
 []\OT1/cmtt/m/n/10 ./run_tests.py --nicolecommand='mpirun -n 8 ../../main/nicol
 e'[] 
  []
 
 
-Overfull \hbox (5.53212pt too wide) in paragraph at lines 1914--1914
+Overfull \hbox (5.53212pt too wide) in paragraph at lines 1920--1920
 []\OT1/cmtt/m/n/10 ./run_nicole.py --nicolecommand='mpirun -n 2 ../../main/nico
 le'[] 
  []
 
 [45] [46]
-Overfull \hbox (0.28217pt too wide) in paragraph at lines 1984--1984
+Overfull \hbox (0.28217pt too wide) in paragraph at lines 1990--1990
 []\OT1/cmtt/m/n/10 ./create_makefile.py --compiler=ifort --otherflags='-fast -r
 8'[] 
  []
@@ -260,7 +262,7 @@ Overfull \hbox (0.28217pt too wide) in paragraph at lines 1984--1984
 ]
 Chapter 5.
 [49] [50] [51] [52] [53] [54] [55] [56] [57] [58] [59] [60]
-Overfull \hbox (0.28217pt too wide) in paragraph at lines 3005--3005
+Overfull \hbox (0.28217pt too wide) in paragraph at lines 3011--3011
 []\OT1/cmtt/m/n/10 ....................................../main/phys_constants.f
 90[] 
  []
@@ -270,7 +272,7 @@ Overfull \hbox (0.28217pt too wide) in paragraph at lines 3005--3005
 ]
 Chapter 6.
 
-Overfull \hbox (17.56029pt too wide) detected at line 3044
+Overfull \hbox (17.56029pt too wide) detected at line 3050
 \OML/cmm/m/it/10 ^^N\OT1/cmr/m/n/10 ([] \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 ) =
  \OMS/cmsy/m/n/10 ^^@ [] \OML/cmm/m/it/10 ^^M^^N^^M \OT1/cmr/m/n/10 = [] \OML/c
 mm/m/it/10 ^^M[] [] ^^_[] [] ^^R^^N^^M[] \OMS/cmsy/m/n/10 ^^@ [] \OML/cmm/m/it/
@@ -281,7 +283,7 @@ mm/m/it/10 ^^M[] [] ^^_[] [] ^^R^^N^^M[] \OMS/cmsy/m/n/10 ^^@ [] \OML/cmm/m/it/
 [75] [76]
 Chapter 7.
 
-Overfull \hbox (30.53215pt too wide) in paragraph at lines 3079--3079
+Overfull \hbox (30.53215pt too wide) in paragraph at lines 3085--3085
  []\OT1/cmtt/m/n/10 ./create_makefile --compiler='/absolutepathtoyourmpi/bin/mp
 if90[] 
  []
@@ -289,7 +291,7 @@ if90[]
 [77
 
 ] [78]
-Overfull \hbox (2.26549pt too wide) in paragraph at lines 3137--3139
+Overfull \hbox (2.26549pt too wide) in paragraph at lines 3143--3145
 []\OT1/cmr/bx/n/10 I mod-i-fied the source code and now some-thing is go-ing wr
 ong.
  []
@@ -316,4 +318,4 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  23i,7n,21p,169b,252s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on manual.dvi (84 pages, 210124 bytes).
+Output written on manual.dvi (84 pages, 210644 bytes).
