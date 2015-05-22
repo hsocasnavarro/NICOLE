@@ -22,7 +22,7 @@ inversion.model_2
 1    ! maxinv 
 10     ! acceptchisq
 1     ! speed 
-1     ! always_compute_der 
+1 0     ! always_compute_der, centered_derivatives 
 2.7414e+4     ! gravity 
 1.e-3     ! regularization 
 10    ! update_opac 
@@ -37,8 +37,8 @@ T     T   0   ! sethydro, setnH, restart
 1   ! depcoef 
 6   ! nlines 
 2    ! nregions 
-6300. 0.02 100 1.0 1 1.0
-10825 0.04 100 1.0 1 1.0
+6300. 0.02 100 1.0 1 1.0 0.0
+10825 0.04 100 1.0 1 1.0 0.0
 2.0 O 1 6300.3040 1.0 0.0000 -9.7127 P 5 2.0 D 5 2.0 3 -1 -1 0.00 0.05 1.00  0 1.0 1.0 F 0 0 0 0 0 0
 2.0 NI 1 6300.335 3.0 4.2660 -2.253 P 5 1.0 D 5 0.0 3 -1 -1 2.63 0.054 1.82  0 1.0 1.0 F 0 0 0 0 0 0
 2.0 NI 1 6300.355 3.0 4.2660 -2.663 P 5 1.0 D 5 0.0 3 -1 -1 2.63 0.054 1.82  0 1.0 1.0 F 0 0 0 0 0 0

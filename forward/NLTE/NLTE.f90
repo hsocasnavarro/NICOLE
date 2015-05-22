@@ -3393,8 +3393,8 @@ Subroutine FormalSolution(NLTE, imu, inu, itran, iformal, X, S, RNu, P, LStMuNu,
       
       do k = boundup, boundlow
        !  print *, rlu(k),  lstmunu(k)
-         lstmunu(k) = min(1.0d0 , lstmunu(k))
-         lstmunu(k) = max(1.d-12, lstmunu(k))
+         lstmunu(k) = min(1.0 , lstmunu(k))
+         lstmunu(k) = max(1.e-12, lstmunu(k))
       end do
       !
  end subroutine bezier_nlte

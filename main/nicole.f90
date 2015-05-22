@@ -1,4 +1,4 @@
-!                      N I C O L E   v 14.12
+!                      N I C O L E   v 15.05
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -72,7 +72,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 14.12 ******************'
+     Print *,'*************** N I C O L E   v 15.05 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -147,7 +147,7 @@ Program Nicole
   Read (headerunit, *) Input%maxinv
   Read (headerunit, *) Input%acceptchisq
   Read (headerunit, *) Params%speed
-  Read (headerunit, *) Params%always_compute_deriv
+  Read (headerunit, *) Params%always_compute_deriv,  Params%cent_der
   Read (headerunit, *) Gravity
   Read (headerunit, *) Params%Regularization
   Read (headerunit, *) Params%update_opac

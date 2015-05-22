@@ -4,7 +4,7 @@ Subroutine MyFlush(iunit)
 ! the current compiler does not support the intrinsic Flush() call
 Integer :: iunit
 !
-   Call Flush(iunit)
+   
 !
    Return
 !
