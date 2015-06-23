@@ -1438,7 +1438,7 @@ for icycle in range(int(ncycles)):
     f.write(nodesvmac+' ! Nodes in v_mac \n')
     f.write(nodesexp+' ! Nodes in ffactor \n')
     nab=0
-    if nodesab != '-1': 
+    if nodesab != '-1' and nodesab != '0': 
         nodesab=nodesab.lower()
         nodesab=nodesab.split(" ")
         nab=len(nodesab)
