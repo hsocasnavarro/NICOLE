@@ -172,8 +172,8 @@ Contains
        Deallocate (Data_swapped)
     End if
     DataOut=Data 
-    If (iost .ne. 0) &
-         Print *,'ERROR!!! I/O error ',iost,' in direct read from unit ',iunit
+    !If (iost .ne. 0) &
+    !     Print *,'ERROR!!! I/O error ',iost,' in direct read from unit ',iunit
     !
   End Subroutine Read_direct
 
