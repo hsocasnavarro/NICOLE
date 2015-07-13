@@ -20,9 +20,9 @@ Module NLTE_Atom_structure
 !
 ! Variable names are reminiscent of those used in Carlsson's MULTI:
 ! However, some MULTI features are not supported here for simplicity:
-!    IW .ne. 0 is not supported
+!    IW .eq. 1 is not supported
 !    ITRAD .eq. 4 is not supported
-  Integer, Parameter :: MaxNFreqs=3000
+  Integer, Parameter :: MaxNFreqs=3000, MaxNTERMS=100, MaxNLIN=1000
   Integer, Parameter :: MaxNColStrings=5000
 !
   Type NLTE_Atom
@@ -109,6 +109,10 @@ Module NLTE_Atom_structure
      Character (Len=6) :: ColRoutine
      Integer :: NColStrings
      Character (Len=500), Dimension(MaxNColStrings) :: ColStr
+! For multiple terms
+     Real, Dimension(MaxNTERMS) :: DETERM, WTERM, FTERM, GATERM, GWTERM, GQTERM
+     Integer, Dimension(MaxNLIN) :: NTERM
+     Integer, Dimension(MaxNTERMS,MaxNLIN) :: KTERM
   End Type NLTE_Atom
 !
 End Module NLTE_Atom_structure
@@ -635,8 +639,9 @@ Subroutine Read_atom(Atom)
   Type (NLTE_Atom) :: Atom
   Character (len=256) :: String
   Character (len=254) :: char_stage
-  Integer :: fileunit, i, iw, lvlswap, i0, inu
+  Integer :: fileunit, i, iw, lvlswap, i0, inu, itrm, KTRM
   Logical :: End, Error
+  Logical, Save :: WarningIssued=.False.
 !
   Call Open_file(fileunit, 'ATOM')
   Call Read_next_nocomment(fileunit, String, End)
@@ -657,6 +662,7 @@ Subroutine Read_atom(Atom)
      Read (String,*) Atom%cm_1(i), Atom%g(i), Atom%lvl_label(i), Atom%ion(i)
   End Do
   Atom%eV(:)=Atom%cm_1(:)*cc*hh/ee
+  KTRM=0
   Do i=1, Atom%NLIN ! Read b-b transition information
      Call Read_next_nocomment(fileunit, String, End)
      Read (String,*) Atom%j(i), Atom%i(i), Atom%f(i), Atom%NQ(i), &
@@ -666,7 +672,35 @@ Subroutine Read_atom(Atom)
         Print *,'MaxNFreqs=',MaxNFreqs,' in NLTE_Atom_structure'
         Stop
      End if
-     If (Atom%QMAX(i) .lt. 0 .or. Atom%Q0(i) .lt. 0 .or. iw .lt. 0) then
+     If (Atom%QMax(i) .lt. 0) then
+        Do inu=1, Atom%NQ(i0)
+           Call Read_next_nocomment(fileunit, String, End)
+           Read (String,*) Atom%Q(inu, i)
+        End do
+     End if
+     If (iw .ge. 2) then
+        If (.not. WarningIssued) then
+           Print *,'Warning. Reading multiple term transition in model atom, line transition:',i
+           Print *,"This doesn't work exactly as in MULTI because the term structure is ignored"
+           Print *,' for the damping calculation. Should be viewed as an approximation'
+           WarningIssued=.True.
+        End if
+        
+        Do itrm=1, iw
+           KTRM=KTRM+1
+           If (KTRM .gt. MaxNTERMS) then
+              Print *,'NTERM too large ',KTRM,' compared to maximum dimension'
+              Print *,'in NLTE_Atom_structure MaxNTERMS=',MaxNTERMS
+              Stop
+           End if
+           Call Read_next_nocomment(fileunit, String, End)
+           Atom%KTERM(itrm,i)=KTRM
+           Read (String,*) Atom%DETERM(KTRM),Atom%WTERM(KTRM),Atom%FTERM(KTRM), &
+                Atom%GATERM(KTRM),Atom%GWTERM(KTRM),Atom%GQTERM(KTRM)
+           
+        End Do
+     End if
+     If (Atom%Q0(i) .lt. 0 .or. iw .eq. 1) then
         Print *,'MULTI feature not supported in model atom'
         Print *,'Line ransition ',i
         Stop
@@ -3882,31 +3916,33 @@ Subroutine FreqQuad(Atom, NLTEInput)
 ! Line transitions
 !
   Do itran=1, Atom%NLIN
-     ncore=(Atom%NQ(itran)-1)/2 ! One point is for line center (Q=0)
-     nwing=Atom%NQ(itran)-ncore
-     if (Atom%QMax(itran) .eq. Atom%Q0(itran)) then ! All is equispaced
-        ncore=Atom%NQ(itran)
-        nwing=0
-     End if
+     If (Atom%QMax(itran) .ge. 0) then ! If Qmax < 0, Q has been read from file
+        ncore=(Atom%NQ(itran)-1)/2 ! One point is for line center (Q=0)
+        nwing=Atom%NQ(itran)-ncore
+        if (Atom%QMax(itran) .eq. Atom%Q0(itran)) then ! All is equispaced
+           ncore=Atom%NQ(itran)
+           nwing=0
+        End if
 !
 ! Symmetric profile, consider only 1 side
 !
 ! core
-     Atom%Q(1,itran)=0. ! line center
-     If (ncore .gt. 1) then
-        DX=Atom%Q0(itran)/(ncore-1)
-        Do ix=1, ncore-1
-           Atom%Q(ix+1,itran)=ix*DX
-        End do
-     End if
+        Atom%Q(1,itran)=0. ! line center
+        If (ncore .gt. 1) then
+           DX=Atom%Q0(itran)/(ncore-1)
+           Do ix=1, ncore-1
+              Atom%Q(ix+1,itran)=ix*DX
+           End do
+        End if
 ! wing
-     if (nwing .gt. 0) then
-        DX=( Log10(Atom%QMAX(itran))-Log10(Atom%Q0(itran)) )/ & 
-             (nwing)
-        Do ix=1, nwing
-           Atom%Q(ncore+ix,itran)=10.**(Log10(Atom%Q0(itran))+(ix)*DX)
-        End do
-     End if
+        if (nwing .gt. 0) then
+           DX=( Log10(Atom%QMAX(itran))-Log10(Atom%Q0(itran)) )/ & 
+                (nwing)
+           Do ix=1, nwing
+              Atom%Q(ncore+ix,itran)=10.**(Log10(Atom%Q0(itran))+(ix)*DX)
+           End do
+        End if
+     End if ! End if in Qmax .ge. 0
 !
 ! Asymmetric profile, consider both sides
 !
@@ -4215,8 +4251,8 @@ Subroutine VoigtProfs(NLTE, NLTEInput, Atom)
   Type (NLTE_input) :: NLTEInput
   Type (Line_data) :: Line
   Real, Dimension (NLTE%NDEP) :: Phi
-  Real :: WQMU, xlam, DlDop, DlDopcms, DlDopkms, Damp, H, F
-  Integer :: itran, imu, inu, idepth, nwave
+  Real :: WQMU, xlam, DlDop, DlDopcms, DlDopkms, Damp, H, F, dqterm
+  Integer :: itran, imu, inu, idepth, nwave, itrm, ktrm
 !
   Call RewindVirtualFile('PHI')
   NLTE%WPhi(:,:)=0.
@@ -4241,11 +4277,24 @@ Subroutine VoigtProfs(NLTE, NLTEInput, Atom)
                  Call Damping(Line, NLTE%Atmo%Temp(idepth), &
                       NLTE%Atmo%El_p(idepth), NLTE%Atmo%Gas_P(idepth), &
                       DlDop, Damp, Atom%GA(itran), Atom%GQ(itran))
-                 xlam=Atom%Q(inu,itran)*NLTEInput%QNORM/DlDopkms
-                 xlam=xlam-NLTE%XMu(imu)*NLTE%Atmo%v_los(idepth)/&
-                      DlDopcms ! Wlength in Doppler units (dimensionless)
-                 H=voigt(Damp, xlam, 0)
-                 Phi(idepth)=H/(DlDopkms/NLTEInput%QNORM*SqrtPi)
+                 If (Atom%Nterm(itran) .le. 1) then
+                    xlam=Atom%Q(inu,itran)*NLTEInput%QNORM/DlDopkms
+                    xlam=xlam-NLTE%XMu(imu)*NLTE%Atmo%v_los(idepth)/&
+                         DlDopcms ! Wlength in Doppler units (dimensionless)
+                    H=voigt(Damp, xlam, 0)
+                    Phi(idepth)=H/(DlDopkms/NLTEInput%QNORM*SqrtPi)
+                 Else
+                    Phi(idepth)=0.
+                    Do itrm=1,Atom%Nterm(itran)
+                       KTRM=Atom%KTERM(itrm,itran)
+                       dqterm=Atom%DETERM(ktrm)*Atom%alamb(itran)*1.e-13*cc/NLTEInput%QNORM
+                       xlam=(Atom%Q(inu,itran)-dqterm)*NLTEInput%QNORM/DlDopkms
+                       xlam=xlam-NLTE%XMu(imu)*NLTE%Atmo%v_los(idepth)/&
+                            DlDopcms ! Wlength in Doppler units (dimensionless)
+                       Phi(idepth)=Phi(idepth)+Atom%Wterm(ktrm)*H
+                    End do
+                    Phi(idepth)=H/(DlDopkms/NLTEInput%QNORM*SqrtPi)
+                 End if ! Atom%Nterm .le. 1
               End if
               NLTE%WPhi(idepth,itran)=NLTE%WPhi(idepth,itran)+ &
                    WQMU*Phi(idepth)
