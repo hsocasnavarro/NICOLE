@@ -673,10 +673,7 @@ Subroutine Read_atom(Atom)
         Stop
      End if
      If (Atom%QMax(i) .lt. 0) then
-        Do inu=1, Atom%NQ(i0)
-           Call Read_next_nocomment(fileunit, String, End)
-           Read (String,*) Atom%Q(inu, i)
-        End do
+        Read (fileunit, *) (Atom%Q(inu, i),inu=1,Atom%NQ(i))
      End if
      If (iw .ge. 2) then
         If (.not. WarningIssued) then
