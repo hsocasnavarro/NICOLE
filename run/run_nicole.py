@@ -506,12 +506,14 @@ for icycle in range(int(ncycles)):
                      2.13,1.17,1.58,0.71,1.50,-10,1.01,0.51,1.12,-0.1,1.14,0.26,
                      0.93,0.00,1.08,0.06,0.88,-10,1.11,-10,1.45,1.35,1.8,1.01,-10,
                      0.9,1.95,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
-    else:
+    elif abund_set.lower() != 'model':
         print 'Abundance set not known in NICOLE.input, section Abundances'
         print 'Must be one of Grevesse_Sauval_1998, Asplund_et_al_2009,'
         print 'Thevenin_1989, or Grevesse_1984'
         sys.exit(1)
-    if abund_set == 'Model': abundances[0]=-1 # Flag to use abundance set in the model
+    if abund_set.lower() == 'model': 
+        abundances=[0]*len(elements)
+        abundances[0]=-1 # Flag to use abundance set in the model
     if len(abundances) != len(elements):
         print 'Error in abundances section of run_nicole.py'
         sys.exit(1)

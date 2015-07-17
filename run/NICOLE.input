@@ -49,6 +49,6 @@ Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
 # Spectral lines
 #
 [Line 1]
-  Line=FeI 6301.5
+  Line=FeI 6301
 [Line 2]
   Line=CaII 8542
