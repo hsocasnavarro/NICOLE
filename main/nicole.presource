@@ -327,7 +327,7 @@ Program Nicole
      ! (flagged by whether abundance(H)=12)
      If (Abs(Guess_model%Comp1%abundance(1)-12.0) .gt. 0.001) &
           Guess_model%Comp1%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
-     If (Abs(Guess_model%Comp2%abundance(1)-12.0) .gt. 0.001 &
+     If (Abs(Guess_model%Comp2%abundance(1)-12.0) .gt. 0.001) &
           Guess_model%Comp2%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
   Endif
   If (KeepVars(1) .gt. -.01) Guess_model%comp1%Keep_El_p=KeepVars(1)
