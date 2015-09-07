@@ -2174,6 +2174,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            ng_i(:)=Line(iline)%b_low         ! are actually n/g
            ng_j(:)=Line(iline)%b_up          ! rather than dep coefs
         End if
+        If (Line(iline)%DepCoefMode .eq. 0) then ! Overwrite b_low and b_up 
+           Line(iline)%b_low(:)=1.
+           Line(iline)%b_up(:)=1.
+        End if
      Else ! NLTE
         itran=Line(iline)%NLTEtransition
         Do idepth=1, npoints
@@ -2233,6 +2237,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         If (Line(iline)%DepCoefMode .eq. 2) then   ! Contents of b_low and b_up 
            NLTE%N(i,:)=Line(iline)%b_low/Atom%g(i) ! are actually n/g
            NLTE%N(j,:)=Line(iline)%b_up/Atom%g(j)  ! rather than dep coefs
+        End if
+        If (Line(iline)%DepCoefMode .eq. 0) then ! Overwrite b_low and b_up 
+           Line(iline)%b_low(:)=NLTE%N(i,:)/NLTE%NStar(i,:)
+           Line(iline)%b_up(:)=NLTE%N(j,:)/NLTE%NStar(j,:)
         End if
         ng_i(:)=NLTE%N(i,:)/Atom%g(i)*Line(iline)%NLTE_nl_ratio
         ng_j(:)=NLTE%N(j,:)/Atom%g(j)*Line(iline)%NLTE_nu_ratio

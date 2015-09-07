@@ -8,6 +8,7 @@ Module NICOLE_inp
      character (len = 4) :: hscale
      logical :: set_hydro, set_nH
      integer :: depcoef_mode
+     Logical :: write_depcoef
      integer :: formal_solution, printout, maxinv, speed, &
           always_compute_deriv, reference_cont
      real :: heliocentric, helioazim, noise, acceptchisq, gravity, &

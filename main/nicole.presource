@@ -1,4 +1,4 @@
-!                      N I C O L E   v 15.07
+!                      N I C O L E   v 15.09
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -43,13 +43,13 @@ Program Nicole
   Integer :: datainunit, modeloutunit, modeloutunit2, modeloutuniterr
   Integer :: profoutunit, i_inv, chisqunit
   Integer :: modelinunit, modelinunit2, strayinunit, headerunit, maskunit
-  Integer :: tmpunit, depunit, percentunit, discard
+  Integer :: tmpunit, depunit, depoutunit, percentunit, discard
   Integer :: ix, iy, nPix_x, nPix_y, ix1, iy1, ix2, iy2, irec0, icycle0
   Integer :: irec, iost1, Restart, ind
   Integer :: ivar, i0, i1, IProfUnit, logfileunit, perc, perc_old
   Character (Len=256) :: Filename
   Character (Len=10) :: Date, Time, Cyclesuffix
-  Logical :: CheckNaN, FileExists, DepCoefExists, DidInvert, NodeLocExists
+  Logical :: CheckNaN, FileExists, DepCoefExists, DepCoefOut, DidInvert, NodeLocExists
   Logical :: Completed
   Integer :: myrank, nprocs, SizeModel, isize, islave
   Integer ::  TaskComing, serialmode=0
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 15.07 ******************'
+     Print *,'*************** N I C O L E   v 15.09 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -127,7 +127,7 @@ Program Nicole
   datainunit=-1 ; modeloutunit=-1 ; modeloutuniterr=-1 ; profoutunit=-1
   iprofunit=-1 ; modeloutunit2=-1
   modelinunit=-1 ; strayinunit=-1 ; headerunit=-1 ; chisqunit=-1 ; maskunit=-1
-  tmpunit=-1 ; depunit=-1; modelinunit2=-1
+  tmpunit=-1 ; depunit=-1; depoutunit=-1; modelinunit2=-1
   Write(Cyclesuffix,'("_",i0)') icycle
   ! 
   ! Header file is read by all processes
@@ -178,7 +178,7 @@ Program Nicole
   End do
   Read (headerunit, *) eqstate_switch, eqstate_switch_others, eqstate_pe_consistency
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
-  Read (headerunit, *) Input%depcoef_mode
+  Read (headerunit, *) Input%depcoef_mode, Input%write_depcoef
   if (ioldnl .ge. 0) ioldnl=Params%n_lines
   Read (headerunit, *) Params%n_lines
   if (ioldnr .ge. 0) ioldnr=Params%n_regions
@@ -542,6 +542,8 @@ Program Nicole
      IntRecord(4)=Params%n_data/4
      Call Write_direct_int(LittleEndian,profoutunit,1,IntRecord,Params%n_data,iost1)
      Deallocate(IntRecord)
+     Call Open_file_direct(depoutunit, 'depcoef_out.dat'//Cyclesuffix, &
+          RealBytes*2*Params%n_lines*Params%n_points)
      ! depcoef (if it exists)
      Inquire (File='depcoef.dat', Exist=DepCoefExists) ! File with departure coefficients 
      If (DepCoefExists) then
@@ -551,7 +553,7 @@ Program Nicole
      Else
         Inquire (File='depcoef.dat'//Cyclesuffix, Exist=DepCoefExists)        
         If (DepCoefExists) then
-           Call Open_file_direct(depunit, 'depcoef.dat', &
+           Call Open_file_direct(depunit, 'depcoef.dat'//Cyclesuffix, &
                 RealBytes*2*Params%n_lines*Params%n_points)
         End if
      End if
@@ -719,6 +721,9 @@ Program Nicole
 !MPI               Call MPI_Send(isize, 1, MPI_INTEGER, islave, 15, MPI_COMM_WORLD, ierr)
 !MPI               Call MPI_Send(Tmp3, isize, MY_MPI_REAL, islave, 16, MPI_COMM_WORLD, ierr)
            End if
+           If (Input%write_depcoef) then
+              
+           End if
            If (nprocs .eq. 1) then ! If serial mode do the job here
               Call Do_Task
               Completed=.True. ! No need to wait in serial mode
@@ -755,6 +760,8 @@ Program Nicole
 !MPI                   24, MPI_COMM_WORLD, stat, ierr)
 !MPI              Call MPI_Recv(DidInvert, 1, MPI_LOGICAL, islave, &
 !MPI                   25, MPI_COMM_WORLD, stat, ierr)
+!MPI              Call MPI_Recv(Tmp3, isize, MY_MPI_REAL, islave, &
+!MPI                   26, MPI_COMM_WORLD, stat, ierr)
               If (Input%Mode .eq. 'i' .and. DidInvert) then
                  Call Write_direct(LittleEndian, profoutunit, &
                       irec+1, Syn_Profile, Params%n_data, iost1)
@@ -782,6 +789,9 @@ Program Nicole
                  If (Params%TwoComp) &
                       Call Write_direct(LittleEndian, modeloutunit2, &
                       irec+1, TmpModel2, SizeModel, iost1)
+              End if
+              If (Input%write_depcoef) then
+                 Call Write_direct(LittleEndian, depoutunit, irec, Tmp3, 2*Params%n_lines*Params%n_points)
               End if
               ! Update percent file
               perc=nint(real(irec)*100/real(Params%nPix))
@@ -822,6 +832,7 @@ Program Nicole
      Call Close_File(modelinunit)
      Call Close_File(modelinunit2)
      Call Close_File(profoutunit)
+     Call Close_File(depoutunit)
      If (DepCoefExists) Call Close_File(depunit)
      If (Input%Stray_profile_file .ne. '') Call Close_File(strayinunit)
      If (IProfUnit .gt. 0) then
@@ -870,6 +881,7 @@ Program Nicole
 !MPI        Call MPI_Send(irec, 1, MPI_INTEGER, 0, 23, MPI_COMM_WORLD, ierr)
 !MPI        Call MPI_Send(Chisq, 1, MY_MPI_REAL, 0, 24, MPI_COMM_WORLD, ierr)
 !MPI        Call MPI_Send(DidInvert, 1, MPI_LOGICAL, 0, 25, MPI_COMM_WORLD, ierr)
+!MPI        Call MPI_Send(Tmp3, isize, MY_MPI_REAL, 0, 26, MPI_COMM_WORLD, ierr)
      End do ! Do while (.True)
 
      ! }}}
@@ -1239,6 +1251,15 @@ Contains
           DidInvert=.True.
        End if ! If ix ge ix1 and ix le ix2 & ...
     End if ! mode .eq. 's'
+    Do iline=1, Params%n_lines
+       i0=(iline-1)*2*Params%n_points +1
+       i1=i0+Params%n_points-1
+       Tmp3(i0:i1)=Line(iline)%b_low(:)
+       i0=i1+1
+       i1=i0+Params%n_points-1
+       Tmp3(i0:i1)=Line(iline)%b_up(:)
+    End do
+
     If (Params%Printout .ge. 1) &
          Print *,'Point ',irec,' of ',Params%nPix,' done by process ',myrank
 

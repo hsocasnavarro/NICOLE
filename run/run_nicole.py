@@ -270,6 +270,7 @@ for icycle in range(int(ncycles)):
     sethydro=get_value(config,'Impose hydrostatic equilibrium','Y','NICOLE.input')
     setnH=get_value(config,'Compute Hydrogen populations','Y','NICOLE.input')
     depcoef=get_value(config,'Depcoef behavior','1','NICOLE.input')
+    write_depcoef=get_value(config,'Write depcoef','N','NICOLE.input')
     inputdens=get_value(config,'Input density','Pel','NICOLE.input')
     keep_el_p=get_value(config,'Keep El_p',' -1 ','NICOLE.input')
     keep_gas_p=get_value(config,'Keep Gas_p',' -1 ','NICOLE.input')
@@ -427,6 +428,16 @@ for icycle in range(int(ncycles)):
         print 'Incorrect choice for depcoef behavior:',depcoef
         print 'Must be 1 or 2'
         sys.exit(1)
+    write_depcoef=write_depcoef[0:1]
+    write_depcoef=write_depcoef.lower()
+    if write_depcoef != 'y' and write_depcoef != 'n':
+        print 'Incorrect "Write depcoef":',depcoef
+        print 'Must be Y or N'
+        sys.exit(1)
+    if write_depcoef == 'y':
+        write_depcoef = 'T'
+    else:
+        write_depcoef = 'F'
     if mode == 'i' and (obsprof == None or outputmodel == None):
         print 'Error in NICOLE.input'
         print 'When Mode is Inversion, the fields "Observed profiles" and'
@@ -1168,7 +1179,7 @@ for icycle in range(int(ncycles)):
         for el in elneglectopacidx: f.write(str(el)+'\n')
     f.write(eqstate+'  '+eqstateH+' '+peconsistency+'          ! Eq state, Eq state for H, Pe_consistency \n')
     f.write(sethydro+'     '+setnH+'   '+restart+'   ! sethydro, setnH, restart \n')
-    f.write(depcoef+'   ! depcoef \n')
+    f.write(depcoef+' '+write_depcoef+'   ! depcoef mode, write \n')
     f.write(nlines+'   ! nlines \n')
     f.write(nregions+'    ! nregions \n')
     for iregion in range(int(nregions)):

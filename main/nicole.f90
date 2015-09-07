@@ -1,4 +1,4 @@
-!                      N I C O L E   v 15.06
+!                      N I C O L E   v 15.09
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -43,37 +43,25 @@ Program Nicole
   Integer :: datainunit, modeloutunit, modeloutunit2, modeloutuniterr
   Integer :: profoutunit, i_inv, chisqunit
   Integer :: modelinunit, modelinunit2, strayinunit, headerunit, maskunit
-  Integer :: tmpunit, depunit, percentunit, discard
+  Integer :: tmpunit, depunit, depoutunit, percentunit, discard
   Integer :: ix, iy, nPix_x, nPix_y, ix1, iy1, ix2, iy2, irec0, icycle0
   Integer :: irec, iost1, Restart, ind
   Integer :: ivar, i0, i1, IProfUnit, logfileunit, perc, perc_old
   Character (Len=256) :: Filename
   Character (Len=10) :: Date, Time, Cyclesuffix
-  Logical :: CheckNaN, FileExists, DepCoefExists, DidInvert, NodeLocExists
+  Logical :: CheckNaN, FileExists, DepCoefExists, DepCoefOut, DidInvert, NodeLocExists
   Logical :: Completed
   Integer :: myrank, nprocs, SizeModel, isize, islave
   Integer ::  TaskComing, serialmode=0
   Integer, allocatable :: inverted_host(:), host_busy(:), pixel_to_do(:)
   Integer :: ierr, NotifyWhenFinished, request, ioldnl=-1, ioldnr=-1
-  Include 'mpif.h'
-  Integer :: stat(MPI_STATUS_SIZE)
- Integer :: My_MPI_Real
   External :: CheckNaN
   myrank=0
   nprocs=1
   !
-  Call MPI_INIT(status)
-  Call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, status)
-  Call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, status)
-  My_MPI_Real=MPI_Real
-  If (Kind(1.0) .eq. 8) My_MPI_Real=MPI_Real8
   If(myrank.eq.0) then
      Allocate(inverted_host(nprocs))
      inverted_host(1:nprocs)=0
-     If (nprocs .eq. 1) then
-        Print *,'Error. MPI parallel version requires using at least two processors'
-        Stop
-     End if
      If (nprocs .eq. 1) serialmode=1
      Allocate(host_busy(0:nprocs-1+serialmode))
      host_busy(:)=0 
@@ -84,7 +72,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 15.06 ******************'
+     Print *,'*************** N I C O L E   v 15.09 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -92,8 +80,7 @@ Program Nicole
      Print *,''
      Print *,'********************************************************'
      Print *,''
-     Print *,'Master / Slave MPI parallel version'
-     Print *,' This is the MPI parallel build'
+     Print *,' This is the serial build'
      Print *,''
   EndIf
   Call Time_routine('main',.True.)
@@ -126,7 +113,7 @@ Program Nicole
   datainunit=-1 ; modeloutunit=-1 ; modeloutuniterr=-1 ; profoutunit=-1
   iprofunit=-1 ; modeloutunit2=-1
   modelinunit=-1 ; strayinunit=-1 ; headerunit=-1 ; chisqunit=-1 ; maskunit=-1
-  tmpunit=-1 ; depunit=-1; modelinunit2=-1
+  tmpunit=-1 ; depunit=-1; depoutunit=-1; modelinunit2=-1
   Write(Cyclesuffix,'("_",i0)') icycle
   ! 
   ! Header file is read by all processes
@@ -177,7 +164,7 @@ Program Nicole
   End do
   Read (headerunit, *) eqstate_switch, eqstate_switch_others, eqstate_pe_consistency
   Read (headerunit, *) Input%set_hydro, Input%set_nH, Restart
-  Read (headerunit, *) Input%depcoef_mode
+  Read (headerunit, *) Input%depcoef_mode, Input%write_depcoef
   if (ioldnl .ge. 0) ioldnl=Params%n_lines
   Read (headerunit, *) Params%n_lines
   if (ioldnr .ge. 0) ioldnr=Params%n_regions
@@ -326,7 +313,7 @@ Program Nicole
      ! (flagged by whether abundance(H)=12)
      If (Abs(Guess_model%Comp1%abundance(1)-12.0) .gt. 0.001) &
           Guess_model%Comp1%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
-     If (Abs(Guess_model%Comp1%abundance(1)-12.0) .gt. 0.002) &
+     If (Abs(Guess_model%Comp2%abundance(1)-12.0) .gt. 0.001) &
           Guess_model%Comp2%Abundance(1:N_elements)=Starting_At_Abund(1:N_elements) 
   Endif
   If (KeepVars(1) .gt. -.01) Guess_model%comp1%Keep_El_p=KeepVars(1)
@@ -541,6 +528,8 @@ Program Nicole
      IntRecord(4)=Params%n_data/4
      Call Write_direct_int(LittleEndian,profoutunit,1,IntRecord,Params%n_data,iost1)
      Deallocate(IntRecord)
+     Call Open_file_direct(depoutunit, 'depcoef_out.dat'//Cyclesuffix, &
+          RealBytes*2*Params%n_lines*Params%n_points)
      ! depcoef (if it exists)
      Inquire (File='depcoef.dat', Exist=DepCoefExists) ! File with departure coefficients 
      If (DepCoefExists) then
@@ -550,7 +539,7 @@ Program Nicole
      Else
         Inquire (File='depcoef.dat'//Cyclesuffix, Exist=DepCoefExists)        
         If (DepCoefExists) then
-           Call Open_file_direct(depunit, 'depcoef.dat', &
+           Call Open_file_direct(depunit, 'depcoef.dat'//Cyclesuffix, &
                 RealBytes*2*Params%n_lines*Params%n_points)
         End if
      End if
@@ -703,20 +692,12 @@ Program Nicole
            End if
            TaskComing=1 ! Notify slave that a new task is coming
 
-            Call MPI_Send(TaskComing, 1, MPI_INTEGER, islave, 1, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(Obs_profile, Params%n_data, MY_MPI_REAL, islave, 1, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(Params%Stray_prof, Params%n_data, MY_MPI_REAL, islave, 2, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(Params%IProf, Params%n_data/4, MY_MPI_REAL, islave, 3, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(SizeModel, 1, MPI_INTEGER, islave, 4, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(TmpModel, SizeModel, MY_MPI_REAL, islave, 5, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(TmpModel2, SizeModel, MY_MPI_REAL, islave, 6, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(irec, 1, MPI_INTEGER, islave, 7, MPI_COMM_WORLD, ierr)
-            Call MPI_Send(DepCoefExists, 1, MPI_LOGICAL, islave, 8, MPI_COMM_WORLD, ierr)
            If (DepCoefExists) then
               Call Read_direct(LittleEndian,depunit,irec,Tmp3, 2*Params%n_lines*Params%n_points,iost1)
               isize=Size(Tmp3)
-               Call MPI_Send(isize, 1, MPI_INTEGER, islave, 15, MPI_COMM_WORLD, ierr)
-               Call MPI_Send(Tmp3, isize, MY_MPI_REAL, islave, 16, MPI_COMM_WORLD, ierr)
+           End if
+           If (Input%write_depcoef) then
+              
            End if
            If (nprocs .eq. 1) then ! If serial mode do the job here
               Call Do_Task
@@ -738,22 +719,7 @@ Program Nicole
         ! Listen to see if anyone has finished
         !
         Do islave=1, nprocs-1+serialmode ! Check if any slave has finished its task
-           Call MPI_IProbe(islave, 131313, MPI_COMM_WORLD, Completed, stat, ierr)
            If (Completed) then ! This slave has finished. Collect results and write to disk
-              Call MPI_Recv(NotifyWhenFinished, 1, MPI_INTEGER, islave, 131313, &
-                   MPI_COMM_WORLD, stat, ierr) ! Clear the flag
-              Call MPI_Recv(Syn_Profile, Params%n_data, MY_MPI_REAL, islave, &
-                   20, MPI_COMM_WORLD, stat, ierr)
-              Call MPI_Recv(TmpModel, SizeModel, MY_MPI_REAL, islave, &
-                   21, MPI_COMM_WORLD, stat, ierr)
-              Call MPI_Recv(TmpModel2, SizeModel, MY_MPI_REAL, islave, &
-                   22, MPI_COMM_WORLD, stat, ierr)
-              Call MPI_Recv(irec, 1, MPI_INTEGER, islave, &
-                   23, MPI_COMM_WORLD, stat, ierr)
-              Call MPI_Recv(Chisq, 1, MY_MPI_REAL, islave, &
-                   24, MPI_COMM_WORLD, stat, ierr)
-              Call MPI_Recv(DidInvert, 1, MPI_LOGICAL, islave, &
-                   25, MPI_COMM_WORLD, stat, ierr)
               If (Input%Mode .eq. 'i' .and. DidInvert) then
                  Call Write_direct(LittleEndian, profoutunit, &
                       irec+1, Syn_Profile, Params%n_data, iost1)
@@ -782,6 +748,9 @@ Program Nicole
                       Call Write_direct(LittleEndian, modeloutunit2, &
                       irec+1, TmpModel2, SizeModel, iost1)
               End if
+              If (Input%write_depcoef) then
+                 Call Write_direct(LittleEndian, depoutunit, irec, Tmp3, 2*Params%n_lines*Params%n_points)
+              End if
               ! Update percent file
               perc=nint(real(irec)*100/real(Params%nPix))
               If (perc .gt. perc_old) then
@@ -802,9 +771,6 @@ Program Nicole
      !
      ! Notify slaves that all tasks are done so they don't need to wait for more tasks
      TaskComing=0
-     Do islave=1, nprocs-1
-        Call MPI_Send(TaskComing, 1, MPI_INTEGER, islave, 7, MPI_COMM_WORLD, ierr)
-     End do
      !
      Write(logfileunit,*)' '
      Write(logfileunit,*)'---PROCESS-STATS---'
@@ -821,6 +787,7 @@ Program Nicole
      Call Close_File(modelinunit)
      Call Close_File(modelinunit2)
      Call Close_File(profoutunit)
+     Call Close_File(depoutunit)
      If (DepCoefExists) Call Close_File(depunit)
      If (Input%Stray_profile_file .ne. '') Call Close_File(strayinunit)
      If (IProfUnit .gt. 0) then
@@ -842,33 +809,13 @@ Program Nicole
 
      Do while (.True.)
         ! Is there a task coming?
-        Call MPI_Recv(TaskComing, 1, MPI_INTEGER, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
         If (TaskComing .eq. 0) Exit ! Master says no more tasks. Break loop
         ! If yes, collect data from master
-        Call MPI_Recv(Obs_profile, Params%n_data, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(Params%Stray_prof, Params%n_data, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(Params%IProf, Params%n_data/4, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(SizeModel, 1, MPI_INTEGER, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(TmpModel, SizeModel, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(TmpModel2, SizeModel, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(irec, 1, MPI_INTEGER, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        Call MPI_Recv(DepCoefExists, 1, MPI_LOGICAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        If (DepCoefExists) then
-           Call MPI_Recv(isize, 1, MPI_INTEGER, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-           Call MPI_Recv(Tmp3, isize, MY_MPI_REAL, 0, MPI_ANY_TAG, MPI_COMM_WORLD, stat, ierr)
-        End if
         ! Got data. Do calculations now
         Call Do_Task ! Routine included with Contains, has access to all variables here
         !
         ! Done. Notify master by sending an asynchronous message
-        Call MPI_Isend(NotifyWhenFinished, 1, MPI_Integer, 0, 131313, MPI_COMM_WORLD, request, ierr)
         ! Send results back to master
-        Call MPI_Send(Syn_Profile, Params%n_data, MY_MPI_REAL, 0, 20, MPI_COMM_WORLD, ierr)
-        Call MPI_Send(TmpModel, SizeModel, MY_MPI_REAL, 0, 21, MPI_COMM_WORLD, ierr)
-        Call MPI_Send(TmpModel2, SizeModel, MY_MPI_REAL, 0, 22, MPI_COMM_WORLD, ierr)
-        Call MPI_Send(irec, 1, MPI_INTEGER, 0, 23, MPI_COMM_WORLD, ierr)
-        Call MPI_Send(Chisq, 1, MY_MPI_REAL, 0, 24, MPI_COMM_WORLD, ierr)
-        Call MPI_Send(DidInvert, 1, MPI_LOGICAL, 0, 25, MPI_COMM_WORLD, ierr)
      End do ! Do while (.True)
 
      ! }}}
@@ -897,9 +844,7 @@ Program Nicole
   Call Time_routine('main',.False.)
   Call Time_log
 
-  Call MPI_Barrier(MPI_COMM_WORLD, ierr)
   If (myrank .eq. 0) print *, "DONE"
-  Call MPI_FINALIZE(status)
   Stop
 
 Contains
@@ -1238,6 +1183,15 @@ Contains
           DidInvert=.True.
        End if ! If ix ge ix1 and ix le ix2 & ...
     End if ! mode .eq. 's'
+    Do iline=1, Params%n_lines
+       i0=(iline-1)*2*Params%n_points +1
+       i1=i0+Params%n_points-1
+       Tmp3(i0:i1)=Line(iline)%b_low(:)
+       i0=i1+1
+       i1=i0+Params%n_points-1
+       Tmp3(i0:i1)=Line(iline)%b_up(:)
+    End do
+
     If (Params%Printout .ge. 1) &
          Print *,'Point ',irec,' of ',Params%nPix,' done by process ',myrank
 
