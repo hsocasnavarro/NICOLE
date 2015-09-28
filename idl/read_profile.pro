@@ -39,7 +39,7 @@ function read_profile,filename,stkq,stku,stkv,outfile=outfile, $
   if tmp(0) eq 3328553116003166574 and tmp(1) eq 2314885530823713334 then begin
      formatversion='1.6'
      npix=tmp(2)
-     nx=1
+     nx=1l
      ny=npix
   endif
   if tmp(0) eq 3328834590979877230 and tmp(1) eq 2314885530823713331 then begin

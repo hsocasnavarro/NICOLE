@@ -34,7 +34,7 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
   if tmp(0) eq 3328553116003166574 and tmp(1) eq 2314885530823516726 then begin
      formatversion='1.6'
      npix=tmp(2)
-     nx=1
+     nx=1l
      ny=npix
   endif
   if tmp(0) eq 3328834590979877230 and tmp(1) eq 2314885530823516723 then begin
@@ -45,7 +45,7 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
      free_lun,inunit
      nx=tmp(4)
      ny=tmp(5)
-     npix=nx*ny
+     npix=long(nx*ny)
   endif
   if tmp(0) eq 3328834590979877230 and tmp(1) eq 2314885530823516726 then begin
      formatversion='2.6'
@@ -55,7 +55,7 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
      free_lun,inunit
      nx=tmp(4)
      ny=tmp(5)
-     npix=nx*ny
+     npix=long(nx*ny)
   endif
   if formatversion eq 'xxx' then begin
      print,'File is not a valid model file:',filename
@@ -240,7 +240,7 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
   if (file_test(path+'maskinvert.dat_1')) then begin
      openr,inunit,path+'maskinvert.dat_1',/get_lun,/swap_if_big_endian
      tmp=0d0
-     for ix=0,nx-1 do for iy=0,ny-1 do begin
+     for ix=0l,nx-1 do for iy=0l,ny-1 do begin
         readu,inunit,tmp
         mask(ix,iy)=tmp
      endfor

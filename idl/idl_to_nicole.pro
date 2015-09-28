@@ -19,7 +19,7 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
      m=m_in
      openw,iunit,filemod,/get_lun,/swap_if_big
      if (size(m.t))(0) eq 1 then begin
-        nz=(size(m.t))(1)
+        nz=long((size(m.t))(1))
         m={z:reform(m.z,1,1,nz),tau:reform(m.tau,1,1,nz),t:reform(m.t,1,1,nz),$
            el_p:reform(m.el_p,1,1,nz),gas_p:reform(m.gas_p,1,1,nz),rho:reform(m.rho,1,1,nz),v_los:reform(m.v_los,1,1,nz),v_mic:reform(m.v_mic,1,1,nz),b_los_z:reform(m.b_los_z,1,1,nz),$
            b_los_x:reform(m.b_los_x,1,1,nz),b_los_y:reform(m.b_los_y,1,1,nz),$
@@ -33,18 +33,18 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
            nH2:reform(m.nH2,1,1,nz),nH2plus:reform(m.nH2plus,1,1,nz),$
            v_mac:reform(m.v_mac,1,1),ffactor:reform(m.ffactor,1,1),$
            stray_frac:reform(m.stray_frac,1,1),abundance:reform(fltarr(92),1,1,92)}
-        nx=1
-        ny=1
+        nx=1l
+        ny=1l
      endif else begin
-        nx=(size(m.t))(1)
-        ny=(size(m.t))(2)
-        nz=(size(m.t))(3)
+        nx=long((size(m.t))(1))
+        ny=long((size(m.t))(2))
+        nz=long((size(m.t))(3))
      endelse
      if n_elements(indx) eq 0 then indx=indgen(nx)
      if n_elements(indy) eq 0 then indy=indgen(ny)
      npix=long(nx)*long(ny)
-     nnx=n_elements(indx)
-     nny=n_elements(indy)
+     nnx=long(n_elements(indx))
+     nny=long(n_elements(indy))
      tmp=lon64arr(22*nz+11+92)
      tmp(0)=3328834590979877230
      tmp(1)=2314885530823516726
