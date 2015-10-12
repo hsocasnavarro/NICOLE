@@ -85,7 +85,15 @@ Subroutine Hydrostatic(Params, Atmo)
      temp(1)=Min_temp
   End if
 
-  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
+  !
+  ! JdlCR: change the boundary condition from "preserve electron pressure"
+  ! to "preserve gas pressure". It seems to solve the problem of dual
+  ! solutions in the upper layers when running chromospheric inversions. 
+  !
+  !  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
+  Call Compute_Pe(1, temp(1), Atmo%Gas_p(1), Atmo%El_p(1))
+  
+
   n2P=BK*temp(1)
   Call Compute_others_from_T_Pe_Pg(1,Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
        Atmo%nHminus(1), Atmo%nHplus(1), Atmo%nH2(1), Atmo%nH2plus(1))
