@@ -2165,10 +2165,10 @@ Contains
     real(kind=8), dimension(n_grid) :: PH_out, PHminus_out, PHplus_out, PH2_out, PH2plus_out, P_elec_arr
     real(kind=8) :: mole(273), minim_ioniz
     real(kind=8), dimension(22), save :: initial_values
-    integer :: i, ind, l, loop, minim, iter, niters
+    integer :: i, ind, l, loop, minim, iter, niters, dir
     logical, Save :: FirstTime=.True.
     Real :: metalicity, Pgold, Peold, Diff1, Diff2
-    Real(Kind=8) :: TotAbund
+    Real(Kind=8) :: TotAbund, scale
     Real, Dimension(1) :: U12, U23, U1, U2, U3, DU1, DU2, DU3, Ne, P4
     Character (Len=256) :: String
     
@@ -2199,6 +2199,10 @@ Contains
        Return
     End if
 
+    !
+    ! JdlCR: Changed the convergence scheme to a more efficient one
+    ! although perhaps this could be furhter improved...
+    !
     If (eqstate_pe_consistency .lt. 10) then
        ! Use Pe as initial guess and iterate
        Do loop = 1, n_grid
@@ -2207,21 +2211,41 @@ Contains
           Call Compute_Pg(1, T4(loop), Pe4(loop), Pg4(loop))
 
           niters=0
+
+          ! Init direction of the correction and scale factor for Pe
+          dir = 0       
+          scale = 2.0d0
+          
           Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
-          Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
-          Do While ( Diff1  .gt. eqstate_pe_consistency .and. Diff2 .gt. eqstate_pe_consistency .and.  &
-               niters .lt. 10)
+          Do While (  abs(Diff1) .gt. eqstate_pe_consistency .and. niters .lt. 50)
              Pgold=Pg4(loop)
              Peold=Pe4(loop)
-             Pe4(loop)=Pe4(loop)*Pt_in(loop)/Pg4(loop)
+
+             !
+             ! Check direction for the correction and correct Pe
+             ! If there is a change in the direction, it means that we are
+             ! overshooting, then scale down the correction.
+             !
+             if(Diff1 .gt.  eqstate_pe_consistency) then
+                if(dir .ne. 1) scale = sqrt(scale)
+                Pe4(loop) = Pe4(loop) * scale
+                dir = 1
+             else if(-Diff1 .gt. eqstate_pe_consistency) then
+                if(dir .ne. -1) scale = sqrt(scale)
+                Pe4(loop) = Pe4(loop) / scale
+                dir = -1
+             end if
+
+             ! Recompute Pg
              Call Compute_Pg(1, T4(loop), Pe4(loop), Pg4(loop))
              niters=niters+1
-             Diff1=abs(Pt_in(loop) - Pg4(loop))/Pt_in(loop)
-             Diff2=abs(Pe4(loop) - Peold)/Pe4(loop)
+
+             ! Check Difference with the input Pgas
+             Diff1=(Pt_in(loop) - Pg4(loop))/(Pg4(loop)+Pt_in(loop))
           End do
        End do
     End if
-
+    
     Call Time_routine('compute_pe',.False.)
     Return
     
