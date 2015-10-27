@@ -1,4 +1,4 @@
-!                      N I C O L E   v 15.09
+!                      N I C O L E   v 15.10
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 15.09 ******************'
+     Print *,'*************** N I C O L E   v 15.10 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -542,7 +542,8 @@ Program Nicole
      IntRecord(4)=Params%n_data/4
      Call Write_direct_int(LittleEndian,profoutunit,1,IntRecord,Params%n_data,iost1)
      Deallocate(IntRecord)
-     Call Open_file_direct(depoutunit, 'depcoef_out.dat'//Cyclesuffix, &
+     If (Input%write_depcoef) &
+          Call Open_file_direct(depoutunit, 'depcoef_out.dat'//Cyclesuffix, &
           RealBytes*2*Params%n_lines*Params%n_points)
      ! depcoef (if it exists)
      Inquire (File='depcoef.dat', Exist=DepCoefExists) ! File with departure coefficients 
