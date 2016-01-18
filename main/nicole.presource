@@ -1,4 +1,4 @@
-!                      N I C O L E   v 15.10
+!                      N I C O L E   v 16.01
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -761,6 +761,7 @@ Program Nicole
 !MPI                   24, MPI_COMM_WORLD, stat, ierr)
 !MPI              Call MPI_Recv(DidInvert, 1, MPI_LOGICAL, islave, &
 !MPI                   25, MPI_COMM_WORLD, stat, ierr)
+!MPI              isize=Size(tmp3)
 !MPI              Call MPI_Recv(Tmp3, isize, MY_MPI_REAL, islave, &
 !MPI                   26, MPI_COMM_WORLD, stat, ierr)
               If (Input%Mode .eq. 'i' .and. DidInvert) then
@@ -882,6 +883,7 @@ Program Nicole
 !MPI        Call MPI_Send(irec, 1, MPI_INTEGER, 0, 23, MPI_COMM_WORLD, ierr)
 !MPI        Call MPI_Send(Chisq, 1, MY_MPI_REAL, 0, 24, MPI_COMM_WORLD, ierr)
 !MPI        Call MPI_Send(DidInvert, 1, MPI_LOGICAL, 0, 25, MPI_COMM_WORLD, ierr)
+!MPI        isize=Size(tmp3)
 !MPI        Call MPI_Send(Tmp3, isize, MY_MPI_REAL, 0, 26, MPI_COMM_WORLD, ierr)
      End do ! Do while (.True)
 

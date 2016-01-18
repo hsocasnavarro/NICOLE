@@ -15,4 +15,6 @@ svbksb.f90
 svdcmp.f90
 tqli.f90
 twofft.f90
-
+nrtype.f90
+nrtype.dp
+nrtype.sp

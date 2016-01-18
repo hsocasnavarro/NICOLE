@@ -1,13 +1,13 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2014.7.27)  7 SEP 2015 12:12
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=latex 2016.1.13)  13 JAN 2016 13:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **manual
 (./manual.tex
-LaTeX2e <2011/06/27>
-Babel <3.9h> and hyphenation patterns for 2 languages loaded.
+LaTeX2e <2015/01/01>
+Babel <3.9l> and hyphenation patterns for 2 languages loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/latex209.def
-File: latex209.def 1998/05/13 v0.52 Standard LaTeX file
+File: latex209.def 2015/02/22 v0.53 Standard LaTeX file
 
 
           Entering LaTeX 2.09 COMPATIBILITY MODE
@@ -40,9 +40,9 @@ File: latex209.def 1998/05/13 v0.52 Standard LaTeX file
 \@clb=\count80
 \mscount=\count81
 (/usr/share/texlive/texmf-dist/tex/latex/base/tracefnt.sty
-Package: tracefnt 1997/05/29 v3.0j Standard LaTeX package (font tracing)
+Package: tracefnt 2015/02/21 v3.0k Standard LaTeX package (font tracing)
 \tracingfonts=\count82
-LaTeX Info: Redefining \selectfont on input line 101.
+LaTeX Info: Redefining \selectfont on input line 106.
 )
 \symbold=\mathgroup4
 \symsans=\mathgroup5
@@ -50,26 +50,26 @@ LaTeX Info: Redefining \selectfont on input line 101.
 \symitalic=\mathgroup7
 \symsmallcaps=\mathgroup8
 \symslanted=\mathgroup9
-LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 293.
-LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 294.
-LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 295.
-LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 301.
-LaTeX Info: Redefining \em on input line 311.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 298.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 299.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 300.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 306.
+LaTeX Info: Redefining \em on input line 316.
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/latexsym.sty
 Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 \symlasy=\mathgroup10
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
-(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 47.
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
 )
-LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 375.
-LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 377.
-LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 379.
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 377.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 379.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 381.
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
-Document Class: book 2007/10/19 v1.4h Standard LaTeX document class
+Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo
-File: bk10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count83
 \c@chapter=\count84
@@ -89,8 +89,8 @@ Compatibility mode: definition of \bf ignored.
 Compatibility mode: definition of \it ignored.
 Compatibility mode: definition of \sl ignored.
 Compatibility mode: definition of \sc ignored.
-LaTeX Info: Redefining \cal on input line 592.
-LaTeX Info: Redefining \mit on input line 593.
+LaTeX Info: Redefining \cal on input line 597.
+LaTeX Info: Redefining \mit on input line 598.
 \bibindent=\dimen105
 ) (./manual.aux)
 \openout1 = `manual.aux'.
@@ -140,7 +140,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 Chapter 1.
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 52.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 52.
@@ -310,12 +310,12 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 463 strings out of 495029
- 5393 string characters out of 6181523
- 82070 words of memory out of 5000000
- 3707 multiletter control sequences out of 15000+600000
+ 463 strings out of 495001
+ 5394 string characters out of 6181195
+ 83117 words of memory out of 5000000
+ 3732 multiletter control sequences out of 15000+600000
  19815 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  23i,7n,21p,169b,252s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on manual.dvi (84 pages, 210644 bytes).
+Output written on manual.dvi (84 pages, 210636 bytes).
