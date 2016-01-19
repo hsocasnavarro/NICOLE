@@ -1993,7 +1993,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Real, Dimension (Params%n_data) :: Syn_profile
   Real, Dimension (Params%n_points) :: Source_f, ltau_500_mu, term
   Real, Dimension (Params%n_points) :: Cont_op_5000, Cont_op, Cont_op_5000_2
-  Real, Dimension (Params%n_points) :: ng_i, ng_j
+  Real, Dimension (Params%n_points) :: ng_i, ng_j, tmp
   Real, Dimension (Params%n_lines, Params%n_points) :: Dldop, Damp, Line_op
   Real, Dimension (Params%n_points,4,4) :: Absorp_height
   Real, Dimension (:,:,:,:), Allocatable :: Absorp, TotAbsorp
@@ -2612,6 +2612,15 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   If (Debug_OutputNLTEsf .and. do_NLTE) then
      Call Open_file_direct (iunit,'NLTE_sf.dat',RealBytes*Params%n_points)
      irec=1
+     if (ATOM%NLIN+ATOM%NCNT .gt. Params%n_points) then
+        print *,"Error in forward.f90. Can't write Source Function file"
+        Stop
+     End if
+     Do itran=1, ATOM%NLIN+ATOM%NCNT
+        tmp(itran)=Atom%NQ(itran)
+     End do
+     Call Write_direct(LittleEndian,iunit,irec,tmp,Params%n_points,iostat)
+     irec=irec+1
      Do itran=1, ATOM%NLIN+ATOM%NCNT
         Do j=1, Atom%NQ(itran)
            Call Write_direct(LittleEndian,iunit,irec,NLTE%Source_f(:,j,itran),Params%n_points,iostat)

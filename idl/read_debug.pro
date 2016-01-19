@@ -38,11 +38,12 @@ pro read_debug,corenumber=corenumber,d,e,m
      if ntran eq 0 then ntran=1
   endif
 
+  maxnq=100
   e={mode:'',ndep:ndep,nk:nk,ndata:ndata,ntran:ntran,nlte:do_nlte,$
      nx:-1,ny:-1,ix:-1,iy:-1,irec:-1,icycle:-1, $
      tau5:tau5,n:fltarr(nk,ndep),nstar:fltarr(nk,ndep),$
      ngi:fltarr(ndep),ngj:fltarr(ndep),contop:fltarr(ndep),$
-     contop5:fltarr(ndep),sf:fltarr(ntran,ndep), $
+     contop5:fltarr(ndep),sf:fltarr(ntran,maxnq,ndep), $
      obs:fltarr(ndata)}
 
   tmp=dblarr(ndep)
@@ -78,9 +79,18 @@ pro read_debug,corenumber=corenumber,d,e,m
 
   if outputpop eq 'T' then begin
      openu,unit,'NLTE_sf.dat',/swap_if_big,/get_lun
+     readu,unit,tmp
+     if max(tmp) gt  maxnq then begin
+        print,"Can't read all wavelengths in source function file"
+        print,"There is a transition with ",max(tmp)," wavelenghts."
+        print,"Can only read up to maxnq=",maxnq
+     endif
+     e.sf=0.
      for i=1,ntran do begin
-        readu,unit,tmp
-        e.sf(i-1,*)=tmp
+        for j=1, tmp[i] do begin
+           readu,unit,tmp
+           e.sf(i-1,j,*)=tmp
+        endfor
      endfor
      free_lun,unit
   endif
