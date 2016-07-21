@@ -45,7 +45,7 @@ Contains
   Type (Parameters) :: Params
   Type (Model) :: Modelo
   Integer :: npoints, status
-
+!  
   If (Allocated(Modelo%z_scale)) then
      If (Size(Modelo%z_scale) .ne. npoints) then
         Print *,'Error in model_struct.f90. Trying to allocate a model'
@@ -130,7 +130,7 @@ Subroutine DeAllocate_model(Modelo)
   Type (Parameters) :: Params
   Type (Model) :: Modelo
 
-  !print *, "deallocating model"     
+  print *, "deallocating model"     
   If (Allocated(Modelo%z_scale)) Deallocate (Modelo%z_scale)
   If (Allocated(Modelo%ltau_500)) Deallocate (Modelo%ltau_500)
   If (Allocated(Modelo%temp)) Deallocate (Modelo%temp)
@@ -159,7 +159,7 @@ End Subroutine DeAllocate_model
 !
 !
 Subroutine Model_assign(A,B)
-  Type (Model), intent(out) :: A
+  Type (Model), intent(inout) :: A
   Type (Model), intent(in) :: B
   Integer :: status, npoints
   !
@@ -209,10 +209,10 @@ Subroutine Model_assign(A,B)
 End subroutine Model_assign
 !
 Subroutine Model_assign_2comp(A,B)
-  Type (Model_2comp), intent(out) :: A
+  Type (Model_2comp), intent(inout) :: A
   Type (Model_2comp), intent(in) :: B
   Integer :: status, npoints
-!
+  !
   If (.NOT.Allocated(A%Comp1%z_scale)) then
      npoints=size(B%Comp1%z_scale)
      Call Allocate_Model(A%Comp1, npoints)
@@ -227,7 +227,7 @@ Subroutine Model_assign_2comp(A,B)
 End Subroutine Model_assign_2comp
 !
 Subroutine Model_swap_2comp(A,B)
-  Type (Model_2comp), intent(out) :: A
+  Type (Model_2comp), intent(inout) :: A
   Type (Model_2comp), intent(in) :: B
   Type (Model_2comp) :: C
   C=B

@@ -7,13 +7,13 @@
 10000000   10000000      ! pixx2, pixy2 
 1          ! irec0 
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
-inversion.model
+guess.bin
 
 observed.bin
-inversion.pro
+inversion.bin
 inversion.model_2
 
-0      ! formal 
+0 0      ! formal boundarycond 
 1.0    ! helio 
 2    ! printout 
 25    ! maxiters. Below: stray profile 
@@ -34,11 +34,11 @@ t          ! hscale
 0 ! elements to ignore in opac
 0  0 1e-1          ! Eq state, Eq state for H, Pe_consistency 
 T     T   0   ! sethydro, setnH, restart 
-1   ! depcoef 
+1 F   ! depcoef mode, write 
 6   ! nlines 
 2    ! nregions 
-6300. 0.02 100 1.0 1 1.0 0.0
-10825 0.04 100 1.0 1 1.0 0.0
+6300. 0.02 100 1.0 1 1.0 0.0 1.0 0.0
+10825 0.04 100 1.0 1 1.0 0.0 1.0 0.0
 2.0 O 1 6300.3040 1.0 0.0000 -9.7127 P 5 2.0 D 5 2.0 3 -1 -1 0.00 0.05 1.00  0 1.0 1.0 F 0 0 0 0 0 0
 2.0 NI 1 6300.335 3.0 4.2660 -2.253 P 5 1.0 D 5 0.0 3 -1 -1 2.63 0.054 1.82  0 1.0 1.0 F 0 0 0 0 0 0
 2.0 NI 1 6300.355 3.0 4.2660 -2.663 P 5 1.0 D 5 0.0 3 -1 -1 2.63 0.054 1.82  0 1.0 1.0 F 0 0 0 0 0 0

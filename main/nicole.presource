@@ -1,4 +1,4 @@
-!                      N I C O L E   v 16.01
+!                      N I C O L E   v 16.06
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 16.01 ******************'
+     Print *,'*************** N I C O L E   v 16.06 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -152,7 +152,7 @@ Program Nicole
   Read (headerunit, '(A)') Input%syn_profile_file
   Read (headerunit, '(A)') Input%model_out_file
   Read (headerunit, '(A)') Input%model_out_file_2
-  Read (headerunit, *) Params%formal_solution
+  Read (headerunit, *) Params%formal_solution, Params%formal_boundary_cond
   Read (headerunit, *) Params%heliocentric
   Read (headerunit, *) Params%printout
   Read (headerunit, *) Params%max_inv_iters
@@ -208,7 +208,8 @@ Program Nicole
      Read (headerunit, *) Region(iregion)%First_wlength, &
           Region(iregion)%Wave_step, Region(iregion)%nwavelengths, &
           Region(iregion)%Macro_enh, Region(iregion)%layer, &
-          Region(iregion)%Opacity_enh, Region(iregion)%Bias
+          Region(iregion)%Opacity_enh, Region(iregion)%Obs_additive, &
+          Region(iregion)%Obs_multiplicative, Region(iregion)%Obs_gauss_sigma
   End do
   Do iline=1, Params%n_lines
      Read (headerunit, *) Line(iline)%Width, &
@@ -702,7 +703,8 @@ Program Nicole
            End if
            Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars, 1)
            If (.not. Params%TwoComp) then
-              Guess_model%Comp2=Guess_model%Comp1
+	      Call model_assign(guess_model%comp2,guess_model%comp1) ! debug
+              !Guess_model%Comp2=Guess_model%Comp1
               Guess_model%Comp1%ffactor=1.0
            End if
            TaskComing=1 ! Notify slave that a new task is coming
@@ -793,7 +795,7 @@ Program Nicole
                       irec+1, TmpModel2, SizeModel, iost1)
               End if
               If (Input%write_depcoef) then
-                 Call Write_direct(LittleEndian, depoutunit, irec, Tmp3, 2*Params%n_lines*Params%n_points)
+                 Call Write_direct(LittleEndian, depoutunit, irec, Tmp3, 2*Params%n_lines*Params%n_points, iost1)
               End if
               ! Update percent file
               perc=nint(real(irec)*100/real(Params%nPix))

@@ -107,7 +107,7 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
   Real, Dimension (Params%n_data) :: Profile, gauss, data
   Real, Dimension (Params%n_data*2) :: ans, respns
   Integer :: i, n, m, mmax, n2, iregion, istokes, iwave, istart, iunit, indreg1
-  Real :: x, Wave, Maximum
+  Real :: x, Wave, Maximum, Sigma
   Logical, Save :: FirstTime=.True., ExistsInstrumProf=.False.
   Real, Dimension(:,:), Pointer, Save :: Instrum_prof
 !  Integer, Dimension(:), Pointer, Save :: mm
@@ -176,15 +176,15 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
         ! Construct the gaussian
         Wave=Region(iregion)%First_wlength + &
              Region(iregion)%nwavelengths/2.*Region(iregion)%Wave_step
-        m=5.*(Atmo%v_mac/cc*Wave/Region(iregion)%Wave_step*Region(iregion)%Macro_enh)
+        Sigma=(Atmo%v_mac/cc*Wave*Region(iregion)%Macro_enh)+Region(iregion)%obs_gauss_sigma ! Angstroms
+        m=5.*Sigma/Region(iregion)%Wave_step
         m=(m/2.)
         m=m*2+1 ! Make sure m is an odd integer
         gauss(1)=1. ! To prevent the case where v_mac .eq. 0.
         If (m .gt. 1) then
            Do i=1, m/2+1 ! Positive x
-              x=(i-1)*Region(iregion)%Wave_step/ &
-                   (Atmo%v_mac*Region(iregion)%Macro_enh/cc*Wave)
-              gauss(i)=Exp(-x*x)
+              x=(i-1)/(Sigma/Region(iregion)%Wave_step)
+              gauss(i)=Exp(-x*x/2.)
            End do
         End if
         Do i=m/2+2, m ! Negative x
@@ -358,9 +358,9 @@ End Subroutine Fill_densities
 !   Almeida and Trujillo Bueno 1999, ApJ, in press.
 !
 Subroutine Formal_solution(npoints, formal_solut, ltau_500, Absorp_in, &
-     Source_f, Stokes, ichoice)
+     Source_f, Stokes, ichoice, boundary_switch)
   Implicit None
-  Integer :: formal_choice, ipoint, npoints, formal_solut
+  Integer :: formal_choice, ipoint, npoints, formal_solut, boundary_switch
   Real, Dimension (npoints) :: ltau_500, Source_f, dtau_nu, tau_500
   Real, Dimension (npoints,4,4) :: Absorp_in, Absorp
   Real, Dimension (4) :: Stokes
@@ -397,29 +397,29 @@ Subroutine Formal_solution(npoints, formal_solut, ltau_500, Absorp_in, &
 !
      Absorp=Absorp_in
      If (formal_choice .eq. 1) then
-        Call delobezier3(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call delobezier3(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=1
      Else If (formal_choice .eq. 2) then
-        Call delobezier(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call delobezier(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=2
      Else If (formal_choice .eq. 3) then
-        Call delobezier_scal(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call delobezier_scal(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=3
      Else If (formal_choice .eq. 4) then
-        Call Hermite(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call Hermite(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         !     Call myold_Hermite(npoints, ltau_500, Absorp, Source_f, Stokes)
         ichoice=4
      Else if (formal_choice .eq. 5) then
-        Call WPM(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call WPM(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=5
      Else if (formal_choice .eq. 6) then
-        Call Delolin(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call Delolin(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=6
      Else if (formal_choice .eq. 7) then
-        Call Delopar(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call Delopar(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=7
      Else if (formal_choice .eq. 8) then
-        Call SC_solver(npoints, dtau_nu, Absorp, Source_f, Stokes)
+        Call SC_solver(npoints, dtau_nu, Absorp, Source_f, Stokes, boundary_switch)
         ichoice=8
      End if
      !
@@ -665,9 +665,9 @@ End Subroutine Profiles
 ! The derivatives of the source function is computed assuming a 
 ! parabolic form.
 !
-Subroutine Scalar_hermite(npoints, tau_nu, S, Intensity)
+Subroutine Scalar_hermite(npoints, tau_nu, S, Intensity, boundary_switch)
   Implicit None
-  Integer :: npoints, ibound, ipoint
+  Integer :: npoints, ibound, ipoint, boundary_switch
   Real, Dimension (npoints) :: tau_nu, S, Intensity
   Real, Dimension (npoints) :: S_p
   Real :: A, E, J, J_down, Cal_J, Cal_J_down, D, dtau
@@ -694,7 +694,11 @@ Subroutine Scalar_hermite(npoints, tau_nu, S, Intensity)
 !
 ! Set boundary condition (I=S + dS/d(tau_nu)) at ibound
 !
-  Intensity(ibound:npoints)=S(ibound:npoints)!+S_p(ibound:npoints)
+  If (boundary_switch .eq. 0) then
+     Intensity(ibound:npoints)=S(ibound:npoints)!+S_p(ibound:npoints)
+  Else
+     Intensity(ibound:npoints)=0.
+  End if
 !
 ! Ray propagation
 !
@@ -881,7 +885,7 @@ Real function syn_hsra(lambda, theta)
 
 !
 !
-  Call delobezier3(npoints, dtau_nu, Ab, Source_f, Stokes)
+  Call delobezier3(npoints, dtau_nu, Ab, Source_f, Stokes, 0)
   syn_hsra=Stokes(1)
 !
   Return 
@@ -892,9 +896,9 @@ End function syn_hsra
 ! approximation of Sanchez Almeida and Trujillo Bueno 1999, ApJ, in
 ! press.
 !
-Subroutine WPM(npoints, dtau_nu, Ab, Source_f, Emergent_stokes)
+Subroutine WPM(npoints, dtau_nu, Ab, Source_f, Emergent_stokes, boundary_switch)
   Implicit None
-  Integer :: npoints, ipoint
+  Integer :: npoints, ipoint, boundary_switch
   Real, Dimension (npoints) :: ltau_500, Source_f, dtau_nu
   Real, Dimension (npoints) :: Opac, tau_500, Stokes_component
   Real, Dimension (npoints,4,4) :: Ab, Ab2
@@ -910,7 +914,7 @@ Subroutine WPM(npoints, dtau_nu, Ab, Source_f, Emergent_stokes)
 !          0.5*(Opac(ipoint)+Opac(ipoint-1))
 !  End do
 !  Call Check_tau(tau_nu)
-  Call delobezier_scal(npoints, dtau_nu, Ab, Source_f, stk)
+  Call delobezier_scal(npoints, dtau_nu, Ab, Source_f, stk, boundary_switch)
 !  Call Scalar_hermite(npoints, tau_nu, Source_f, Stokes_component)
   Emergent_stokes(1)=stk(1)
 !
@@ -924,7 +928,7 @@ Subroutine WPM(npoints, dtau_nu, Ab, Source_f, Emergent_stokes)
 !          0.5*(Opac(ipoint)+Opac(ipoint-1))
 !  End do 
 !  Call Check_tau(tau_nu)
-  Call delobezier_scal(npoints, dtau_nu, Ab2, Source_f, stk)
+  Call delobezier_scal(npoints, dtau_nu, Ab2, Source_f, stk, boundary_switch)
 !  Call Scalar_hermite(npoints, tau_nu, Source_f, Stokes_component)
   Emergent_stokes(4)=stk(1) - Emergent_stokes(1) ! I+V - I
 !
@@ -939,7 +943,7 @@ Subroutine WPM(npoints, dtau_nu, Ab, Source_f, Emergent_stokes)
 !          0.5*(Opac(ipoint)+Opac(ipoint-1))
 !  End do 
 !  Call Check_tau(tau_nu)
-  Call delobezier_scal(npoints, dtau_nu, Ab2, Source_f, stk)
+  Call delobezier_scal(npoints, dtau_nu, Ab2, Source_f, stk, boundary_switch)
 !  Call Scalar_hermite(npoints, tau_nu, Source_f, Stokes_component)
   Emergent_stokes(2)=stk(1) - Emergent_stokes(1) ! I+Q - I
 !
@@ -954,7 +958,7 @@ Subroutine WPM(npoints, dtau_nu, Ab, Source_f, Emergent_stokes)
 !          0.5*(Opac(ipoint)+Opac(ipoint-1))
 !  End do 
 !  Call Check_tau(tau_nu)
-  Call delobezier_scal(npoints, dtau_nu, Ab2, Source_f, stk)
+  Call delobezier_scal(npoints, dtau_nu, Ab2, Source_f, stk, boundary_switch)
 !  Call Scalar_hermite(npoints, tau_nu, Source_f, Stokes_component)
   Emergent_stokes(3)=stk(1) - Emergent_stokes(1) ! I+U - I
 ! Done!
@@ -967,10 +971,10 @@ End Subroutine WPM
 ! The derivatives of the source function and the absorption matrix are
 ! computed assuming a parabolic form for them.
 !
-  Subroutine hermite(npoints, dtau_nu, Ab, S, stokes)
+  Subroutine hermite(npoints, dtau_nu, Ab, S, stokes, boundary_switch)
     USE Bezier_math
     Implicit None
-    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound
+    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound, boundary_switch
     Integer :: ipiv(4)
     Real, dimension(npoints) :: tau_nu, S, iab, dtau_nu, tau_500
     Real, dimension(npoints, 4, 4) :: Ab, abp
@@ -1027,7 +1031,11 @@ End Subroutine WPM
     ! Set boundary condition (I=S) at ibound
     !
     ostokes(2:4)=0.0d0
-    ostokes(1) = S(ibound) ! Boundary cond.
+    If (boundary_switch .eq. 0) then
+       ostokes(1) = S(ibound) ! Boundary cond.
+    Else
+       ostokes(1) = 0.
+    Endif
 
     !
     ! Derivatives of the source function and ab matrix
@@ -1082,137 +1090,10 @@ End Subroutine WPM
     stokes = ostokes
   END Subroutine hermite
 
-
-Subroutine myold_Hermite(npoints, ltau_500, Ab, S, Emergent_stokes)
-  Implicit None
-  Integer :: ipoint, npoints, ibound, jj, kk
-  Real, Dimension (npoints) :: ltau_500, S, S_p, Tmp, tau_nu, &
-       tau_500
-  Real, Dimension (npoints, 4) :: Stokes
-  Real, Dimension (npoints, 4, 4) :: Ab, Ab_p
-  Real, Dimension (4, 4) :: K2, A, Cal_K, D, Id, Tmp44
-  Real, Dimension (4) :: Emergent_stokes, Tmp4
-  Real, Dimension (4) :: J, Cal_J, E, J_down, Cal_J_down
-  Real :: dtau
-  Real, Parameter :: Optically_thick = 100., Optically_thin=1.e-4
-  Logical, Save :: Warning_thin=.TRUE., Warning_thick=.TRUE.
-  logical :: checknan
-!
-! First construct the tau_nu (monochromatic optical depth) and
-! tau_5000 scales
-!
-  tau_500(1:npoints)=10**ltau_500(1:npoints)
-  tau_nu(1)=(10**ltau_500(1))*Ab(1, 1, 1)
-  Do ipoint=2, npoints
-     tau_nu(ipoint)=tau_nu(ipoint-1)+ &
-          (tau_500(ipoint)-tau_500(ipoint-1))* &
-          0.5*(Ab(ipoint, 1, 1)+Ab(ipoint-1,1, 1))
-  End do
-!  Call Check_tau(tau_nu)
-!
-! Calculate the derivatives of Source funct. and Absorpt. mat.
-!
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,1,1), Tmp)
-  Ab_p(1:npoints,1,1)=Tmp
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,1,2), Tmp)
-  Ab_p(1:npoints,1,2)=Tmp
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,1,3), Tmp)
-  Ab_p(1:npoints,1,3)=Tmp
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,1,4), Tmp)
-  Ab_p(1:npoints,1,4)=Tmp
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,2,3), Tmp)
-  Ab_p(1:npoints,2,3)=Tmp
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,2,4), Tmp)
-  Ab_p(1:npoints,2,4)=Tmp
-  Call Parab_deriv(npoints, tau_500, Ab( 1:npoints,3,4), Tmp)
-  Ab_p(1:npoints,3,4)=Tmp
-
-! Invoke symmetry properties to construct the rest of the abs. matrix derivat.
-  Ab_p( 1:npoints,2,2)=Ab_p( 1:npoints,1,1)
-  Ab_p( 1:npoints,3,3)=Ab_p( 1:npoints,1,1)
-  Ab_p( 1:npoints,4,4)=Ab_p( 1:npoints,1,1)
-  Ab_p( 1:npoints,2,1)=Ab_p( 1:npoints,1,2)
-  Ab_p( 1:npoints,3,1)=Ab_p( 1:npoints,1,3)
-  Ab_p( 1:npoints,4,1)=Ab_p( 1:npoints,1,4)
-  Ab_p( 1:npoints,3,2)=-Ab_p(1:npoints,2,3)
-  Ab_p( 1:npoints,4,2)=-Ab_p( 1:npoints,2,4)
-  Ab_p( 1:npoints,4,3)=-Ab_p( 1:npoints,3,4)
-! Derivatives of source function (1st component only)
-  Call Parab_deriv(npoints, tau_500, S, S_p)
-!
-! Find the point for the boundary condition
-!
-  ibound=npoints-1
-  Do while (tau_nu(ibound) .gt. Optically_thick .and. ibound .gt. 3)
-     ibound=ibound-1
-  End do
-  If (tau_nu(ibound) .lt. 10. .and. Warning_thick) then
-     Print *,'Warning! Line not optically thick at the bottom'
-     Print *,'Tau_nu at the bottom = ',tau_nu(ibound)
-     Print *,'This warning will not be shown any more during this run'
-     Warning_thick=.FALSE.
-  End if
-!
-! Set boundary condition (I=S + dS/dtau) at ibound
-!
-  Stokes(ibound, 1)=S(ibound) + 0.*S_p(ibound)/ & ! Boundary cond.
-       Ab(ibound,1, 1) ! Note that S_p is with respect to
-                        ! tau_500 and we need it with tau_nu
-  Stokes(ibound,2:4)=0.
-!
-! Ray propagation
-!
-  Id(1:4, 1:4)=0.
-  Id(1,1)=1.
-  Id(2,2)=1.
-  Id(3,3)=1.
-  Id(4,4)=1. ! Define identity matrix
-  ipoint=ibound-1
-  Do while (ipoint .gt. 1 .and. tau_nu(ipoint) .gt. Optically_thin) ! Loop
-     dtau=tau_500(ipoint+1)-tau_500(ipoint)
-!
-! Down quantities (point "i" in the paper)
-!
-     J_down(1:4)=dtau/2.*Ab(ipoint+1,1:4, 1)*S(ipoint+1)
-     Call Multiply_matrix(4, 4, 4, Ab(ipoint+1,1:4, 1:4), &
-          Ab(ipoint+1,1:4, 1:4), K2) ! K^2
-     Cal_J_down(1:4)=dtau*dtau/12.*(Ab(ipoint+1,1:4, 1)*S_p(ipoint+1)+ &
-          Ab_p(ipoint+1,1:4, 1)*S(ipoint+1) - K2(1:4, 1)*S(ipoint+1))
-!
-! Up quantities (point "i+1" in the paper)
-!
-     J(1:4)=dtau/2.*Ab(ipoint,1:4, 1)*S(ipoint)
-     Call Multiply_matrix(4, 4, 4, Ab(ipoint+1,1:4, 1:4), &
-          Ab(ipoint,1:4, 1:4), K2) ! K^2
-     Cal_J(1:4)=dtau*dtau/12.*(Ab(ipoint,1:4, 1)*S_p(ipoint)+ &
-          Ab_p(ipoint,1:4, 1)*S(ipoint) - K2(1:4, 1)*S(ipoint))
-     Cal_K(1:4, 1:4)=K2(1:4, 1:4) - Ab_p(ipoint,1:4, 1:4)
-     D(1:4, 1:4)=Id(1:4, 1:4) + dtau/2.*Ab(ipoint,1:4, 1:4) + &
-          dtau*dtau/12.*Cal_K(1:4, 1:4)
-     Call matinx(D) ! Now the matrix D is actually the D^-1 in the paper
-     Tmp44(1:4, 1:4)=Id(1:4, 1:4) - dtau/2.*Ab(ipoint+1, 1:4, 1:4) + &
-          dtau*dtau/12.*Cal_K(1:4, 1:4)
-     Call Multiply_matrix(4, 4, 4, D, Tmp44, A)
-     Tmp4(1:4)=J(1:4)+J_down(1:4)+Cal_J_down(1:4)-Cal_J(1:4)
-     Call Multiply_matrix(4, 4, 1, D, Tmp4, E)
-     Call Multiply_matrix(4, 4, 1, A, Stokes(ipoint+1,1:4), Tmp4)
-     Stokes(ipoint,1:4)=Tmp4(1:4) + E(1:4) ! I(i+1)=A.I(i)+E
-     ipoint=ipoint-1
-  End do ! End loop at the top of the atmo or where tau_nu < Optically_thin
-  If (tau_nu(1) .gt. 1.e-2 .and. Warning_thin) then
-     Print *,'Warning! Line not optically thin in the surface'
-     Print *,'Tau_nu at the surface = ',tau_nu(1)
-     Print *,'This warning will not be shown any more during this run'
-     Warning_thin=.FALSE.
-  End if
-  Emergent_Stokes(1:4)=Stokes(ipoint,1:4)
-  Return
-End Subroutine myold_Hermite
-
-Subroutine SC_solver(npoints, dtau_nu, Ab, S, Emergent_stokes)
+Subroutine SC_solver(npoints, dtau_nu, Ab, S, Emergent_stokes, boundary_switch)
 ! *** NOTE: For intensity ONLY. Returns Q=U=V=0.
   Implicit None
-  Integer :: npoints, ibound, ipoint
+  Integer :: npoints, ibound, ipoint, boundary_switch
   Real, Dimension (npoints) :: ltau_500, S, dtau_nu
   Real, Dimension (npoints) :: Opac, tau_nu, Stokes_component
   Real, Dimension (npoints,4, 4) :: Ab
@@ -1246,7 +1127,11 @@ Subroutine SC_solver(npoints, dtau_nu, Ab, S, Emergent_stokes)
 !
 ! Set boundary condition (I=S) at ibound
 !
-  Intensity(ibound)=S(ibound) ! Boundary cond.
+  If (boundary_switch .eq. 0) then
+     Intensity(ibound)=S(ibound) ! Boundary cond.
+  Else
+     Intensity(ibound)=0.
+  Endif
   ipoint=ibound-1
   Do while (ipoint .gt. 1 .and. tau_nu(ipoint) .gt. Optically_thin) ! Loop
      dtm=dtau_nu(ipoint+1)
@@ -1268,9 +1153,9 @@ Subroutine SC_solver(npoints, dtau_nu, Ab, S, Emergent_stokes)
 !
 End Subroutine SC_solver
 !
-Subroutine Delopar(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes)
+Subroutine Delopar(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes, boundary_switch)
   Implicit None
-  Integer :: npoints, ibound, ipoint, k, km, kp, i, j
+  Integer :: npoints, ibound, ipoint, k, km, kp, i, j, boundary_switch
   Real, Dimension (npoints) :: ltau_500, Source, tau_nu, dtau_nu, tau_500
   Real, Dimension (npoints,4) :: Opac
   Real, Dimension (npoints,4,4) :: Ab_matrix
@@ -1315,7 +1200,11 @@ Subroutine Delopar(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes)
 ! Set boundary condition (I=S) at ibound
 !
   Stokes(ibound:npoints,2:4)=0.
-  Stokes(ibound:npoints,1)=Source(ibound:npoints) ! Boundary cond.
+  If (boundary_switch .eq. 0) then
+     Stokes(ibound:npoints,1)=Source(ibound:npoints) ! Boundary cond.
+  Else
+     Stokes(ibound:npoints,1)=0.
+  Endif
 !
 ! Identity matrix
   identity(:,:)=0.
@@ -1440,9 +1329,9 @@ Subroutine Delopar(npoints, ltau_500, Ab_matrix, Source, Emergent_Stokes)
 
 End Subroutine Delopar
 
-Subroutine Delolin(npoints, dtau_nu, Ab_matrix, Source, Emergent_Stokes)
+Subroutine Delolin(npoints, dtau_nu, Ab_matrix, Source, Emergent_Stokes, boundary_switch)
   Implicit None
-  Integer :: npoints, ibound, ipoint, k, km, kp, i, j
+  Integer :: npoints, ibound, ipoint, k, km, kp, i, j, boundary_switch
   Real, Dimension (npoints) :: ltau_500, Source, tau_nu, dtau_nu, tau_500
   Real, Dimension (npoints,4) :: Opac
   Real, Dimension (npoints,4, 4) :: Ab_matrix
@@ -1493,7 +1382,11 @@ Subroutine Delolin(npoints, dtau_nu, Ab_matrix, Source, Emergent_Stokes)
 ! Set boundary condition (I=S) at ibound
 !
   Stokes(ibound:npoints,2:4)=0.
-  Stokes(ibound:npoints,1)=Source(ibound:npoints) ! Boundary cond.
+  If (boundary_switch .eq. 0) then 
+     Stokes(ibound:npoints,1)=Source(ibound:npoints) ! Boundary cond.
+  Else
+     Stokes(ibound:npoints,1)=0.
+  Endif
 !
 ! Identity matrix
   identity(:,:)=0.
@@ -1960,6 +1853,7 @@ Subroutine Forward(Params, Line, Region, Atmo, Syn_profile, Hydro)
   Type (Region_data), dimension (Params%n_regions) :: Region
   Type (Model_2comp) :: Atmo
   Real, Dimension (Params%n_data) :: Syn_profile, syn2
+  Integer :: iregion, iwave, i0
   Logical :: Hydro
 !
   Call Forward_1comp(Params, Line, Region, Atmo%Comp1, Syn_profile, Hydro)
@@ -1974,6 +1868,14 @@ Subroutine Forward(Params, Line, Region, Atmo, Syn_profile, Hydro)
        Call Convolve_profile(Params, Region, Atmo%Comp1, Syn_profile) ! Macroturbulence
   If (Atmo%Comp1%stray .gt. 0.001) &
        Call Add_stray_light(Params, Atmo%Comp1, Region, Syn_profile) ! Add stray light &
+! Apply observational additive and multiplicative constants
+  Do iregion=1, Params%n_regions
+     Do iwave=1, Region(iregion)%nwavelengths
+        i0=(iwave-1)*4
+        Syn_profile(i0+1:i0+4)=(Syn_profile(i0+1:i0+4)+Region(iregion)%obs_additive)* &
+             Region(iregion)%obs_multiplicative
+     End do
+  End do
 !
   Return 
 !
@@ -2355,6 +2257,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               If (Line(iline)%Width .gt. 5.) Incomplete=.FALSE.
               If (Incomplete) Line(iline)%Width=Line(iline)%Width*2.
            End do ! While incomplete
+           print *,'phii=',phi_i(196:206,100)
+           print *,'tau=',atmo%ltau_500
            Call Abs_matrix(npoints, nwlengths,  Phi_I(:,:), Phi_Q(:,:), &
                 Phi_U(:,:), Phi_V(:,:), &
                 Psi_Q(:,:), Psi_U(:,:), Psi_V(:,:), &
@@ -2423,12 +2327,14 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                  End if
               End if
            End do ! Do in iwave
-  
+
            If (Line(iline)%DepCoefMode .eq. 1) then
               Do idepth=1, Params%n_points ! Apply depature coefficients
                  Absorp(:,idepth,:,:)=Absorp(:,idepth,:,:)* &
                       Line(iline)%b_low(idepth)
               End do
+              print *,'b_u=',line(iline)%b_up
+              print *,'b_l=',line(iline)%b_low
            End if
 
            TotAbsorp(:,:,:,:)=TotAbsorp(:,:,:,:)+ &
@@ -2484,7 +2390,21 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call time_routine('formalsolution',.True.)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
-                Stokes, ichoice) ! Formal solution
+                Stokes, ichoice, Params%formal_boundary_cond) ! Formal solution
+
+           print *,'i=',iwave,' syn=',stokes(1),' sf=',source_f(20)
+           print *,'n=',params%n_points
+           if (iwave .eq. 196) then
+              open (99,file='196.dat')
+              write (99,*) source_f, absorp_height(:,1,1), line(1)%b_low, line(1)%b_up
+              close(99)
+           endif
+           if (iwave .eq. 206) then
+              open (99,file='206.dat')
+              write (99,*) source_f, absorp_height(:,1,1), line(1)%b_low, line(1)%b_up
+              close(99)
+           endif
+              
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point
@@ -2542,9 +2462,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Stop
         End if
         nformal(ichoice)=nformal(ichoice)+1 ! How many solutions of each type
-        Syn_profile(idata)=Syn_profile(idata)+Region(iregion)%Bias*reference_cont
-        Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/ &
-             (reference_cont*(1.+Region(iregion)%Bias))
+        Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/reference_cont
         idata=idata+4*Params%Skip_lambda ! Update the data index
      End do !$$ PARALLEL LOOP END
 

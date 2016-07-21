@@ -10,7 +10,7 @@ Real, Dimension(nz, maxnlevels, 3500) :: XSec
 
 Contains
   Subroutine UVOpacity_TOPbase_init
-    Character (Len=49) :: Path='/home/d/navarro/nicole/git/NICOLE-master/forward/'
+    Character (Len=42) :: Path='/scratch/hsocas/nicole/git/NICOLE/forward/'
     Logical :: Exists, FirstTime=.True.
     Integer :: unit, iz, ilev, ilam
     !

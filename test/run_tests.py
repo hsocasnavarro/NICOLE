@@ -447,8 +447,12 @@ if success == 1:
     print 'Congratulations! Your build of NICOLE has passed all tests successfully :)\n\n'
     if numpy == 0:
         print ' (Note, however, that you will not be able to use IDL save files on this machine)'
+    import calccorrect
+    calccorrect.message()
     sys.exit(0)
 else:
     print '\n\n         =========================================='
     print 'Unfortunately your build of NICOLE has failed one or more tests :(\n\n'
+    import calccorrect
+    calccorrect.message(correct=False)
     sys.exit(1)

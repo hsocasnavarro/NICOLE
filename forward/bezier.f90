@@ -480,10 +480,10 @@ CONTAINS
   !
   ! Solvers
   !
-  Subroutine delobezier3(npoints, dtau_nu, Ab, S, stokes)
+  Subroutine delobezier3(npoints, dtau_nu, Ab, S, stokes, boundary_switch)
     USE Bezier_math
     Implicit None
-    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound
+    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound, boundary_switch
     Integer :: ipiv(4), myunit
     Real, dimension(npoints) :: tau_500, tau_nu, iab, S, dtau_nu
     Real, dimension(npoints, 4, 4) :: Ab, abp
@@ -550,7 +550,11 @@ CONTAINS
     ! Set boundary condition (I=S) at ibound
     !
     ostokes(2:4)=0.0d0
-    ostokes(1) = S(ibound) ! Boundary cond.
+    if (boundary_switch .eq. 0) then
+       ostokes(1) = S(ibound) ! Boundary cond.
+    else
+       ostokes(1) = 0.
+    endif
 
     !
     ! Derivatives for Ab and Sv
@@ -632,10 +636,10 @@ CONTAINS
 
   End Subroutine delobezier3
 
-  Subroutine delobezier(npoints, dtau_nu, Ab, S, stokes)
+  Subroutine delobezier(npoints, dtau_nu, Ab, S, stokes, boundary_switch)
     USE Bezier_math
     Implicit None
-    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound
+    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound, boundary_switch
     Integer :: ipiv(4)
     Real, dimension(npoints) :: dtau_nu, S, iab, tau_nu, tau_500
     Real, dimension(npoints,4, 4) :: Ab, abp
@@ -703,7 +707,12 @@ CONTAINS
     ! Set boundary condition (I=S) at ibound
     !
     ostokes(2:4)=0.0d0
-    ostokes(1) = S(ibound) ! Boundary cond.
+    if (boundary_switch .eq. 0) then
+       ostokes(1) = S(ibound) ! Boundary cond.
+    else
+       ostokes(1) = 0.
+    endif
+    
 
     !
     ! Derivatives of the source function and ab matrix
@@ -778,10 +787,10 @@ CONTAINS
 
   END Subroutine delobezier
   
-  SUBROUTINE delobezier_scal(npoints, dtau_nu, Ab, S, stokes)
+  SUBROUTINE delobezier_scal(npoints, dtau_nu, Ab, S, stokes, boundary_switch)
     Use bezier_math
     Implicit None
-    Integer :: npoints, k, k1, ibound, ubound
+    Integer :: npoints, k, k1, ibound, ubound, boundary_switch
     Real, dimension(npoints) :: dtau_nu, tau_nu, tau_500, S, iab
     Real, dimension(npoints,4,4) :: Ab
     Real, dimension(4) :: stokes
@@ -820,7 +829,11 @@ CONTAINS
     !
     ! Boundary condition
     !
-    I = S(ibound)
+    if (boundary_switch .eq. 0) then
+       I = S(ibound)
+    else
+       I = 0.
+    endif
 
     ibound = ibound - 1
     
@@ -863,10 +876,10 @@ CONTAINS
     stokes = 0
     stokes(1) = I
   end SUBROUTINE delobezier_scal
-  Subroutine hermite2(npoints, dtau_nu, Ab, S, stokes)
+  Subroutine hermite2(npoints, dtau_nu, Ab, S, stokes, boundary_switch)
     USE Bezier_math
     Implicit None
-    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound
+    Integer :: ipoint, npoints, ibound, ii, jj, k, k1, info, ubound, boundary_switch
     Integer :: ipiv(4)
     Real, dimension(npoints) :: dtau_nu, S, iab, tau_nu, tau_500
     Real, dimension(npoints, 4, 4) :: Ab, abp
@@ -927,7 +940,11 @@ CONTAINS
     ! Set boundary condition (I=S) at ibound
     !
     ostokes(2:4)=0.0d0
-    ostokes(1) = S(ibound) ! Boundary cond.
+    if (boundary_switch .eq. 0) then   
+       ostokes(1) = S(ibound) ! Boundary cond.
+    else
+       ostokes(1) = 0.
+    endif
 
     !
     ! Derivatives of the source function and ab matrix

@@ -47,10 +47,19 @@ Module Line_data_structure
      Real :: Wave_step ! in Angstroms
      Real :: Macro_enh ! Macroturbulence enhancement factor (dimensionless)
      Real :: Opacity_enh ! Fudge factor to enhance background opacities
-     Real :: bias ! This value will be added to the spectral profile at
+     Real :: obs_additive ! This value will be added to the spectral profile at
                   ! all wavelengths in this region. Typically used
                   ! to compensate for spectrally-flat scattered light
                   ! inside the instrument
+     Real :: obs_multiplicative ! This value will be applied to the spectral
+                  ! profile (after the additive constant) at
+                  ! all wavelengths in this region. Typically used
+                  ! to compensate for spectrally-flat scattered light
+                  ! inside the instrument
+     Real :: obs_gauss_sigma ! If .ne. 0, use a Gaussian instrumental profile
+                             ! for convolution of synthetic spectrum. This is
+                             ! overriden if a detailed instrumental profile 
+                             ! has been specified (units=Angstroms)
      Integer :: nwavelengths ! number of wavelengths
      Integer :: layer ! 1->Photospheric region; 2->Chromospheric region
   End Type Region_data

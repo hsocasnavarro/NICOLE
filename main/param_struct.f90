@@ -5,7 +5,7 @@ Module Param_structure
 !
 ! Recl parameter for binary read input/output when reading/writing a 64-bit
 ! real number
-  Integer, Parameter :: RealBytes=           8 ! DO NOT MODIFY THIS LINE!!!
+  Integer, Parameter :: RealBytes=           2 ! DO NOT MODIFY THIS LINE!!!
 ! Machine endianness
 !  True=Little Endian, e.g. i386
 !  False=Big endian, e.g. Motorola, PowerPC
@@ -18,7 +18,7 @@ Module Param_structure
      Integer :: n_data, n_free_parameters, n_variables
      Integer :: max_inv_iters
      Integer :: n_points, n_lines, n_regions, ncycles
-     Integer :: formal_solution, printout
+     Integer :: formal_solution, formal_boundary_cond, printout
      Integer :: nPix, def_abund, speed, always_compute_deriv, cent_der
      Integer :: recompute_deriv, reference_cont
      Integer :: Skip_lambda, Reinterpolate

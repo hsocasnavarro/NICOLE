@@ -4562,11 +4562,9 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
   Debug_errorflags(flag_NLTE)=0
   Debug_warningflags(flag_NLTE)=0
   If (FirstTime) then
-     Allocate(Saved_NLTE%Atmo%temp(NLTE%NDEP))
+     Call Allocate_model(Saved_NLTE%Atmo, NLTE%NDEP)
      Saved_NLTE%Atmo%temp(:)=0.
-     Allocate(Saved_NLTE%Atmo%v_los(NLTE%NDEP))
      Saved_NLTE%Atmo%v_los(:)=0.
-     Allocate(Saved_NLTE%Atmo%v_mic(NLTE%NDEP))
      Saved_NLTE%Atmo%v_mic(:)=0.
      Allocate(Saved_NLTE%N(Atom%NK,NLTE%NDEP))
      Saved_NLTE%N(:,:)=0.
@@ -5027,7 +5025,8 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      Saved_NLTE%N(1:Atom%NK,1:NLTE%NDEP)=NLTE%N(1:Atom%NK,1:NLTE%NDEP)
      Saved_NLTE%Source_f(:,:,:)=NLTE%Source_f(:,:,:)
      Saved_NLTE%Error=NLTE%Error
-     Saved_NLTE%atmo=NLTE%atmo
+     !Saved_NLTE%atmo=NLTE%atmo
+     Call Model_assign(Saved_NLTE%atmo,NLTE%atmo)
      Saved_NLTE%atmo%temp=NLTE%atmo%temp
      Saved_NLTE%atmo%v_los=NLTE%atmo%v_los
      Saved_NLTE%atmo%v_mic=NLTE%atmo%v_mic

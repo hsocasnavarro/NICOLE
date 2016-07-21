@@ -166,16 +166,24 @@ elements=['h','he','li','be','b','c','n','o','f','ne',
 
 # Get command-line arguments
 nicolecommand=''
+inputmodel=''
+outprof=''
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"", ["nicolecommand="])
+    opts, args = getopt.getopt(sys.argv[1:],"", ["nicolecommand=","modelin=","profout="])
 except:
     print 'Command-line option not recognized'
     print 'Usage:'
-    print "run_nicole.py [--nicolecommand='command']"
+    print "run_nicole.py [--nicolecommand='command' --modelin='inputmodel' --profout='outputprofiles']"
     sys.exit(2)
 for o, a in opts:
     if o == '--nicolecommand':
         nicolecommand=a
+    if o == '--modelin':
+        inputmodel=a
+    if o == '--profout':
+        outprof=a
+
+if ((inputmodel <> '') and (outprof <> '')): print 'Calculating model ', inputmodel,', profiles output ',outprof
 
 # Check sizes of default types
 [int4f,intf,flf]=check_types()
@@ -233,9 +241,11 @@ for icycle in range(int(ncycles)):
         nicolecommand=get_value(config,'Command','../main/nicole','NICOLE.input')
     mode=get_value(config,'Mode','','NICOLE.input')
 #    ncycles=get_value(config,'Cycles','1','NICOLE.input')
-    inputmodel=get_value(config,'Input model','','NICOLE.input')
+    if inputmodel == '':
+        inputmodel=get_value(config,'Input model','','NICOLE.input')
     inputmodel2=get_value(config,'Input model 2',None,'NICOLE.input')
-    outprof=get_value(config,'Output profiles','','NICOLE.input')
+    if outprof == '':
+        outprof=get_value(config,'Output profiles','','NICOLE.input')
     helio=get_value(config,'Heliocentric angle','None','NICOLE.input')
     xang=get_value(config,'Heliocentric X-angle','None','NICOLE.input')
     yang=get_value(config,'Heliocentric Y-angle','None','NICOLE.input')
@@ -245,6 +255,7 @@ for icycle in range(int(ncycles)):
     outputmodel=get_value(config,'Output model',None,'NICOLE.input')
     outputmodel2=get_value(config,'Output model 2',None,'NICOLE.input')
     formal=get_value(config,'Formal solution method','0','NICOLE.input')
+    boundarycond=get_value(config,'Formal solution boundary condition','Normal','NICOLE.input')
     stray=get_value(config,'Stray light file',None,'NICOLE.input')
     printout=get_value(config,'Printout detail','1','NICOLE.input')
     maxiters=get_value(config,'Maximum inversion iterations','25','NICOLE.input')
@@ -362,6 +373,18 @@ for icycle in range(int(ncycles)):
     if inputdens != 'pel' and inputdens != 'pgas' and inputdens != 'nel' and inputdens != 'dens':
         print 'Error in NICOLE.input. Input density must be either Pel, Pgas, Nel or Dens'
         sys.exit(1)
+    if formal < '0' or formal > '9':
+        print 'Error in NICOLE.input. Invalid formal solution method'
+        sys.exit(1)
+    boundarycond=boundarycond.lower()
+    if boundarycond == 'normal' or boundarycond == 'difussion':
+        boundarycond = '0'
+    elif boundarycond == 'zero':
+        boundarycond = '1'
+    else:
+        print 'Error in NICOLE.input. Invalid formal solution boundary condition'
+        print 'Must be Normal, Difusion or Zero'
+        sys.exit(1)    
     if hscale != 't' and hscale != 'z':
         print 'Error in NICOLE.input. Input density must be either tau or z'
         sys.exit(1)
@@ -1147,7 +1170,7 @@ for icycle in range(int(ncycles)):
     f.write(outprof+'\n')
     f.write(outputmodel+'\n')
     f.write(outputmodel2+'\n')
-    f.write(formal+'      ! formal \n')
+    f.write(formal+' '+boundarycond+'      ! formal boundarycond \n')
     f.write(helio+' '+'   ! helio \n')
     f.write(printout+'    ! printout \n')
     f.write(maxiters+'    ! maxiters. Below: stray profile \n')
@@ -1200,9 +1223,13 @@ for icycle in range(int(ncycles)):
                       ,'Region '+str(iregion+1))
         tmp6=get_value(config,'Opacity enhancement','1.0','NICOLE.input'
                       ,'Region '+str(iregion+1))
-        tmp7=get_value(config,'Bias','0.0','NICOLE.input'
+        tmp7=get_value(config,'Observations additive constant','0.0','NICOLE.input'
                       ,'Region '+str(iregion+1))
-        f.write(tmp1+' '+tmp2+' '+tmp3+' '+tmp4+' '+tmp5+' '+tmp6+' '+tmp7+'\n')
+        tmp8=get_value(config,'Observations multiplicative constant','1.0','NICOLE.input'
+                      ,'Region '+str(iregion+1))
+        tmp9=get_value(config,'Gaussian profile sigma','0.0','NICOLE.input'
+                      ,'Region '+str(iregion+1))
+        f.write(tmp1+' '+tmp2+' '+tmp3+' '+tmp4+' '+tmp5+' '+tmp6+' '+tmp7+' '+tmp8+' '+tmp9+'\n')
     # Parse spectral line database file
     fl=open('LINES')
     LINES_lines=fl.readlines()
@@ -1503,4 +1530,5 @@ for icycle in range(int(ncycles)):
 print ''
 print 'Starting code execution'
 status=subprocess.call(nicolecommand.split())
-
+import calccorrect
+calccorrect.message(correct= status == 0)
