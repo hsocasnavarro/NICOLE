@@ -1244,7 +1244,7 @@ assuming that the instrumental profile is a Gaussian but sometimes
 this approach does not suffice. If we know the instrumental profile of
 our instrument (e.g., from theoretical considerations or by measuring
 the spectrum produced when the system is illuminated by a laser beam)
-we can specify it by including an ASCII file in the running directory
+we can specify it by including a file in the running directory
 named Instrumental\_profile.dat. One can also use the suffix \_1, \_2,
 etc to have a different file for each cycle of the run. If the file
 exists, NICOLE will read and use it. Make sure you have spelled the
@@ -1253,16 +1253,33 @@ NICOLE.input is 1 or higher, NICOLE will print the following message:
 \begin{verbatim}
  Reading Instrumental_profile.dat
 \end{verbatim}
-The format of this file is the same as any other profile file. This
-has changed from versions prior to 2.6 to allow for an instrumental
-profile that varies over the field of view, as is the case with some
-instruments. Note that each profile might contain different spectral
-regions. We then need to include the appropriate profile for each
-region in each profile. The instrumental profile needs to have its
-peak at the first point, then have the right-hand side of the profile
-function run through half of the region profile and, finally, from the
-midpoint to the last we have the left side of the profile. If the
-instrumental profile is specified, macroturbulence is ignored. It is
+This is a binary file with as many records as pixels in the field of
+view (i.e., $nx \times ny$) plus one. This has changed from versions
+prior to 2.6 to allow for an instrumental profile that varies over the
+field of view, as is the case with some instruments. Note that each
+profile might contain different spectral regions. We then need to
+include the appropriate profile for each region in each profile. The
+instrumental profile needs to have its peak at the first point, then
+have the right-hand side of the profile function run through half of
+the region profile and, finally, from the midpoint to the last we have
+the left side of the profile.  Each record has $n\lambda$ 8-byte
+numbers. The first record contains some metadata. The first number
+specifies the number of points in the instrumental profile for the
+first spectral region. If there are more regions, then the second
+number has the number of points in the instrumental profile for the
+second region, and so on. The number of regions must match what has
+been specified in NICOLE.input. The user is responsible to ensure that
+this file is consistent with the rest of inputs. No sanity checks are
+performed by the code. After this first record with metadata, we have
+all other records with the instrumental profile(s) for each
+pixel. Each record contains the instrumental profile, starting with
+the peak, with the same wavelength sampling as the spectral region and
+normalized so that the total area is unity (otherwise the synthetic
+profile normaliazation is affected by the profile area). Obviously,
+the number of points in all of the instrumental profiles together must
+not exceed the total number of wavelengths being computed.
+
+If the instrumental profile is specified, macroturbulence is ignored. It is
 recommended to test this option with a simple synthesis of a narrow
 line (without micro- or macroturbulence), observing the broadening
 produced when the instrumental profile is used.
