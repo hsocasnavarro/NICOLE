@@ -1,12 +1,12 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=latex 2016.5.8)  11 AUG 2016 11:33
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=latex 2016.4.12)  14 AUG 2016 18:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **manual
 (./manual.tex
-LaTeX2e <2016/02/01>
-Babel <3.9q> and hyphenation patterns for 3 language(s) loaded.
-(/usr/share/texlive/texmf-dist/tex/latex/base/latex209.def
+LaTeX2e <2016/03/31>
+Babel <3.9q> and hyphenation patterns for 52 language(s) loaded.
+(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/latex209.def
 File: latex209.def 2015/02/22 v0.53 Standard LaTeX file
 
 
@@ -39,7 +39,7 @@ File: latex209.def 2015/02/22 v0.53 Standard LaTeX file
 \@cla=\count79
 \@clb=\count80
 \mscount=\count81
-(/usr/share/texlive/texmf-dist/tex/latex/base/tracefnt.sty
+(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/tracefnt.sty
 Package: tracefnt 2015/02/21 v3.0k Standard LaTeX package (font tracing)
 \tracingfonts=\count82
 LaTeX Info: Redefining \selectfont on input line 106.
@@ -50,25 +50,25 @@ LaTeX Info: Redefining \selectfont on input line 106.
 \symitalic=\mathgroup7
 \symsmallcaps=\mathgroup8
 \symslanted=\mathgroup9
-LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 298.
-LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 299.
-LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 300.
-LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 306.
-LaTeX Info: Redefining \em on input line 316.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 268.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 269.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 270.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 276.
+LaTeX Info: Redefining \em on input line 286.
 
-(/usr/share/texlive/texmf-dist/tex/latex/base/latexsym.sty
+(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/latexsym.sty
 Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 \symlasy=\mathgroup10
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 (Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
 )
-LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 377.
-LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 379.
-LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 381.
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 332.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 334.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 336.
 )
-(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/book.cls
 Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
-(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo
+(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/bk10.clo
 File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count83
@@ -89,8 +89,8 @@ Compatibility mode: definition of \bf ignored.
 Compatibility mode: definition of \it ignored.
 Compatibility mode: definition of \sl ignored.
 Compatibility mode: definition of \sc ignored.
-LaTeX Info: Redefining \cal on input line 597.
-LaTeX Info: Redefining \mit on input line 598.
+LaTeX Info: Redefining \cal on input line 582.
+LaTeX Info: Redefining \mit on input line 583.
 \bibindent=\dimen105
 ) (./manual.aux)
 \openout1 = `manual.aux'.
@@ -114,8 +114,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 26.
 LaTeX Font Info:    Try loading font information for U+lasy on input line 26.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/ulasy.fd
+ (/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
 Overfull \hbox (43.66466pt too wide) in paragraph at lines 26--26
@@ -139,14 +138,15 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [2]
 Chapter 1.
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 52.
-(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 52.
  [3
 
-] [4] [5] [6]
+] [4]
+[5] [6]
 Chapter 2.
 [7
 
@@ -307,12 +307,12 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 463 strings out of 494954
- 5394 string characters out of 6181004
- 83374 words of memory out of 5000000
- 3782 multiletter control sequences out of 15000+600000
+ 463 strings out of 493651
+ 5513 string characters out of 6151148
+ 86707 words of memory out of 5000000
+ 3997 multiletter control sequences out of 15000+600000
  19815 words of font info for 72 fonts, out of 8000000 for 9000
- 14 hyphenation exceptions out of 8191
+ 783 hyphenation exceptions out of 8191
  23i,7n,21p,169b,252s stack positions out of 5000i,500n,10000p,200000b,80000s
 
 Output written on manual.dvi (84 pages, 212124 bytes).

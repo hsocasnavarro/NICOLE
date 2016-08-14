@@ -2257,8 +2257,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               If (Line(iline)%Width .gt. 5.) Incomplete=.FALSE.
               If (Incomplete) Line(iline)%Width=Line(iline)%Width*2.
            End do ! While incomplete
-           print *,'phii=',phi_i(196:206,100)
-           print *,'tau=',atmo%ltau_500
            Call Abs_matrix(npoints, nwlengths,  Phi_I(:,:), Phi_Q(:,:), &
                 Phi_U(:,:), Phi_V(:,:), &
                 Psi_Q(:,:), Psi_U(:,:), Psi_V(:,:), &
@@ -2391,20 +2389,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice, Params%formal_boundary_cond) ! Formal solution
-
-           print *,'i=',iwave,' syn=',stokes(1),' sf=',source_f(20)
-           print *,'n=',params%n_points
-           if (iwave .eq. 196) then
-              open (99,file='196.dat')
-              write (99,*) source_f, absorp_height(:,1,1), line(1)%b_low, line(1)%b_up
-              close(99)
-           endif
-           if (iwave .eq. 206) then
-              open (99,file='206.dat')
-              write (99,*) source_f, absorp_height(:,1,1), line(1)%b_low, line(1)%b_up
-              close(99)
-           endif
-              
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point

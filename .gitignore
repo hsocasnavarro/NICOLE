@@ -18,3 +18,7 @@ twofft.f90
 nrtype.f90
 nrtype.dp
 nrtype.sp
+*.pyc
+*.aux
+*.dvi
+*.toc
