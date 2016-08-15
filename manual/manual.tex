@@ -1975,16 +1975,19 @@ cd ..
 \section{Compiling in double precision}
 \label{sec:double}
 
-There are plans to support a switch to select the desired precision
-at compilation time but this is not yet possible in the current 
-NICOLE version. However, there is a quick-and-dirty workaround using 
-flags that most compilers incorporate to select the kind of implicit 
-types. For example, the Intel compiler uses the flag -r8 to signal
-the compiler that all implicit reals should be of kind=8 (i.e., double
-precision). We can use this flag alongside a small modification to one
-of the Numerical Recipes routines to compile NICOLE in double precision.
-In the directory numerical\_recipes, edit the nrtype.f90 file and
-change the following section:
+It is strongly recommended that you run NICOLE in double precision,
+especially for inversions or in complex NLTE syntheses.
+
+There are plans to support a switch to select the desired precision at
+compilation time but unfortunately this is not yet possible in the
+current NICOLE version. However, there is a quick-and-dirty workaround
+using flags that most compilers incorporate to select the kind of
+implicit types. For example, the Intel compiler uses the flag -r8 to
+signal the compiler that all implicit reals should be of kind=8 (i.e.,
+double precision). We can use this flag alongside a small modification
+to one of the Numerical Recipes routines to compile NICOLE in double
+precision.  In the directory numerical\_recipes, edit the nrtype.f90
+file and change the following section:
 \begin{verbatim}
   INTEGER, PARAMETER :: SP = KIND(1.0)
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
