@@ -130,7 +130,6 @@ Subroutine DeAllocate_model(Modelo)
   Type (Parameters) :: Params
   Type (Model) :: Modelo
 
-  print *, "deallocating model"     
   If (Allocated(Modelo%z_scale)) Deallocate (Modelo%z_scale)
   If (Allocated(Modelo%ltau_500)) Deallocate (Modelo%ltau_500)
   If (Allocated(Modelo%temp)) Deallocate (Modelo%temp)
