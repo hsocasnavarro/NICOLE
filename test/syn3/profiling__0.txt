@@ -1,16 +1,18 @@
- Code execution started on: 2014/12/02 at 14:29:11.965
-   Code execution ended on: 2014/12/02 at 14:29:13.649
+ Code execution started on: 2016/08/18 at 23:09:54.994
+   Code execution ended on: 2016/08/18 at 23:09:56.257
  Total execution time (s):           1
- Total execution time (hours):   4.68055543E-04
+ Total execution time (hours):  3.506666666666667E-004
  Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1   1.68499994       100.000000    
-    forward           1   1.67600000       99.4658737    
-    background_opac        1616   1.36699998       81.1275940    
-    solvestat           1  0.222000003       13.1750746    
-    NLTE_formalsolution       13200  0.192000002       11.3946590    
-    formalsolution         400   1.89999994E-02   1.12759650    
-    profiles           4   1.09999999E-02  0.652818978    
-    Fill densities           1   1.00000005E-03   5.93471862E-02
-    compute_pg           1   1.00000005E-03   5.93471862E-02
-    eneq         882   1.00000005E-03   5.93471862E-02
-    compute_others_from_T_Pe_Pg          85   0.00000000       0.00000000    
+    main           1   1.26240000000000        100.000000000000     
+    forward           1   1.24880000000000        98.9226869455006     
+    background_opac        1616  0.969100000000000        76.7664765525982     
+    solvestat           1  0.207800000000000        16.4607097591888     
+    NLTE_formalsolution       13200  0.172700000000000     
+   13.6802915082383     
+    formalsolution         400  1.350000000000000E-002   1.06939163498099     
+    profiles           4  1.240000000000000E-002  0.982256020278834     
+    eneq         879  9.000000000000000E-004  7.129277566539924E-002
+    Fill densities           1  5.999999999999999E-004  4.752851711026616E-002
+    compute_pg           1  5.999999999999999E-004  4.752851711026616E-002
+    compute_others_from_T_Pe_Pg          85  3.000000000000000E-004
+  2.376425855513308E-002

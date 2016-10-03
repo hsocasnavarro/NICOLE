@@ -165,9 +165,9 @@ elements=['h','he','li','be','b','c','n','o','f','ne',
           'fr','ra','ac','th','pa','u']
 
 # Get command-line arguments
-nicolecommand=''
-inputmodel=''
-outprof=''
+nicolecommand_argv=''
+inputmodel_argv=''
+outprof_argv=''
 try:
     opts, args = getopt.getopt(sys.argv[1:],"", ["nicolecommand=","modelin=","profout="])
 except:
@@ -177,13 +177,13 @@ except:
     sys.exit(2)
 for o, a in opts:
     if o == '--nicolecommand':
-        nicolecommand=a
+        nicolecommand_argv=a
     if o == '--modelin':
-        inputmodel=a
+        inputmodel_argv=a
     if o == '--profout':
-        outprof=a
+        outprof_argv=a
 
-if ((inputmodel <> '') and (outprof <> '')): print 'Calculating model ', inputmodel,', profiles output ',outprof
+if ((inputmodel_argv <> '') and (outprof_argv <> '')): print 'Command-line options, model ', inputmodel_argv,', profiles output ',outprof_argv
 
 # Check sizes of default types
 [int4f,intf,flf]=check_types()
@@ -237,15 +237,21 @@ for icycle in range(int(ncycles)):
     for l in NICOLE_input_lines:
         NICOLE_input_lower.append(lower_to_sep(l)) # Convert keys to lowercase
     config=ConfigObj(NICOLE_input_lower)
-    if nicolecommand == '':
+    if nicolecommand_argv == '':
         nicolecommand=get_value(config,'Command','../main/nicole','NICOLE.input')
+    else:
+        nicolecommand=nicolecommand_argv
     mode=get_value(config,'Mode','','NICOLE.input')
 #    ncycles=get_value(config,'Cycles','1','NICOLE.input')
-    if inputmodel == '':
+    if inputmodel_argv == '':
         inputmodel=get_value(config,'Input model','','NICOLE.input')
+    else:
+        inputmodel=inputmodel_argv
     inputmodel2=get_value(config,'Input model 2',None,'NICOLE.input')
-    if outprof == '':
+    if outprof_argv == '':
         outprof=get_value(config,'Output profiles','','NICOLE.input')
+    else:
+        outprof=outprof_argv
     helio=get_value(config,'Heliocentric angle','None','NICOLE.input')
     xang=get_value(config,'Heliocentric X-angle','None','NICOLE.input')
     yang=get_value(config,'Heliocentric Y-angle','None','NICOLE.input')

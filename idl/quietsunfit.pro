@@ -1,8 +1,8 @@
-@/home/hsocas/idl/ftsread.pro
-@/home/hsocas/idl/ver.pro
-@/home/hsocas/idl/line_min.pro
-@/home/hsocas/idl/min_line2.pro
-@/home/hsocas/idl/whereq
+;@~/idl/ftsread.pro
+;@~/idl/ver.pro
+;@~/idl/line_min.pro
+;@~/idl/min_line2.pro
+;@~/idl/whereq
 
 pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=halfwidth
   if not keyword_set(spectrumx) then begin ; Wavelength calibration
