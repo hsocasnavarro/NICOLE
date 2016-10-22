@@ -998,14 +998,14 @@ Contains
 
           ! }}}
        End if
+       Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
+       If (Params%TwoComp) &
+            Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
        If (Input%mode .eq. 'c' .and. Input%set_hydro) then
           Call Hydrostatic(Params, Guess_model%Comp1)
           If (Params%TwoComp) &
                          Call Hydrostatic(Params, Guess_model%Comp2)
        End if
-       Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
-       If (Params%TwoComp) &
-            Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
        If (Input%hscale .eq. 'z') then
           Call z_to_tau(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
