@@ -248,6 +248,7 @@ Subroutine Compute_chisq(Params, Obs_profile, Syn_profile, Sigma, &
         ndata=ndata+1
      End if
   End do
+  
   Chisq=Chisq/ndata
   NWChisq=Chisq
 !

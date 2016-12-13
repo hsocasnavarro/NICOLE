@@ -157,7 +157,7 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
 !     End if
 !  End if
 !
-  If (Atmo%v_mac .lt. 1.e-6 .and. .not. ExistsInstrumProf) Return
+  If (Atmo%v_mac .lt. 1.e-6 .and. MaxVal(Region(:)%obs_gauss_sigma) .lt. 1e-6 .and. .not. ExistsInstrumProf) Return
 !
   istart=1 ! Index to the first point of the line
   indreg1=1
@@ -180,6 +180,10 @@ Subroutine Convolve_profile(Params, Region, Atmo, Profile)
         m=5.*Sigma/Region(iregion)%Wave_step
         m=(m/2.)
         m=m*2+1 ! Make sure m is an odd integer
+        If (m .gt. Params%n_data) then
+           Print *,'Error in Convolve_profile. Gaussian too big'
+           Stop
+        End if
         gauss(1)=1. ! To prevent the case where v_mac .eq. 0.
         If (m .gt. 1) then
            Do i=1, m/2+1 ! Positive x
@@ -1872,7 +1876,9 @@ Subroutine Forward(Params, Line, Region, Atmo, Syn_profile, Hydro)
   Do iregion=1, Params%n_regions
      Do iwave=1, Region(iregion)%nwavelengths
         i0=(iwave-1)*4
-        Syn_profile(i0+1:i0+4)=(Syn_profile(i0+1:i0+4)+Region(iregion)%obs_additive)* &
+        Syn_profile(i0+1)=(Syn_profile(i0+1)+Region(iregion)%obs_additive)* &
+             Region(iregion)%obs_multiplicative
+        Syn_profile(i0+2:i0+4)=(Syn_profile(i0+2:i0+4))* &
              Region(iregion)%obs_multiplicative
      End do
   End do

@@ -1,8 +1,8 @@
-;@~/idl/ftsread.pro
-;@~/idl/ver.pro
-;@~/idl/line_min.pro
-;@~/idl/min_line2.pro
-;@~/idl/whereq
+@~/idl/ftsread.pro
+@~/idl/ver.pro
+@~/idl/line_min.pro
+@~/idl/min_line2.pro
+@~/idl/whereq
 
 pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=halfwidth
   if not keyword_set(spectrumx) then begin ; Wavelength calibration
@@ -125,27 +125,33 @@ pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=half
   endif
   sigma=halfwidth/1.17740
   if halfwidth gt 0 then begin
-     kernelx=(findgen(100)-50.)/50.*6.*sigma
+      dx=median(deriv(atlasx))
+     nkernel=fix(sigma/dx*5)*2
+     nkernel2=fix(sigma/dx*5)
+     kernelx=(findgen(nkernel)-nkernel2)*dx
      kernely=exp(-((kernelx)^2)/(2.*sigma)^2)
      kernely=kernely/total(kernely)
-     
+
      convlvatlas=convol(atlasy,kernely)
-     convlvatlas[0:50]=convlvatlas[50]
-     convlvatlas[n_elements(convlvatlas)-50:n_elements(convlvaltas)-1]=convlvatlas[n_elements(convlvatlas)-50]
+     convlvatlas[0:nkernel2]=convlvatlas[nkernel2]
+     convlvatlas[n_elements(convlvatlas)-nkernel2:n_elements(convlvaltas)-1]=convlvatlas[n_elements(convlvatlas)-nkernel2]
   endif else convlvatlas=atlasy
 
   plot,xx,yy
   oplot,atlasx,convlvatlas,lin=2
 
-  plot,spectrumx,spectrumy
-  ampspec=max(spectrumy)-min(spectrumy)
+  tmp=interpol(prefilter,xx,spectrumx)
+  prefilter=tmp
+  plot,spectrumx,spectrumy/prefilter
+  ampspec=max(spectrumy/prefilter)-min(spectrumy/prefilter)
+
   ampatlas=max(convlvatlas)-min(convlvatlas)
   norm=ampspec/ampatlas
 ;  oplot,atlasx,(convlvatlas-min(convlvatlas))*ampspec/ampatlas+min(spectrumy),lin=2
-  oplot,atlasx,( convlvatlas +min(spectrumy)/norm-min(convlvatlas) )*norm,lin=2
+  oplot,atlasx,( convlvatlas +min(spectrumy/prefilter)/norm-min(convlvatlas) )*norm,lin=2
   print,'Width (sigma, Angstroms)=',sigma
   print,'Multiplicative constant=',norm
-  print,'Additive constant=',min(spectrumy)/norm-min(convlvatlas)
+  print,'Additive constant=',min(spectrumy/prefilter)/norm-min(convlvatlas)
   
   save,file='fit.idl',/var,/compress
   
