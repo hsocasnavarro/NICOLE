@@ -7,10 +7,10 @@
 10000000   10000000      ! pixx2, pixy2 
 1          ! irec0 
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
-guess.bin
+inversion.model
 
 observed.bin
-inversion.bin
+inversion.pro
 inversion.model_2
 
 0 0      ! formal boundarycond 

@@ -2082,6 +2082,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            ng_i(:)=Line(iline)%b_low         ! are actually n/g
            ng_j(:)=Line(iline)%b_up          ! rather than dep coefs
         End if
+        If (Line(iline)%DepCoefMode .eq. 3) then ! Overwrite b_low and b_up 
+           Line(iline)%b_low=ng_i(:)
+           Line(iline)%b_up=ng_j(:) 
+        End if
         If (Line(iline)%DepCoefMode .eq. 0) then ! Overwrite b_low and b_up 
            Line(iline)%b_low(:)=1.
            Line(iline)%b_up(:)=1.
@@ -2143,12 +2147,16 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         i=Atom%i(itran)
         j=Atom%j(itran)
         If (Line(iline)%DepCoefMode .eq. 2) then   ! Contents of b_low and b_up 
-           NLTE%N(i,:)=Line(iline)%b_low/Atom%g(i) ! are actually n/g
-           NLTE%N(j,:)=Line(iline)%b_up/Atom%g(j)  ! rather than dep coefs
+           NLTE%N(i,:)=Line(iline)%b_low*Atom%g(i) ! are actually n/g
+           NLTE%N(j,:)=Line(iline)%b_up*Atom%g(j)  ! rather than dep coefs
         End if
         If (Line(iline)%DepCoefMode .eq. 0) then ! Overwrite b_low and b_up 
            Line(iline)%b_low(:)=NLTE%N(i,:)/NLTE%NStar(i,:)
            Line(iline)%b_up(:)=NLTE%N(j,:)/NLTE%NStar(j,:)
+        End if
+        If (Line(iline)%DepCoefMode .eq. 3) then ! Overwrite b_low and b_up 
+           Line(iline)%b_low(:)=NLTE%N(i,:)/Atom%g(i)
+           Line(iline)%b_up(:)=NLTE%N(j,:)/Atom%g(j)
         End if
         ng_i(:)=NLTE%N(i,:)/Atom%g(i)*Line(iline)%NLTE_nl_ratio
         ng_j(:)=NLTE%N(j,:)/Atom%g(j)*Line(iline)%NLTE_nu_ratio
@@ -2161,7 +2169,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Line_op(iline, 1:npoints)=Line_op(iline, 1:npoints) / &
           Atmo%Rho(1:npoints) ! cm^2/cm^3 to cm^2/g
   End do ! End line loop
-
 !
 ! Start loop in spectral regions and wavelengths.
 !
@@ -2337,8 +2344,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                  Absorp(:,idepth,:,:)=Absorp(:,idepth,:,:)* &
                       Line(iline)%b_low(idepth)
               End do
-              print *,'b_u=',line(iline)%b_up
-              print *,'b_l=',line(iline)%b_low
            End if
 
            TotAbsorp(:,:,:,:)=TotAbsorp(:,:,:,:)+ &

@@ -7,7 +7,7 @@
 10000000   10000000      ! pixx2, pixy2 
 1          ! irec0 
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
-guess.bin
+inversion.mod
 
 hsra_mag.pro
 inversion.pro

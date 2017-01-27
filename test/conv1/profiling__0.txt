@@ -1,6 +1,0 @@
- Code execution started on: 2016/10/03 at 12:40:49.098
-   Code execution ended on: 2016/10/03 at 12:40:49.105
- Total execution time (s):           0
- Total execution time (hours):  2.000000000000000E-006
- Subroutines profiled   (Name, number of calls, time(s), % of total time)
-    main           1  7.200000000000000E-003   100.000000000000     

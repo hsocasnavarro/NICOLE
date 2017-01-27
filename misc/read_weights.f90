@@ -10,8 +10,7 @@ SUBROUTINE read_weights(Params,Sigma)
 !
 ! Normalize weights so that their minimum is the noise
 !
-  Sigma(1:Params%n_data)=Sigma(1:Params%n_data)/MinVal(Sigma(1:Params%n_data))* &
-       Params%Noise
+!  Sigma(1:Params%n_data)=Sigma(1:Params%n_data)/MinVal(Sigma(1:Params%n_data)) !      Params%Noise
 !
 ! Discard values smaller than -10
 !

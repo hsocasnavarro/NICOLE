@@ -1,4 +1,4 @@
-!                      N I C O L E   v 16.10
+!                      N I C O L E   v 16.12
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 16.10 ******************'
+     Print *,'*************** N I C O L E   v 16.12 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -224,7 +224,13 @@ Program Nicole
           Line(iline)%HF_Alow, Line(iline)%HF_Blow, &
           Line(iline)%HF_Aup, Line(iline)%HF_Bup, Line(iline)%SpinI, &
           Line(iline)%Extra_vmic
-     If (Input%depcoef_mode .eq. 2) Line(iline)%DepCoefMode=2
+     If (Input%depcoef_mode .eq. 2) then
+        If (.not. Input%write_depcoef) then
+           Line(iline)%DepCoefMode=2
+        Else
+           Line(iline)%DepCoefMode=3
+        Endif
+     End if
 !
      Line(iline)%Atomic_number=1
      Do While (Atom_char(Line(iline)%Atomic_number) .ne. Line(iline)%Elem &
