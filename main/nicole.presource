@@ -558,6 +558,8 @@ Program Nicole
         !    Open depcoef file (leave it open, we'll read it as we go)
         Call Open_file_direct(depunit, 'depcoef.dat', &
              RealBytes*2*Params%n_lines*Params%n_points)
+        If (Params%Printout .ge. 2 .and. myrank .eq. 0) &
+             Print *,'Reading depcoef.dat'
      Else
         Inquire (File='depcoef.dat'//Cyclesuffix, Exist=DepCoefExists)        
         If (DepCoefExists) then
