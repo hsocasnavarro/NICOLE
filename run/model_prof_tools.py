@@ -282,7 +282,7 @@ def read_prof(filename, filetype, nx, ny, nlam, ix, iy, sequential=0):
     import struct
     import re
     import sys
-    global idl, irec, f # Save values between calls
+    global idl, irec, f, lastfilename # Save values between calls
 
     [int4f,intf,flf]=check_types()
 # Read a particular profile from a profile file 
@@ -328,6 +328,17 @@ def read_prof(filename, filetype, nx, ny, nlam, ix, iy, sequential=0):
         return data
     elif filetype == 'idl':
         import idlsave
+        try:
+            a=lastfilename
+        except:
+            lastfilename=''
+        if filename != lastfilename:
+            idl=idlsave.read(filename,verbose=0)
+            idl.stki=idl.stki.reshape(nlam,ny,nx)
+            idl.stkq=idl.stkq.reshape(nlam,ny,nx)
+            idl.stku=idl.stku.reshape(nlam,ny,nx)
+            idl.stkv=idl.stkv.reshape(nlam,ny,nx)
+        lastfilename=filename
         try: 
             a=idl.stki[0,0,0]
         except:

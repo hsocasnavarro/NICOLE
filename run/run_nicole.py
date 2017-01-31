@@ -1055,7 +1055,7 @@ for icycle in range(int(ncycles)):
                         if iy2 > nystray-1: 
                             iy2=nystray-1
                             seq=0
-                        data=read_prof(stray, filemodestray, nx, ny, nlam, ix2, iy2, sequential=seq)
+                        data=read_prof(stray, filemodestray, nxstray, nystray, nlam, ix2, iy2, sequential=seq)
                         seq=1
                         for d in data:
                             d=d/float(contval) # Normalization value
