@@ -431,7 +431,7 @@ Subroutine Formal_solution(npoints, formal_solut, ltau_500, Absorp_in, &
         print *,'something went wrong',stokes
         If (itry .eq. 2) then ! Bad result, couldn't fix it
            print *,'cant fix it'
-           Stokes(:)=1e10
+           Stokes(:)=2e25
            Call Debug_log('NaNs in formal solution',1)
         Else ! Let's try to fix it
            print *,'trying to fix it...'
@@ -2141,7 +2141,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            NLTE_done=.TRUE.
         End if
         If (Debug_errorflags(flag_NLTE) .ge. 1) then
-           Syn_profile(:)=1e10
+           Syn_profile(:)=2e25
            Debug_errorflags(flag_forward)=1
         End if
         i=Atom%i(itran)
@@ -2400,6 +2400,15 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice, Params%formal_boundary_cond) ! Formal solution
+!           if (Stokes(1) .gt. 1e25) then
+!              print *,'stk=',stokes
+!              print *,'tau=',Atmo%ltau_500
+!              print *,'temp=',Atmo%temp
+!              print *,'elp=',Atmo%el_p
+!              print *,'gas_p=',Atmo%gas_p
+!              print *,'rho=',Atmo%rho
+!              stop
+!           endif
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point
@@ -2447,7 +2456,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                     Write (Debug_FileUnit,*) NLTE%N(j,:)
                  End if
                  Call Debug_Log('Error in Forward, discarding results',1)
-                 Syn_profile(:)=1E10 ! Discard this result
+                 Syn_profile(:)=2E25 ! Discard this result
               End if
            End if
         End do

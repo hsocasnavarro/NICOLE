@@ -1067,8 +1067,12 @@ Contains
             .and. ix .ge. ix1 .and. ix .le. ix2 &
             .and. iy .ge. iy1 .and. iy .le. iy2 &
             .and. irec .ge. irec0 )  )
-          If (i_inv .gt. 1) &
-               Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model)
+          If (i_inv .gt. 1) then
+             Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model)
+             Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
+             If (Params%TwoComp) &
+                  Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
+          End if
           If (Params%Printout .ge. 1) &
                Print *,' Inversion try:',i_inv
           Chisq=1e10
