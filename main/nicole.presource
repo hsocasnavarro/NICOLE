@@ -1,4 +1,4 @@
-!                      N I C O L E   v 17.01
+!                      N I C O L E   v 17.02
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 17.01 ******************'
+     Print *,'*************** N I C O L E   v 17.02 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -1018,11 +1018,11 @@ Contains
        If (Input%hscale .eq. 'z') then
           Call z_to_tau(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
-               Call z_to_tau(Params, Guess_model%Comp1)
+               Call z_to_tau(Params, Guess_model%Comp2)
        Else If (Input%hscale .eq. 't') then
           Call tau_to_z(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
-               Call tau_to_z(Params, Guess_model%Comp1)
+               Call tau_to_z(Params, Guess_model%Comp2)
        Else
           Print *,'Unknown hscale value'
           Stop
@@ -1174,6 +1174,9 @@ Contains
           i_inv=i_inv+1
           Chisq=BestChisq
           Guess_Model=Best_Model
+          Call tau_to_z(Params, Guess_model%Comp1)
+          If (Params%TwoComp) & 
+               Call tau_to_z(Params, Guess_model%Comp2)          
           Call Forward(Params, Line, Region, Guess_model, Syn_profile, &
                .TRUE.)
           Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2,KeepVars, -1)

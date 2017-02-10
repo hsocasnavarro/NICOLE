@@ -2400,15 +2400,15 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice, Params%formal_boundary_cond) ! Formal solution
-!           if (Stokes(1) .gt. 1e25) then
-!              print *,'stk=',stokes
-!              print *,'tau=',Atmo%ltau_500
-!              print *,'temp=',Atmo%temp
-!              print *,'elp=',Atmo%el_p
-!              print *,'gas_p=',Atmo%gas_p
-!              print *,'rho=',Atmo%rho
-!              stop
-!           endif
+           if (Stokes(1) .gt. 1e25) then
+              print *,'stk=',stokes
+              print *,'tau=',Atmo%ltau_500
+              print *,'temp=',Atmo%temp
+              print *,'elp=',Atmo%el_p
+              print *,'gas_p=',Atmo%gas_p
+              print *,'rho=',Atmo%rho
+              stop
+           endif
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point

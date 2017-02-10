@@ -52,3 +52,5 @@ Input density= Pel # (Can be Pgas, Pel, Nel, Dens)
   Line=FeI 6301
 [Line 2]
   Line=CaII 8542
+[Abundances]
+Ti=4.973

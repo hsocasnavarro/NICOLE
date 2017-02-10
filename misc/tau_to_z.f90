@@ -10,12 +10,15 @@ Subroutine Tau_to_z(Params, Atmo)
   Use Eq_state, Only: Compute_others_from_T_Pe_Pg
   Implicit None
   Type (Parameters) :: Params
-  Type (Model) :: Atmo
+  Type (Model) :: Atmo, Saved_atmo
   Integer :: idx, ipoint, i, j
   Integer, Dimension(1) :: imin
   Logical :: Error
   Real :: Scat, dtau, n2P, dz, metal
   Real, Dimension(Params%n_points) :: Kappa
+
+  Saved_atmo=Atmo
+  
 !
 ! Check tau scale for errors
 !
@@ -76,10 +79,12 @@ Subroutine Tau_to_z(Params, Atmo)
   n2P=BK*Atmo%Temp(1)
   metal=Atmo%Abundance(26)-7.5
 
-  Call Compute_others_from_T_Pe_Pg(1, Atmo%Temp(1), &
-       Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
-       Atmo%nHminus(1), Atmo%nHplus(1), &
-       Atmo%nH2(1), Atmo%nH2plus(1))
+
+  print *,'aaa1=',atmo%gas_p(30),atmo%nh(30),atmo%nHminus(30)
+  Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp,  &
+       Atmo%El_p, Atmo%Gas_p, Atmo%nH, Atmo%nHminus, Atmo%nHplus, &
+       Atmo%nH2, Atmo%nH2plus)
+  
   Kappa(1)=Background_opacity(Atmo%Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1)*n2P, &
        Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, &
        Atmo%nH2plus(1)*n2P, 5000., Scat)
@@ -88,10 +93,6 @@ Subroutine Tau_to_z(Params, Atmo)
   Do ipoint=2, Params%n_points
      dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
      n2P=BK*Atmo%Temp(ipoint)
-     Call Compute_others_from_T_Pe_Pg(1, Atmo%Temp(ipoint), &
-          Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
-          Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), &
-          Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
      Kappa(ipoint)=Background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), &
           Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, &
           Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint)*n2P, 5000., Scat)
@@ -100,7 +101,10 @@ Subroutine Tau_to_z(Params, Atmo)
           dtau/2./1.e5* &
           (1./(Kappa(ipoint)*Atmo%Rho(ipoint))+1./(Kappa(ipoint-1)*Atmo%Rho(ipoint-1)))
   End do
-! Make z=0 at point with min(abs(ltau_5000))
+
+  print *,'aaa2=',Atmo%Temp(30),atmo%el_p(30),atmo%gas_p(30),atmo%gas_p(30),atmo%nh(30),atmo%nHminus(30)
+
+  ! Make z=0 at point with min(abs(ltau_5000))
   imin=MinLoc(Abs(Atmo%ltau_500))
   Atmo%Z_scale(1:Params%n_points)=Atmo%Z_scale(1:Params%n_points) - &
        Atmo%Z_scale(imin(1))
