@@ -80,7 +80,6 @@ Subroutine Tau_to_z(Params, Atmo)
   metal=Atmo%Abundance(26)-7.5
 
 
-  print *,'aaa1=',atmo%gas_p(30),atmo%nh(30),atmo%nHminus(30)
   Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp,  &
        Atmo%El_p, Atmo%Gas_p, Atmo%nH, Atmo%nHminus, Atmo%nHplus, &
        Atmo%nH2, Atmo%nH2plus)
@@ -101,8 +100,6 @@ Subroutine Tau_to_z(Params, Atmo)
           dtau/2./1.e5* &
           (1./(Kappa(ipoint)*Atmo%Rho(ipoint))+1./(Kappa(ipoint-1)*Atmo%Rho(ipoint-1)))
   End do
-
-  print *,'aaa2=',Atmo%Temp(30),atmo%el_p(30),atmo%gas_p(30),atmo%gas_p(30),atmo%nh(30),atmo%nHminus(30)
 
   ! Make z=0 at point with min(abs(ltau_5000))
   imin=MinLoc(Abs(Atmo%ltau_500))
