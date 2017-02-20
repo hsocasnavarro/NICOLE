@@ -1029,14 +1029,10 @@ for icycle in range(int(ncycles)):
                 print 'But there are ',nlam2,' in the stray light profile file:',stray
                 sys.exit(1)
             if useorigfilestray == 0 and (nxprof != nxstray or nyprof != nystray):
-                print 'Warning! Stray light profile file:'+stray
+                print 'Error! Stray light profile file:'+stray
                 print 'has ',nxstray,'x',nystray,'=',nxstray*nystray,' profiles.'
                 print 'The input profile has ',nxprof*nyprof
-                print 'Adopting geometry in the profile file'
-                if nxstray*nystray > nxprof*nyprof:
-                    print 'The last profiles in the stray light file will be ignored'
-                if nxprof*nyprof > nxstray*nystray:
-                    print 'The stray light file will be padded by repeating the last profile'
+                sys.exit(1)
             if filemodestray == 'nicole2.3' or icycle >= 1:
                 useorigfilestray=1
             else:
