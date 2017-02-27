@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 
 def message(correct=True):
-    import curses
+    try:
+        import curses
+    except:
+        import sys
+        sys.exit(1)
 
     stdscr = curses.initscr()
     [maxy,maxx]=stdscr.getmaxyx()

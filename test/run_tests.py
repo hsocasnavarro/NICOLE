@@ -242,10 +242,10 @@ else:
 #        print 'max(i,q,u,v)=',max(i),max(q),max(u),max(v) # debug
 #        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
 
-        if abs(max(i)-1.000)>0.03 or abs(min(i)-0.230)>0.03 or \
-                abs(max(q)-0.)>2e-3 or abs(min(q)+.001)>2e-3 or \
-                abs(max(u)-0.0036)>2e-3 or abs(min(u))>2e-3 or \
-                abs(max(v)-0.029)>2e-3 or abs(min(v)+0.0295)>2e-3:
+        if abs(max(i)-0.999)>0.03 or abs(min(i)-0.239)>0.03 or \
+                abs(max(q)-0.)>2e-3 or abs(min(q)+.000907)>2e-3 or \
+                abs(max(u)-0.0031)>2e-3 or abs(min(u))>2e-3 or \
+                abs(max(v)-0.02595)>2e-3 or abs(min(v)+0.02598)>2e-3:
             print '     ** ERROR!! NICOLE produced inaccurate results'
             success=0
         else:
