@@ -41,6 +41,7 @@ Module Param_structure
           NLTE_NumLambdaIters
      Integer :: NLTE_formal_solution
      Logical :: NLTE_VelFree, NLTE_NGacc
+     character (len = 4) :: input_dens     
   End Type Parameters
 ! Maximum allowed Zeeman components per spectral line
   Integer, Parameter :: transitions=5000

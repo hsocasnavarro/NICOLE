@@ -1,4 +1,4 @@
-!                      N I C O L E   v 17.02
+!                      N I C O L E   v 17.04
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 17.02 ******************'
+     Print *,'*************** N I C O L E   v 17.04 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -185,6 +185,7 @@ Program Nicole
   Read (headerunit, *) Params%n_regions
   Call Set_params(Input, Params)
   Params%nPix=nPix_x*nPix_y
+  Params%Input_dens=Input%Input_dens
   !
   ! Allocate memory for line and region arrays
   !
@@ -1068,10 +1069,12 @@ Contains
             .and. iy .ge. iy1 .and. iy .le. iy2 &
             .and. irec .ge. irec0 )  )
           If (i_inv .gt. 1) then
-             Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model)
+             Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model%Comp1)
              Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
-             If (Params%TwoComp) &
-                  Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
+             If (Params%TwoComp) then
+                Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model%Comp2)
+                Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
+             End if
           End if
           If (Params%Printout .ge. 1) &
                Print *,' Inversion try:',i_inv

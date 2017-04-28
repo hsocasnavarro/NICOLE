@@ -91,7 +91,9 @@ Subroutine Hydrostatic(Params, Atmo)
   ! solutions in the upper layers when running chromospheric inversions. 
   !
   !  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
-  Call Compute_Pe(1, temp(1), Atmo%Gas_p(1), Atmo%El_p(1))
+
+  If (Params%Input_dens .ne. 'pel')  &
+       Call Compute_Pe(1, temp(1), Atmo%Gas_p(1), Atmo%El_p(1))
   
 
   n2P=BK*temp(1)

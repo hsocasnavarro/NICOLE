@@ -70,6 +70,8 @@ Subroutine Randomize_Model(Params, Nodes, ModelIn, ModelOut)
      End do
   End if
 
+  Call Hydrostatic(Params, ModelOut)
+  
 End Subroutine Randomize_Model
 
 
