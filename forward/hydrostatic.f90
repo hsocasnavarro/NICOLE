@@ -92,9 +92,12 @@ Subroutine Hydrostatic(Params, Atmo)
   !
   !  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
 
-  If (Params%Input_dens .ne. 'pel')  &
-       Call Compute_Pe(1, temp(1), Atmo%Gas_p(1), Atmo%El_p(1))
-  
+  If (Params%Input_dens .ne. 'pel')  then
+     Call Compute_Pe(1, temp(1), Atmo%Gas_p(1), Atmo%El_p(1))
+  else
+     Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
+  End if
+    
 
   n2P=BK*temp(1)
   Call Compute_others_from_T_Pe_Pg(1,Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
