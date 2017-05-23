@@ -2044,12 +2044,9 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 !
 
   metal=at_abund(26)-7.5
-  print *,'gp10=',atmo%gas_p(20)
   Call compute_others_from_T_Pe_Pg(Params%n_points,Atmo%Temp, Atmo%el_p, Atmo%Gas_p,&
        Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
-  print *,'gp11=',atmo%gas_p(20)
     Call Reset_densities(Atmo, Saved)
-  print *,'gp12=',atmo%gas_p(20)
 !
 
   nformal(1:nformalsolutions)=0. ! Initialize the f. s. counter
