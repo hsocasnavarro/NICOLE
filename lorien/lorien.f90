@@ -119,6 +119,12 @@ Contains
 !
   Pertur=0.04
   Params%recompute_deriv=1
+  Call Hydrostatic(Params, Guess_model%Comp1)
+  Call Fill_Densities(Params, Params%Input_dens, Guess_model%Comp1)
+  If (Params%TwoComp) then
+     Call Hydrostatic(Params, Guess_model%Comp2)
+     Call Fill_Densities(Params, Params%Input_dens, Guess_model%Comp2)
+  End if
   Call Forward(Params, Line, Region, Guess_model, Syn_profile, .TRUE.)
   If (Debug_errorflags(flag_forward) .ge. 1) then
      Print *,'This guess model produces errors in the synthesis'
@@ -153,9 +159,16 @@ Contains
      Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Trial_model%Comp1)
      If (Params%TwoComp) &
           Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Trial_model%Comp2)
+     Call Hydrostatic(Params, trial_model%Comp1)
+     Call Fill_Densities(Params, Params%Input_dens, trial_model%Comp1)
+     If (Params%TwoComp) then
+        Call Hydrostatic(Params, trial_model%Comp2)
+        Call Fill_Densities(Params, Params%Input_dens, trial_model%Comp2)
+     End if
      Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.) 
      Call Compute_chisq(Params, Obs_profile, Trial_profile, Sigma, &
           Nodes, Trial_model, Chisq, NWChisq, Regul)
+     
      If (Debug_errorflags(flag_forward) .ge. 1) Chisq=1e10
      HistChisq(n_iter)=Chisq
      HistLambda(n_iter)=Lambda
@@ -334,6 +347,12 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
               Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
               If (Params%TwoComp) & 
                    Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
+              Call Hydrostatic(Params, Pert_atmo%Comp1)
+              Call Fill_Densities(Params, Params%Input_dens, Pert_atmo%Comp1)
+              If (Params%TwoComp) then
+                 Call Hydrostatic(Params, Pert_atmo%Comp2)
+                 Call Fill_Densities(Params, Params%Input_dens, Pert_atmo%Comp2)
+              End if
               Call Forward(Params, Line, Region, Pert_atmo, Pert_profile, &
                    .TRUE.)
               If (Debug_errorflags(flag_forward) .ge. 1) &
@@ -359,6 +378,12 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
                  Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
                  If (Params%TwoComp) & 
                       Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
+                 Call Hydrostatic(Params, Pert_atmo%Comp1)
+                 Call Fill_Densities(Params, Params%Input_dens, Pert_atmo%Comp1)
+                 If (Params%TwoComp) then
+                    Call Hydrostatic(Params, Pert_atmo%Comp2)
+                    Call Fill_Densities(Params, Params%Input_dens, Pert_atmo%Comp2)
+                 End if
                  Call Forward(Params, Line, Region, Pert_atmo, Pert_profile, &
                       .TRUE.)
                  If (Debug_errorflags(flag_forward) .ge. 1) &
@@ -382,6 +407,12 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
                  Call Check_boundaries(Params, Nodes, Guess_model%Comp1, Pert_atmo%Comp1)
                  If (Params%TwoComp) & 
                       Call Check_boundaries(Params, Nodes, Guess_model%Comp2, Pert_atmo%Comp2)
+                 Call Hydrostatic(Params, Pert_atmo%Comp1)
+                 Call Fill_Densities(Params, Params%Input_dens, Pert_atmo%Comp1)
+                 If (Params%TwoComp) then
+                    Call Hydrostatic(Params, Pert_atmo%Comp2)
+                    Call Fill_Densities(Params, Params%Input_dens, Pert_atmo%Comp2)
+                 End if
                  Call Forward(Params, Line, Region, Pert_atmo, Pert_profile1, &
                       .TRUE.)
                  If (Debug_errorflags(flag_forward) .ge. 1) &

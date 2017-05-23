@@ -1866,6 +1866,7 @@ Subroutine Forward(Params, Line, Region, Atmo, Syn_profile, Hydro)
      Call Forward_1comp(Params,Line,Region,Atmo%Comp2,syn2,Hydro)
      Syn_profile=Atmo%Comp1%ffactor*Syn_profile + (1.-Atmo%Comp1%ffactor)*syn2
   End if
+
 !
 ! Use macroturbulence and stray light factor from the first component
   If (Params%Skip_lambda .eq. 1) &
@@ -2024,13 +2025,11 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 ! the columns Gas_P, El_p, Rho and Z_scale of the model.
 !
   Saved=Atmo
-  If (Hydro) then     
-     Call Hydrostatic(Params, Atmo)
-  Else ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
+  If (.not. Hydro) then ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
        !       nH2 columns of the model
 
-!     Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
-!          Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)
+     Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
+          Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)
      Atmo%ne=Atmo%el_p/bk/Atmo%temp
      If (Atmo%Keep_El_p .gt. 0.9) Atmo%El_p=Saved%El_p
      If (Atmo%Keep_Gas_p .gt. 0.9) Atmo%Gas_p=Saved%Gas_p
@@ -2045,9 +2044,12 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 !
 
   metal=at_abund(26)-7.5
+  print *,'gp10=',atmo%gas_p(20)
   Call compute_others_from_T_Pe_Pg(Params%n_points,Atmo%Temp, Atmo%el_p, Atmo%Gas_p,&
        Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
+  print *,'gp11=',atmo%gas_p(20)
     Call Reset_densities(Atmo, Saved)
+  print *,'gp12=',atmo%gas_p(20)
 !
 
   nformal(1:nformalsolutions)=0. ! Initialize the f. s. counter

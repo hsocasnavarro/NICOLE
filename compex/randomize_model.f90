@@ -70,7 +70,9 @@ Subroutine Randomize_Model(Params, Nodes, ModelIn, ModelOut)
      End do
   End if
 
-  Call Hydrostatic(Params, ModelOut)
+  ! debug
+  !  ModelOut%v_mac=ModelIn%v_mac
+  ! ModelOut%v_mac=2.e5  
   
 End Subroutine Randomize_Model
 

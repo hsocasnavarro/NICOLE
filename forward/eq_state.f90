@@ -1920,14 +1920,14 @@ Contains
     Character (Len=256) :: String
 
     Call Time_routine('compute_others_from_T_Pe_Pg',.True.)
-    
+
     If (eqstate_switch_others .eq. 3) then ! Use Wittmann's
        Call Wittmann_compute_others_from_T_pe_pg(n_grid, temp4, Pe4, Pg4,&
        nH4, nHminus4, nHplus4, nH24, nH2plus4)
        Call Time_routine('compute_others_from_T_Pe_Pg',.False.)
        Return
     Endif
-
+    
     HLimit=1.-10**(At_abund(2)-At_abund(1))
     If (eqstate_switch_others .eq. 0) then ! Use ANN 
        Ne4(1:n_grid)=Pe4(1:n_grid)/BK/Temp4(1:n_grid)
@@ -2300,7 +2300,6 @@ Contains
     Debug_warningflags(flag_computepg)=0
 
     If (eqstate_switch .eq. 0) then ! Use NICOLE approach (with ANNs and elements)
-
        Met2=At_abund(26)-7.5 ! Metalicity
        If (Met2 .gt. .5) then
           Debug_warningflags(flag_computeopac)=1

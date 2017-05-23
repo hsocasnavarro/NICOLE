@@ -18,10 +18,11 @@ Contains
     Real :: T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4    
     Real :: Scat, Scat2, Background_opacity, TotH, llambda_in4, Opac
     Real :: nu, chi_0, chi_e, eta, num, den, Rho
+    Real :: ph
     Integer :: i
 
     Call Time_routine('background_opac',.True.)
-
+    
     TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
     If (Opacity_Package .eq. 1) then ! Use Wittmann'
        Opac=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat, elneglectopac)
@@ -60,11 +61,12 @@ Contains
              Stop
           End if
        End if
+    End if
        
-    Else if (Opacity_Package .eq. 3) then ! Use SOPAS
+    If (Opacity_Package .eq. 3) then ! Use SOPAS
        TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
        nu=cc/(lambda_in4*1e-8) ! s^-1
-       Call Sopas(1, 2, nu, TotH, Pe4, T4, Pg4, chi_0, chi_e, eta, elneglectopac)
+       Call Sopas(1, 2, nu, TotH, Pe4, T4, Pg4, chi_0, chi_e, eta)
        Background_opacity=chi_0+chi_e
        Scat=chi_e
     endif

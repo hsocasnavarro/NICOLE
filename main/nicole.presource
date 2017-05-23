@@ -497,7 +497,7 @@ Program Nicole
            Call Open_File (tmpunit,Trim(Input%Model_out_file)//'.err')
            Close (tmpunit, STATUS='DELETE')
         End if
-        Inquire (File=Trim(Input%Syn_profile_file)//'.err',Exist=FileExists)
+        Inquire (File=Trim(Input%Syn_profile_file),Exist=FileExists)
         If (FileExists) then
            Call Open_File (tmpunit,Trim(Input%Syn_profile_file))
            Close (tmpunit, STATUS='DELETE')
@@ -1011,10 +1011,13 @@ Contains
        Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
        If (Params%TwoComp) &
             Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
-       If (Input%mode .eq. 'c' .and. Input%set_hydro) then
+       If (Input%set_hydro) then
           Call Hydrostatic(Params, Guess_model%Comp1)
-          If (Params%TwoComp) &
-                         Call Hydrostatic(Params, Guess_model%Comp2)
+          Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
+          If (Params%TwoComp) then
+             Call Hydrostatic(Params, Guess_model%Comp2)
+             Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
+          End if
        End if
        If (Input%hscale .eq. 'z') then
           Call z_to_tau(Params, Guess_model%Comp1)
@@ -1070,9 +1073,11 @@ Contains
             .and. irec .ge. irec0 )  )
           If (i_inv .gt. 1) then
              Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model%Comp1)
+             Call Hydrostatic(Params, Guess_Model%Comp1)
              Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
              If (Params%TwoComp) then
                 Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model%Comp2)
+                Call Hydrostatic(Params, Guess_Model%Comp2)
                 Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
              End if
           End if

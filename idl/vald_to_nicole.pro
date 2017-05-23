@@ -1,6 +1,8 @@
 ; This procedure takes a text file with the long-format output from
 ; the VAL-D database and extracts the spectral line information in 
 ; the format of NICOLE's LINES file
+;
+; Using Extract ALL, short format with all boxes checked
 
 pro vald_to_nicole,filein=filein
 
@@ -14,35 +16,22 @@ while (not eof(lun)) do begin
    str=strtrim(str,2)
    str2=''
    if strmid(str,0,1) eq "'" then begin ; this is a line to parse
-      readf,lun,str2 ; Clear following line
 ; Parse data
       nlines=nlines+1
-      element=strmid(str,1,2)
-      element=strtrim(element,2)
-      ionstage=strmid(str,4,1)
-      ionstage=strtrim(ionstage,2)
-      wlength=strmid(str,7,16)
-      wlength=strtrim(wlength,2)
-      loggf=strmid(str,24,8)
-      loggf=strtrim(loggf,2)
-      pot=strmid(str,33,8)
-      pot=strtrim(pot,2)
-      jlow=strmid(str,42,5)
-      jlow=strtrim(jlow,2)
-      jup=strmid(str,57,5)
-      jup=strtrim(jup,2)
-      landelow=strmid(str,62,6)
-      landelow=strtrim(landelow,2)
-      landeup=strmid(str,69,6)
-      landeup=strtrim(landeup,2)
-      gamma_r=strmid(str,84,6)
-      gamma_r=strtrim(gamma_r,2)
-      gamma_stk=strmid(str,91,6)
-      gamma_stk=strtrim(gamma_stk,2)
-      gamma_vdw=strmid(str,98,6)
-      gamma_vdw=strtrim(gamma_vdw,2) ;
+      strdata=strsplit(str,',',/extract)
+      element=(strsplit(strdata[0],"' ",/extract))[0]
+      ionstage=(strsplit(strdata[0],"' ",/extract))[1]
+      wlength=(strdata[1])
+      pot=(strdata[2])
+      loggf=(strdata[3])
+      gamma_r=(strdata[4])
+      gamma_stk=(strdata[5])
+      gamma_vdw=(strdata[6])
+      lande=(strdata[7])
+      jlow='0.'
+      jup='0.'
 ; labels
-      newlabel=element+ionstage+' '+strtrim(string(nint(wlength)),2)
+      newlabel=element+ionstage+' '+strtrim(string(wlength,format='(f0.3)'),2)
       if (where(newlabel eq labels))(0) ne -1 then duplicated=[duplicated,newlabel]
          
       labels=[labels,newlabel]
@@ -80,6 +69,5 @@ if n_elements(duplicated) gt 1 then begin
    print,''
 endif
 free_lun,lun
-
 
 end

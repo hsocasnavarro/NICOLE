@@ -1532,5 +1532,8 @@ for icycle in range(int(ncycles)):
 print ''
 print 'Starting code execution'
 status=subprocess.call(nicolecommand.split())
-import calccorrect
-calccorrect.message(correct= status == 0)
+try:
+    import calccorrect
+    calccorrect.message(correct= status == 0)
+except:
+    pass

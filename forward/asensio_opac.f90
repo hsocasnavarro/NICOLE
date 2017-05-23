@@ -278,6 +278,10 @@ contains
             com1(5)*theta**3 + com1(6)*theta**3.5
     endif
 
+    if (abs(T-6390) .lt. 1) then
+       print *,'asensio_opac bb=',1.d-29*result
+    endif
+    
     hminus_ff = 1.d-29 * result * Pe 
     
   end function hminus_ff
@@ -618,7 +622,6 @@ contains
        Call Debug_log('In asensio_background_opacity. Pe .gt. Max_Pe parameter. Clipping it.',2)
        Pe=Max_Pe
     End if
-
 
     If (PH .gt. 1.e-6*(PH2+PH2plus)) then ! There is atomic H, act normally
        factor = 1.d0 + (PHminus + PHplus + 2.d0*(PH2+PH2plus)) / PH

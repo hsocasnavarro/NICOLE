@@ -102,6 +102,7 @@ Subroutine Hydrostatic(Params, Atmo)
   n2P=BK*temp(1)
   Call Compute_others_from_T_Pe_Pg(1,Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1), &
        Atmo%nHminus(1), Atmo%nHplus(1), Atmo%nH2(1), Atmo%nH2plus(1))
+
   Kappa(1)=Background_opacity(Temp(1), Atmo%El_p(1), Atmo%Gas_p(1), Atmo%nH(1)*n2P, &
        Atmo%nHminus(1)*n2P, Atmo%nHplus(1)*n2P, Atmo%nH2(1)*n2P, Atmo%nH2plus(1)*n2P,&
        5000., Scat)
@@ -130,6 +131,9 @@ Subroutine Hydrostatic(Params, Atmo)
 !             Atmo%B_str(ipoint)**2) /8./Pi ! Magnetic pressure term
         Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
         OldKappa=Kappa(ipoint)
+        n2P=BK*temp(ipoint)
+        Call Compute_others_from_T_Pe_Pg(1,Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
+             Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
         Call Compute_others_from_T_Pe_Pg(1,Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
              Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
         Kappa(ipoint)=Background_opacity(Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint)*n2P, &
@@ -139,6 +143,7 @@ Subroutine Hydrostatic(Params, Atmo)
              Atmo%El_p(ipoint)/Atmo%Gas_p(ipoint))
         Atmo%Rho(ipoint)=Atmo%Gas_p(ipoint)*Avmolweight/Avog/bk/temp(ipoint) ! Gas density
         Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
+
         Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
              dtau/2./1.e5* &
              (1./(Kappa(ipoint)*Atmo%Rho(ipoint))+1./(Kappa(ipoint-1)*Atmo%Rho(ipoint-1)))

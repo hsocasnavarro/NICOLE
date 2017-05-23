@@ -14,7 +14,7 @@ Subroutine Tau_to_z(Params, Atmo)
   Integer :: idx, ipoint, i, j
   Integer, Dimension(1) :: imin
   Logical :: Error
-  Real :: Scat, dtau, n2P, dz, metal
+  Real :: Scat, dtau, n2P, dz, metal, AvOp
   Real, Dimension(Params%n_points) :: Kappa
 
   Saved_atmo=Atmo
@@ -94,11 +94,11 @@ Subroutine Tau_to_z(Params, Atmo)
      n2P=BK*Atmo%Temp(ipoint)
      Kappa(ipoint)=Background_opacity(Atmo%Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), &
           Atmo%nH(ipoint)*n2P, Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, &
-          Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint)*n2P, 5000., Scat)
-     Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
+          Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint)*n2P, 5000., Scat) ! cm^-1
+!     Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g 
+     AvOp=(Kappa(ipoint) + Kappa(ipoint-1))/2. ! cm-1
      Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
-          dtau/2./1.e5* &
-          (1./(Kappa(ipoint)*Atmo%Rho(ipoint))+1./(Kappa(ipoint-1)*Atmo%Rho(ipoint-1)))
+          dtau/AvOp/1.e5
   End do
 
   ! Make z=0 at point with min(abs(ltau_5000))
