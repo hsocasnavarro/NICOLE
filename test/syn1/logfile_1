@@ -1,7 +1,5 @@
-16:39:57:Point:1(x=1,y=1) assigned to processor:1
+12:46:28:Point:1(x=1,y=1) assigned to processor:1
   
  ---PROCESS-STATS---
 host: 1, rank:     0, pixels processed:       0 (  0.00%)
 host: 2, rank:     1, pixels processed:       0 (  0.00%)
-host: 3, rank:     2, pixels processed:       0 (  0.00%)
-host: 4, rank:     3, pixels processed:       0 (  0.00%)

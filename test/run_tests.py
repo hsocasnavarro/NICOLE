@@ -289,8 +289,8 @@ else:
  
         limi=[0.99999, 0.219]
         limq=[0.0, -0.002]
-        limu=[0.0068, -0.000274]
-        limv=[0.0491, -0.0440]
+        limu=[0.0061, -0.000274]
+        limv=[0.0455, -0.0406]
 
 #        print 'max(i,q,u,v)=',max(i),max(q),max(u),max(v) # debug
 #        print 'min(i,q,u,v)=',min(i),min(q),min(u),min(v) # debug
