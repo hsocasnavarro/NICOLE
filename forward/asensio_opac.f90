@@ -278,10 +278,6 @@ contains
             com1(5)*theta**3 + com1(6)*theta**3.5
     endif
 
-    if (abs(T-6390) .lt. 1) then
-       print *,'asensio_opac bb=',1.d-29*result
-    endif
-    
     hminus_ff = 1.d-29 * result * Pe 
     
   end function hminus_ff
