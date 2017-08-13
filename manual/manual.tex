@@ -21,7 +21,7 @@ the Lorien Engine}
 e-mail: \mbox{hsocas@iac.es; jaime@astro.su.se; aasensio@iac.es}\\
 }
 
-\date{Version 17.07}
+\date{Version 17.08}
 
 \maketitle
 
@@ -694,7 +694,7 @@ mpirun -n 8 ./nicole
   atmosphere and will result in no contamination of the synthetic
   profile. This profile can also be used as a prescribed external
   atmosphere that coexists within the spatial resolution element with
-  the atmosphere undergoing synthesis or inversion. 
+  the atmosphere undergoing synthesis or inversion. The stray light profile must be in units of the quiet Sun continuum at disk center.
 \item Printout detail: (Optional, default=1). This switch controls how
   much information is printed out to screen during normal
   operation. Higher values correspond to more detailed information
@@ -752,6 +752,11 @@ mpirun -n 8 ./nicole
   will be recomputed. Setting this to 0 makes the code recompute
   opacities for each wavelength point. Larger values avoid too
   frequent recalculations and therefore save some time.
+\item Negligible opacity: (Optional, default=0.0). Opacity threshold
+  to avoid wasting time computing lines that are too weak to
+  contribute to the spectrum. If the ratio of line opacity to
+  continuum opacity at 500 nm is smaller than this threshold, the line
+  is neglected. This condition is tested at each depth-point and wavelength.
 \item Continuum reference: (Optional, default=1). Switch to control
   the normalization of the spectral profiles.  Select 0 for no
   normalization (output will be in c.g.s. units,

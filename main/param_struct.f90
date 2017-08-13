@@ -23,7 +23,7 @@ Module Param_structure
      Integer :: recompute_deriv, reference_cont
      Integer :: Skip_lambda, Reinterpolate
      Real :: SVD_threshold, heliocentric, helioazim
-     Real :: Noise, Update_opac 
+     Real :: Noise, Update_opac, Negligible_opacity
      Real :: Regularization, Regul_temp, Regul_stray, Regul_mic
      Logical :: IProfExists, WeightsExist
      Logical :: TwoComp=.False.

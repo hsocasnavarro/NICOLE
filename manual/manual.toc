@@ -26,27 +26,27 @@
 \contentsline {subsection}{\numberline {3.2.1}Setting the input parameters}{36}
 \contentsline {subsection}{\numberline {3.2.2}Running NICOLE in inversion mode}{37}
 \contentsline {subsection}{\numberline {3.2.3}Inversion weights}{38}
-\contentsline {subsection}{\numberline {3.2.4}Changing the default number of nodes}{38}
-\contentsline {subsection}{\numberline {3.2.5}Monitoring the inversion}{38}
+\contentsline {subsection}{\numberline {3.2.4}Changing the default number of nodes}{39}
+\contentsline {subsection}{\numberline {3.2.5}Monitoring the inversion}{39}
 \contentsline {subsection}{\numberline {3.2.6}The error bars}{39}
 \contentsline {subsection}{\numberline {3.2.7}The file maskinvert.dat}{39}
-\contentsline {subsection}{\numberline {3.2.8}Tips for successful inversions}{39}
+\contentsline {subsection}{\numberline {3.2.8}Tips for successful inversions}{40}
 \contentsline {subsection}{\numberline {3.2.9}Restarting an inversion}{40}
-\contentsline {subsection}{\numberline {3.2.10}Debugging and profiling}{40}
-\contentsline {chapter}{\numberline {4}Compiling NICOLE}{43}
-\contentsline {section}{\numberline {4.1}Creating the makefile}{43}
-\contentsline {section}{\numberline {4.2}Compiler notes}{44}
-\contentsline {subsection}{\numberline {4.2.1}Mac and GNU Fortran}{44}
-\contentsline {subsection}{\numberline {4.2.2}Linux and GNU Fortran}{44}
-\contentsline {subsection}{\numberline {4.2.3}Intel Fortran}{44}
-\contentsline {section}{\numberline {4.3}MPI version}{45}
-\contentsline {section}{\numberline {4.4}Testing the code}{45}
-\contentsline {subsection}{\numberline {4.4.1}Testing in non-interactive mode}{45}
-\contentsline {section}{\numberline {4.5}Compiling in double precision}{46}
-\contentsline {section}{\numberline {4.6}Supported platforms}{47}
-\contentsline {chapter}{\numberline {5}The source code}{49}
-\contentsline {section}{\numberline {5.1}The dependency tree}{50}
-\contentsline {chapter}{\numberline {6}Geometry of the magnetic field}{75}
-\contentsline {chapter}{\numberline {7}Troubleshooting}{77}
-\contentsline {chapter}{\numberline {8}Version history}{81}
-\contentsline {chapter}{\numberline {9}Bibliography}{83}
+\contentsline {subsection}{\numberline {3.2.10}Debugging and profiling}{41}
+\contentsline {chapter}{\numberline {4}Compiling NICOLE}{45}
+\contentsline {section}{\numberline {4.1}Creating the makefile}{45}
+\contentsline {section}{\numberline {4.2}Compiler notes}{46}
+\contentsline {subsection}{\numberline {4.2.1}Mac and GNU Fortran}{46}
+\contentsline {subsection}{\numberline {4.2.2}Linux and GNU Fortran}{46}
+\contentsline {subsection}{\numberline {4.2.3}Intel Fortran}{46}
+\contentsline {section}{\numberline {4.3}MPI version}{47}
+\contentsline {section}{\numberline {4.4}Testing the code}{47}
+\contentsline {subsection}{\numberline {4.4.1}Testing in non-interactive mode}{47}
+\contentsline {section}{\numberline {4.5}Compiling in double precision}{48}
+\contentsline {section}{\numberline {4.6}Supported platforms}{49}
+\contentsline {chapter}{\numberline {5}The source code}{51}
+\contentsline {section}{\numberline {5.1}The dependency tree}{52}
+\contentsline {chapter}{\numberline {6}Geometry of the magnetic field}{77}
+\contentsline {chapter}{\numberline {7}Troubleshooting}{79}
+\contentsline {chapter}{\numberline {8}Version history}{83}
+\contentsline {chapter}{\numberline {9}Bibliography}{85}

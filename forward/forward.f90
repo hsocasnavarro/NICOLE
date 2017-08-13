@@ -2231,7 +2231,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      End do
 
      Do iline=1, Params%n_lines ! Loop in lines to blend		
-        If (MaxVal(Line_op(iline,:)/Cont_op_5000(:)) .gt. 1.e-1) then ! Consider line			
+        If (MaxVal(Line_op(iline,:)/Cont_op_5000(:)) .gt. Params%negligible_opacity) then ! Consider line			
            Incomplete=.TRUE.
            Do While (Incomplete)
               istart= (Line(iline)%Wlength-Line(iline)%Width - Wave(1))/ &

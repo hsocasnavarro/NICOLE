@@ -282,6 +282,7 @@ for icycle in range(int(ncycles)):
     gravity=get_value(config,'Gravity','2.7414e+4','NICOLE.input')
     regul=get_value(config,'Regularization','1.e-3','NICOLE.input')
     update_opac=get_value(config,'Update opacities every','10','NICOLE.input')
+    negligible_opac=get_value(config,'Negligible opacity','0','NICOLE.input')
     contref=get_value(config,'Continuum reference','1','NICOLE.input')
     contval=get_value(config,'Continuum value','1','NICOLE.input')
     sethydro=get_value(config,'Impose hydrostatic equilibrium','Y','NICOLE.input')
@@ -1191,6 +1192,7 @@ for icycle in range(int(ncycles)):
     f.write(gravity+'     ! gravity \n')
     f.write(regul+'     ! regularization \n')
     f.write(update_opac+'    ! update_opac \n')
+    f.write(negligible_opac+'    ! negligible_opac \n')
     f.write(contref+'       !  contref \n')
     f.write(inputdens+'       ! inputdens \n')
     f.write(keep_el_p+' '+keep_gas_p+' '+keep_rho+' '+keep_nH+' '+ 
