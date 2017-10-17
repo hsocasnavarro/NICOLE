@@ -31,7 +31,8 @@ Module Param_structure
      Integer, Dimension(:), Allocatable :: mm
      Real, dimension(:), allocatable :: IProf
      Real, Dimension (:), pointer :: Stray_prof ! For the stray light
-     Character (len=20) :: WeightsFilename
+     Character (len=20) :: WeightsFilename 
+     character (len = 4) :: hscale
      Real :: NLTE_Elim1=1e-3, NLTE_Elim2=1e-3
      Real ::  NLTE_QNORM, NLTE_CPER, NLTE_OptThin, NLTE_OptThick
      Integer :: NLTE_linear

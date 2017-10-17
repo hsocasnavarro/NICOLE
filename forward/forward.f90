@@ -2406,6 +2406,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               print *,'elp=',Atmo%el_p
               print *,'gas_p=',Atmo%gas_p
               print *,'rho=',Atmo%rho
+              print *,'iwave=',iwave,' lambda=',Wave(iwave)
               stop
            endif
            Call time_routine('formalsolution',.False.)

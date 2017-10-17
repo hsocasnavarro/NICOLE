@@ -110,9 +110,9 @@ Subroutine Hydrostatic(Params, Atmo)
        Atmo%El_P(1)/Atmo%Gas_P(1))
   Atmo%Rho(1)=Atmo%Gas_p(1)*Avmolweight/Avog/bk/temp(1) ! Gas density
   Kappa(1)=Kappa(1)/Atmo%Rho(1) ! Convert to cm^2/g
-  Atmo%Z_scale(1)=0. ! Boundary condition for the height scale
+  If (Params%hscale .eq. 't') &
+       Atmo%Z_scale(1)=0. ! Boundary condition for the height scale
   Do ipoint=2, npoints
-     dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
      temp(ipoint)=Atmo%Temp(ipoint)
      If (temp(ipoint) .lt. Min_temp) then ! Check temperature so that gasc won't crash
         temp(ipoint)=Min_temp
@@ -124,6 +124,11 @@ Subroutine Hydrostatic(Params, Atmo)
      iters=0
 ! Now iterate to find consistent kappa, gas_p, el_p
      Do while (iters .lt. niters .and. dif .gt. Precision)
+        if (Params%hscale .eq. 't') then
+           dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
+        Else
+           dtau=(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*1e5*.5*(Kappa(ipoint)*Atmo%Rho(ipoint)+Kappa(ipoint-1)*Atmo%Rho(ipoint-1))
+        Endif
 !       Hydrostatic equilibrium equation.
         Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
              Gravity*dtau/(.5*(Kappa(ipoint-1)+Kappa(ipoint))) ! + & 
@@ -144,7 +149,8 @@ Subroutine Hydrostatic(Params, Atmo)
         Atmo%Rho(ipoint)=Atmo%Gas_p(ipoint)*Avmolweight/Avog/bk/temp(ipoint) ! Gas density
         Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
 
-        Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
+        If (Params%hscale .eq. 't') &
+             Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
              dtau/2./1.e5* &
              (1./(Kappa(ipoint)*Atmo%Rho(ipoint))+1./(Kappa(ipoint-1)*Atmo%Rho(ipoint-1)))
         dif=Abs(OldKappa-Kappa(ipoint))/(OldKappa+Kappa(ipoint))
@@ -182,7 +188,8 @@ Subroutine Hydrostatic(Params, Atmo)
   End if
 
   imin=MinLoc(Abs(Atmo%ltau_500))
-  Atmo%Z_scale(1:Params%n_points)=Atmo%Z_scale(1:Params%n_points) - &
+  If (Params%hscale .eq. 't') &
+       Atmo%Z_scale(1:Params%n_points)=Atmo%Z_scale(1:Params%n_points) - &
        Atmo%Z_scale(imin(1))
   Atmo%ne(1:Params%n_points)=Atmo%el_p(1:Params%n_points)/ &
        bk/Atmo%Temp(1:Params%n_points)
