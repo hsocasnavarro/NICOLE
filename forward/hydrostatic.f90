@@ -127,7 +127,8 @@ Subroutine Hydrostatic(Params, Atmo)
         if (Params%hscale .eq. 't') then
            dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
         Else
-           dtau=(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*1e5*.5*(Kappa(ipoint)*Atmo%Rho(ipoint)+Kappa(ipoint-1)*Atmo%Rho(ipoint-1))
+           dtau=(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*1e5*.5* &
+                (Kappa(ipoint)*Atmo%Rho(ipoint)+Kappa(ipoint-1)*Atmo%Rho(ipoint-1))
         Endif
 !       Hydrostatic equilibrium equation.
         Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
