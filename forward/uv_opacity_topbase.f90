@@ -2,7 +2,7 @@ Module UV_opacity_TOPbase
 ! UV opacities using data from The Opacity Project (TOPbase)
 ! Only neutrals and first ion, photoionization processes
 ! Considers most elements up to Z=26 (Fe), many levels
-! Valid only in the wavelength interval from 500A to 4000A
+! Valid only in the wavelength interval from 500 A to 4000 A
 !
 ! Returns opacity cross-section (cm2) per H nucleus
 !
@@ -61,7 +61,8 @@ Contains
           End do
        End if
     End do
-
+    if (int(T) .eq. 6642) Stop
+    
     UVOpacity_TOPbase=Opac
     Scat=0.
     Return

@@ -532,7 +532,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
   azi=atan2(Atmo%B_y, Atmo%B_x)/Pi*180.
   If (FirstTime) then
      Constant_B=.FALSE.
-     If (Line%Hyperfine) then
+     If (Line%Hyperfine .ge. 1) then
         If (MaxVal(B_str)-MinVal(B_str) .lt. 10) Constant_B=.TRUE.
      End if
 !     FirstTime=.FALSE.
@@ -601,7 +601,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
         dldopcms=Dldop(ind)/Line%Wlength*cc ! Dldop in cm/s
         vv(1:nw)=DWave(IndexWave(1:nw))/Dldop(ind) - Atmo%v_los(ind)/dldopcms
         mag=B_str(ind)/dldopcm
-        If (Line%Hyperfine) then
+        If (Line%Hyperfine .eq. 1) then
            If (.not. Constant_B .or. ind .eq. npoints) then
               Call Zeeman_hyperfine(line, B_str(ind), np, nl, nr, &
                    dlp, dll, dlr, sp, sl, sr)

@@ -23,7 +23,7 @@ Module Line_data_structure
             ! Gamma_Strk is per 1E12 electrons per cm3; G_Strk and G_vdW are
             ! quoted at T=1E4 K with temperature dependence of T^0.17 and
             ! T^0.38, respectively. A value of -1 means compute using Unsold)
-     Logical :: Hyperfine 
+     Integer :: Hyperfine 
      Real :: HF_Alow, HF_Blow, HF_Aup, HF_Bup, SpinI ! For hyperfine structure
             !                                            A and B are in cm-1
      Real :: extra_vmic ! Extra line broadening, behaves like microturb

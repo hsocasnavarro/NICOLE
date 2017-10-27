@@ -22,9 +22,12 @@ Contains
     Integer :: i
 
     Call Time_routine('background_opac',.True.)
-    
+
     TotH=ph4+phminus4+phplus4+2*ph24+2*ph2plus4
+
     If (Opacity_Package .eq. 1) then ! Use Wittmann'
+       Do lambda_in4=500., 4000.
+    
        Opac=Wittmann_opac(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat, elneglectopac)
        Background_opacity=Opac
        ! If lambda .le. 4000 use specific module for UV
@@ -42,6 +45,7 @@ Contains
              Stop
           End if
        End if
+    End do
 
     Else if (Opacity_Package .eq. 2) then ! Use Asensio's
        Opac=Asensio_background_opacity(T4, Pe4, Pg4, PH4, PHminus4, PHplus4, PH24, PH2plus4, lambda_in4, Scat, elneglectopac)

@@ -1338,8 +1338,9 @@ for icycle in range(int(ncycles)):
             nuratio=get_value(config_lines,'Upper level population ratio','1.0','LINES',line_label)
         hf=get_value(config_lines,'Hyperfine structure','n','LINES',line_label)
         hf=hf.lower()
-        if hf == 'n' or hf == 'no' or hf == 'false' or hf == '.false.' or hf == 'f' or hf == '.f.': hf='F'
-        if hf == 'y' or hf == 'yes' or hf == 'true' or hf == '.true.' or hf == 't' or hf == '.t.': hf='T'
+        if hf == 'n' or hf == 'no' or hf == 'false' or hf == '.false.' or hf == 'f' or hf == '.f.': hf='0'
+        if hf == 'y' or hf == 'yes' or hf == 'true' or hf == '.true.' or hf == 't' or hf == '.t.': hf='1'
+        if hf == 'precomputed' or hf == 'table': hf='2'
         alow='';blow='';aup='';bup='';spini=''
         if hf == 'T':
             alow=get_value(config_lines,'Hyperfine Alow','','LINES',line_label)
