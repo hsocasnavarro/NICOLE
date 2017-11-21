@@ -1,4 +1,4 @@
-!                      N I C O L E   v 17.10
+!                      N I C O L E   v 17.11
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 17.10 ******************'
+     Print *,'*************** N I C O L E   v 17.11 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -1019,12 +1019,10 @@ Contains
              Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
           End if
        End if
-       
        If (Input%hscale .eq. 'z') then
           Call z_to_tau(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
                Call z_to_tau(Params, Guess_model%Comp2)
-
        Else If (Input%hscale .eq. 't') then
           Call tau_to_z(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
