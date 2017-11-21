@@ -1009,6 +1009,8 @@ Contains
 
           ! }}}
        End if
+       Best_model=Guess_model
+       Start_model=Guess_model
        Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
        If (Params%TwoComp) &
             Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
