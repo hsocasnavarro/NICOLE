@@ -120,6 +120,7 @@ Subroutine Hydrostatic(Params, Atmo)
      End if
 ! Initialization
      Kappa(ipoint)=Kappa(ipoint-1)
+     Atmo%Rho(ipoint)=Atmo%Rho(ipoint-1)
      dif=1
      iters=0
 ! Now iterate to find consistent kappa, gas_p, el_p
@@ -132,7 +133,7 @@ Subroutine Hydrostatic(Params, Atmo)
            dtau=(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*1e5*.5* &
                 (Kappa(ipoint)*Atmo%Rho(ipoint)+Kappa(ipoint-1)*Atmo%Rho(ipoint-1))
            Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
-                Gravity*Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint)
+                Gravity*(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*.5*(Atmo%Rho(ipoint-1)+Atmo%Rho(ipoint))
         Endif
 !       Hydrostatic equilibrium equation.
         Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
