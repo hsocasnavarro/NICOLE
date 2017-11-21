@@ -1008,6 +1008,8 @@ Contains
 
           ! }}}
        End if
+       Best_model=Guess_model
+       Start_model=Guess_model
        Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
        If (Params%TwoComp) &
             Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
@@ -1019,8 +1021,6 @@ Contains
              Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
           End if
        End if
-       Best_model=Guess_model
-       Start_model=Guess_model
        If (Input%hscale .eq. 'z') then
           Call z_to_tau(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
@@ -1172,14 +1172,11 @@ Contains
           Sigma2(:)=Sigma
           Call Lorien(Params, Nodes, Line, Region, Guess_model, Obs_profile, &
                Sigma, Brute_force, Errors, Chisq)
-!          print *,'rho1=',guess_model%comp1%rho
           Deallocate (Brute_force)                             
           If (CheckNAN(Chisq)) Chisq=1.E10 
           If (Chisq .le. BestChisq) then
              DidInvert=.True.
              Best_Model=Guess_Model
-!             print *,'rho3=',guess_model%comp1%rho
-!             print *,'rho4=',best_model%comp1%rho
              BestChisq=Chisq
           End if
           If (Params%Printout .ge. 1) &
@@ -1187,9 +1184,7 @@ Contains
           i_inv=i_inv+1
           Chisq=BestChisq
           Guess_Model=Best_Model
-!          print *,'rho2=',guess_model%comp1%rho
           Call tau_to_z(Params, Guess_model%Comp1)
-!          print *,'rho3=',guess_model%comp1%rho
           If (Params%TwoComp) & 
                Call tau_to_z(Params, Guess_model%Comp2)          
           Call Forward(Params, Line, Region, Guess_model, Syn_profile, &

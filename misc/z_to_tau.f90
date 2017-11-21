@@ -14,6 +14,7 @@ Subroutine Z_to_tau(Params, Atmo)
   Type (Parameters) :: Params
   Type (Model) :: Atmo
   Integer :: ipoint, idx, iatom
+  Integer, Dimension(1) :: imin
   Real :: Avmolweight, Asum, Wsum, metal
   Real :: T, Pe, Pg, Rho, dtau, Chi_0, Chi_e, Eta, H
   Real :: PH, PHminus, PHplus, PH2, PH2plus, Scat, n2P
@@ -136,6 +137,9 @@ Subroutine Z_to_tau(Params, Atmo)
 ! Convert to Log(tau)
 !
   Atmo%ltau_500=Log10(Atmo%ltau_500)
+  imin=MinLoc(Abs(Atmo%z_scale))
+  Atmo%ltau_500(1:Params%n_points)=Atmo%ltau_500(1:Params%n_points) - &
+       Atmo%ltau_500(imin(1))
 
   Return
 !
