@@ -80,6 +80,7 @@ Subroutine Z_to_tau(Params, Atmo)
 !
 ! First depth-point
 !
+
   n2P=BK*Atmo%Temp(1)
   metal=Atmo%Abundance(26)-7.5
 
@@ -122,10 +123,10 @@ Subroutine Z_to_tau(Params, Atmo)
 !
   If (MinVal(Atmo%ltau_500) .lt. 0) then
       Atmo%ltau_500=Atmo%ltau_500-MinVal(Atmo%ltau_500)+1e-8
-   endif
+  endif
 !
 ! Check that no two points have the same tau (similar to check_tau routine in forward.f90)
-!
+  !
   Do ipoint=Params%n_points-1, 1, -1
      Do While (Atmo%ltau_500(ipoint) .gt.  Atmo%ltau_500(ipoint+1)-.01*Atmo%ltau_500(ipoint+1))
         Atmo%ltau_500(ipoint+1:Params%n_points)=Atmo%ltau_500(ipoint+1:Params%n_points)+.01*Atmo%ltau_500(ipoint)

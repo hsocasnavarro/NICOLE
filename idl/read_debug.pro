@@ -77,12 +77,13 @@ pro read_debug,corenumber=corenumber,d,e,m
      free_lun,unit
   endif
 
-  if outputpop eq 'T' then begin
+  tmp1=dblearr(ndep)
+  if outputnltesf eq 'T' then begin
      openu,unit,'NLTE_sf.dat',/swap_if_big,/get_lun
-     readu,unit,tmp
-     if max(tmp) gt  maxnq then begin
+     readu,unit,tmp1
+     if max(tmp1) gt  maxnq then begin
         print,"Can't read all wavelengths in source function file"
-        print,"There is a transition with ",max(tmp)," wavelenghts."
+        print,"There is a transition with ",max(tmp1)," wavelenghts."
         print,"Can only read up to maxnq=",maxnq
      endif
      e.sf=0.

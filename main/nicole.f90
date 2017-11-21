@@ -1019,10 +1019,12 @@ Contains
              Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
           End if
        End if
+       
        If (Input%hscale .eq. 'z') then
           Call z_to_tau(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
                Call z_to_tau(Params, Guess_model%Comp2)
+
        Else If (Input%hscale .eq. 't') then
           Call tau_to_z(Params, Guess_model%Comp1)
           If (Params%TwoComp) & 
