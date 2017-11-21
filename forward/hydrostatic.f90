@@ -132,7 +132,7 @@ Subroutine Hydrostatic(Params, Atmo)
            dtau=(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*1e5*.5* &
                 (Kappa(ipoint)*Atmo%Rho(ipoint)+Kappa(ipoint-1)*Atmo%Rho(ipoint-1))
            Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
-                Gravity*Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint)
+                Gravity*(Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint))*Atmo%Rho(ipoint-1)*1e5
         Endif
 !       Hydrostatic equilibrium equation.
         Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
