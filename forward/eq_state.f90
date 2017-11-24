@@ -1901,7 +1901,7 @@ Contains
     Implicit None
     integer :: n_grid
     real , dimension(n_grid) :: temp4, Pg4, PH4, PHminus4,PHplus4, PH24, &
-         PH2plus4, Pe4, try_Pe4
+         PH2plus4, Pe4, try_Pe4,  Pe4b
     real , dimension(n_grid) :: nH4, nHminus4,nHplus4, nH24, &
          nH2plus4, ne4
     real(kind=8) :: temper_in(n_grid), Pe_in(n_grid), n_e_in(n_grid), Pt_in(n_grid)

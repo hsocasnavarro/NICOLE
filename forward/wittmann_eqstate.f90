@@ -12,41 +12,46 @@
 !      dp es la derivada de p respecto a t, ddp respecto a pe.          
 
     subroutine wittmann_compute_pe(n,T,Pg,Pe)
-      real, dimension(n) :: T, Pg, Pe      
+      real, dimension(n) :: T, Pg, Pe, Pg2, Pe2
       integer :: n, loop
 
+      Pe2=Pe
+      Pg2=Pg
       Do loop=1, n
-         Pe(loop)=0.3*Pg(loop)
-         Call pefrompg10(T(loop),Pg(loop),Pe(loop))
+         Pe2(loop)=0.3*Pg2(loop)
+         Call pefrompg10(T(loop),Pg2(loop),Pe2(loop))
       End do
     End subroutine wittmann_compute_pe
 !
     subroutine wittmann_compute_pg(n,T,Pe,Pg)
-      real, dimension(n) :: T, Pg, Pe      
+      real, dimension(n) :: T, Pg, Pe, Pg2, Pe2
       real, dimension(99) :: p,dp,ddp
       real :: theta
       integer :: n, loop
 
+      Pe2=Pe
       Do loop=1, n
          theta=5040./T(loop)
-         call gasb(theta,Pe(loop),p,dp,ddp)
+         call gasb(theta,Pe2(loop),p,dp,ddp)
          Pg(loop)=p(84)
       End do
     End subroutine wittmann_compute_pg
 !
     subroutine wittmann_compute_others_from_T_pe_pg(n,T,Pe,Pg,&
          nH,nHminus,nHplus,nH2,nH2plus)
-      real, dimension(n) :: T, Pg, Pe
+      real, dimension(n) :: T, Pg, Pe, Pg2, Pe2
       real, dimension(n) :: nH, nHminus, nHplus, nH2, nH2plus
       real, dimension(99) :: p,dp,ddp
       real :: theta, PHtot
       real, parameter :: bk=1.38066D-16
       integer :: n, loop
 
+      Pe2=Pe
+      Pg2=Pg
       Do loop=1, n
          theta=5040./T(loop)
-         call gasb(theta,Pe(loop),p,dp,ddp)
-         Pg(loop)=p(84)
+         call gasb(theta,Pe2(loop),p,dp,ddp)
+         Pg2(loop)=p(84)
          P2n=1./(bk*T(loop))
          PHtot=p(85)
          nH(loop)=p(1)*PHtot*P2n

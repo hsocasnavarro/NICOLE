@@ -10,7 +10,6 @@ Subroutine Hydrostatic(Params, Atmo)
   Use Eq_state
   Use Atomic_data
   Use Background_opacity_module, Only: Background_opacity
-  Use Forward_module
   Use Debug_module
   Use Profiling
   Implicit None
@@ -25,7 +24,7 @@ Subroutine Hydrostatic(Params, Atmo)
   Real, Parameter :: nu500 = cc/(5000.*1.e-8), Min_temp = 2500., &
        Mu=12.566370614 ! Vacuum permeability (G^2 cm^3/erg)=4*Pi, P_m=B^2/2/Mu
   Real :: dtau, dif, n2P, Scat, chi_0, chi_e, eta
-  Real :: Avmolweight, Asum, Wsum, Pg_Old, OldKappa, OldRho, metal
+  Real :: Avmolweight, Asum, Wsum, Pg_Old, OldKappa, metal
   Logical :: Warning1, Warning2
   Logical, Save :: FirstTime=.True.
 !
@@ -67,13 +66,6 @@ Subroutine Hydrostatic(Params, Atmo)
   Warning1=.FALSE.
   Warning2=.FALSE.
   Tau=10.**Atmo%ltau_500
-
-  If (Params%Hscale .eq. 'z') then ! First conver to tau
-     Call Fill_densities(Params, Params%Input_dens, Atmo)
-     Call z_to_tau(Params, Atmo)
-  End if
-  
-  
 !
 ! Calculate the average molecular weight of the particles
 !
@@ -133,10 +125,19 @@ Subroutine Hydrostatic(Params, Atmo)
      iters=0
 ! Now iterate to find consistent kappa, gas_p, el_p
      Do while (iters .lt. niters .and. dif .gt. Precision)
-        dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
-        Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
-             Gravity*dtau/(.5*(Kappa(ipoint-1)+Kappa(ipoint)))
-        
+        if (Params%hscale .eq. 't') then
+           dtau=10.**Atmo%ltau_500(ipoint) - 10.**Atmo%ltau_500(ipoint-1)
+           Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
+                Gravity*dtau/(.5*(Kappa(ipoint-1)+Kappa(ipoint)))
+        Else
+           Avmolweight=Wsum/(Asum+ &
+                Atmo%El_p(ipoint-1)/Atmo%Gas_p(ipoint-1))
+           Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
+                exp(-Gravity/Avog/BK*Avmolweight* &
+                .5*(1./Atmo%Temp(ipoint)+1./Atmo%Temp(ipoint-1))* &
+                 (Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint)))
+        Endif
+  
 !       Hydrostatic equilibrium equation.
         Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
         OldKappa=Kappa(ipoint)
@@ -146,14 +147,14 @@ Subroutine Hydrostatic(Params, Atmo)
         Kappa(ipoint)=Background_opacity(Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint)*n2P, &
              Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(1)*n2P,&
              5000., Scat)
-        Avmolweight=Wsum/(Asum+ &
-             Atmo%El_p(ipoint)/Atmo%Gas_p(ipoint))
-        OldRho=Atmo%Rho(ipoint)
         Atmo%Rho(ipoint)=Atmo%Gas_p(ipoint)*Avmolweight/Avog/bk/temp(ipoint) ! Gas density
         Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
 
+        If (Params%hscale .eq. 't') &
+             Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
+             dtau/2./1.e5* &
+             (1./(Kappa(ipoint)*Atmo%Rho(ipoint))+1./(Kappa(ipoint-1)*Atmo%Rho(ipoint-1)))
         dif=Abs(OldKappa-Kappa(ipoint))/(OldKappa+Kappa(ipoint))
-        dif=dif+Abs(OldRho-Atmo%Rho(ipoint))/(OldRho+Atmo%Rho(ipoint))
         iters=iters+1
      End do
      Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
@@ -191,7 +192,11 @@ Subroutine Hydrostatic(Params, Atmo)
   If (Params%hscale .eq. 't') &
        Atmo%Z_scale(1:Params%n_points)=Atmo%Z_scale(1:Params%n_points) - &
        Atmo%Z_scale(imin(1))
-  
+  imin=MinLoc(Abs(Atmo%z_scale))
+  If (Params%hscale .eq. 'z') &
+       Atmo%ltau_500(1:Params%n_points)=Atmo%ltau_500(1:Params%n_points) - &
+       Atmo%ltau_500(imin(1))
+
   Atmo%ne(1:Params%n_points)=Atmo%el_p(1:Params%n_points)/ &
        bk/Atmo%Temp(1:Params%n_points)
 !
