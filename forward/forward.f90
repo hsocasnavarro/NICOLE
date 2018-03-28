@@ -1929,7 +1929,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Real, Parameter :: Min_Pe=1e-4
 !
   Call Time_routine('forward',.True.)
-
+  
   npoints=Params%n_points  
   Atmo=Atmo_in ! Model assign operation
 
@@ -1958,7 +1958,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   NLTE_done=.FALSE.
 !
   Params%def_abund=0 ! Force to not use ANN. Need to revise this
-
   Do iline=1, Params%n_lines
      ! Complete line information
      Line(iline)%Atomic_weight=At_weight(Line(iline)%Atomic_number)
@@ -2468,6 +2467,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         nformal(ichoice)=nformal(ichoice)+1 ! How many solutions of each type
         Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/reference_cont
         idata=idata+4*Params%Skip_lambda ! Update the data index
+        If (Debug_errorflags(flag_NLTE) .ge. 1) Syn_profile(idata:idata+3)=-1e20
      End do !$$ PARALLEL LOOP END
 
 

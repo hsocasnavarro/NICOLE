@@ -41,6 +41,7 @@ Contains
 
     Opac=0.0
     Do iz=1,nz ! Loop in elements
+
        If (ilam .le. Maxval(nlambda(iz,:)) .and. .not. ignore(iz)) then ! Is at least one level relevant?
           Ab=10**(At_abund(zs(iz))-12.)
           Call Partition_f(zs(iz),TT(1),U1(1),U2(1),U3(1),dU1(1),dU2(1),dU3(1))
@@ -61,7 +62,6 @@ Contains
           End do
        End if
     End do
-    if (int(T) .eq. 6642) Stop
     
     UVOpacity_TOPbase=Opac
     Scat=0.

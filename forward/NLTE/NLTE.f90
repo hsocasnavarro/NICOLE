@@ -463,7 +463,7 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   Logical, Save :: FirstTime=.TRUE.
   Logical :: Error
   Real, Dimension (10) :: Pp
-!
+  !
   If (FirstTime) then ! All intializations
      Call Read_atom(Atom)
      Call Find_atomic_number
@@ -491,9 +491,12 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
 ! From here on may be needed for repeated calls with different atmospheres
 
   If (NLTEInput%Hydro) then
+
      Call Hydrostatic(Params, NLTE%Atmo) ! To fill in some arrays in Atmo
+
   Else ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
-       !       nH2 columns of the model
+     !       nH2 columns of the model
+
      NLTE%Atmo%ne=NLTE%Atmo%el_p/BK/NLTE%Atmo%Temp
      Call Compute_others_from_T_Pe_Pg(NLTE%NDEP, NLTE%Atmo%Temp, &
           NLTE%Atmo%El_p, NLTE%Atmo%Gas_p, &
@@ -516,6 +519,7 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
 !
   Call BackgroundOpac(NLTE, NLTEInput, Atom) ! Compute background opacities
   Call VoigtProfs(NLTE, NLTEInput, Atom) ! Compute Voigt profiles
+
 !
   Return
 !
@@ -807,6 +811,7 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
 !
 ! Calculate standard opacities at 500nm (will be used for normalization)
 !
+
   If (FirstTime) then
      Allocate(Cont_op_5000_2(NLTE%NDEP))
      Cont_op_5000_2(:)=-10
@@ -831,13 +836,16 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
         XCONT(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P, &
              Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, &
              Atmo%nH2plus(idepth)*n2P, Atom%Alamb(itran), Scat(idepth))
+
         If (Cont_op_5000_2(idepth) .lt. 0) then
+
            Cont_op_5000_2(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth),&
                 Atmo%Gas_p(idepth),Atmo%nH(idepth)*n2P,Atmo%nHminus(idepth)*n2P, &
                 Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, Atmo%nH2plus(idepth)*n2P, &
                 5000., Dummy(1))
         End if
 !        XCONT(idepth)=XCONT(idepth)/Cont_op_5000_2(idepth)
+
         NLTE%BPlanck(idepth,itran)=Planck(freq,NLTE%Atmo%Temp(idepth))
         SC(idepth)=(XCONT(idepth)-Scat(idepth))/XCONT(idepth)* &
              NLTE%BPlanck(idepth,itran)

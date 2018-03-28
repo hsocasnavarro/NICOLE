@@ -230,7 +230,7 @@ Contains
      If (n_iter .ge. Params%max_inv_iters) StopIter=.True.
      n_iter=n_iter+1
   End do
-  Params%Skip_lambda=1 
+  Params%Skip_lambda=1
   Call Deallocate_model_2comp(Trial_model)
   Call Deallocate_model_2comp(Trial_errors)
   Call Deallocate_model_2comp(Errors)

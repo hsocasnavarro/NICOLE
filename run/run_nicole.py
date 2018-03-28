@@ -339,7 +339,7 @@ for icycle in range(int(ncycles)):
         print 'Unknown value for "Eq state for H"'
         print 'Must be NICOLE, Asensio, Asensio273 or Wittmann'
         sys.exit(1)
-    peconsistency=get_value(config,'Pe consistency','1e-1','NICOLE.input')
+    peconsistency=get_value(config,'Pe consistency','1e-4','NICOLE.input')
     debug=get_value(config,'Debug mode','0','NICOLE.input')
     interp=get_value(config,'Optimize grid','-','NICOLE.input')
     outputpop=get_value(config,'Output populations','0','NICOLE.input')
