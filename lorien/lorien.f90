@@ -625,6 +625,11 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   Reguls(4)=Sqrt(Sum( y**2 ) )*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))/500.
   Regul_weights(4)=0.01
   !
+  ! Constant T
+  !
+  Norm=Sum(y(:))/Params%n_points
+  Reguls(4)=Reguls(4)+Sqrt(Sum( (y(:)-Norm)**2 ) )
+  !
   ! v_mic
   !
   Reguls(5)=Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
@@ -699,6 +704,11 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   End do
   y=Atmo%Temp-y2
   Reguls(4)=Reguls(4) + Sqrt(Sum( y**2 ) )*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))/500.
+  !
+  ! Constant T
+  !
+  Norm=Sum(y(:))/Params%n_points
+  Reguls(4)=Reguls(4)+Sqrt(Sum( (y(:)-Norm)**2 ) )
   !
   ! v_mic
   !
