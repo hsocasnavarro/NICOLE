@@ -21,6 +21,7 @@
          Pe2(loop)=0.3*Pg2(loop)
          Call pefrompg10(T(loop),Pg2(loop),Pe2(loop))
       End do
+      Pe=Pe2
     End subroutine wittmann_compute_pe
 !
     subroutine wittmann_compute_pg(n,T,Pe,Pg)

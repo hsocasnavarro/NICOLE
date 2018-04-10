@@ -1921,7 +1921,7 @@ Contains
 
     Call Time_routine('compute_others_from_T_Pe_Pg',.True.)
 
-    If (eqstate_switch_others .eq. 3) then ! Use Wittmann's
+    If (eqstate_switch_others .eq. 3) then ! Use Wittmann's       
        Call Wittmann_compute_others_from_T_pe_pg(n_grid, temp4, Pe4, Pg4,&
        nH4, nHminus4, nHplus4, nH24, nH2plus4)
        Call Time_routine('compute_others_from_T_Pe_Pg',.False.)
@@ -2192,7 +2192,7 @@ Contains
           Call ann_pefrompg(T4(loop), Pg4(loop), metalicity, Pe4(loop))
        End do
     End if
-
+    
     If (eqstate_switch .eq. 2) then ! Use Wittmann's EoS
        Call wittmann_compute_pe(n_grid, temp4, PT4, Pe4)
        Call Time_routine('compute_pe',.False.)
@@ -2245,7 +2245,7 @@ Contains
           End do
        End do
     End if
-    
+
     Call Time_routine('compute_pe',.False.)
     Return
     

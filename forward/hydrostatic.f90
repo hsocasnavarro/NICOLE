@@ -138,15 +138,17 @@ Subroutine Hydrostatic(Params, Atmo)
                  (Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint)))
         Endif
   
-!       Hydrostatic equilibrium equation.
+        !       Hydrostatic equilibrium equation.
         Call Compute_Pe(1, Temp(ipoint), Atmo%Gas_p(ipoint), Atmo%El_p(ipoint))
         OldKappa=Kappa(ipoint)
         n2P=BK*temp(ipoint)
         Call Compute_others_from_T_Pe_Pg(1,Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint), &
              Atmo%nHminus(ipoint), Atmo%nHplus(ipoint), Atmo%nH2(ipoint), Atmo%nH2plus(ipoint))
         Kappa(ipoint)=Background_opacity(Temp(ipoint), Atmo%El_p(ipoint), Atmo%Gas_p(ipoint), Atmo%nH(ipoint)*n2P, &
-             Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(1)*n2P,&
+             Atmo%nHminus(ipoint)*n2P, Atmo%nHplus(ipoint)*n2P, Atmo%nH2(ipoint)*n2P, Atmo%nH2plus(ipoint)*n2P,&
              5000., Scat)
+        Avmolweight=Wsum/(Asum+ &
+             Atmo%El_P(ipoint)/Atmo%Gas_P(ipoint))
         Atmo%Rho(ipoint)=Atmo%Gas_p(ipoint)*Avmolweight/Avog/bk/temp(ipoint) ! Gas density
         Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g
 

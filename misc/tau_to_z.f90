@@ -98,7 +98,8 @@ Subroutine Tau_to_z(Params, Atmo)
 !     Kappa(ipoint)=Kappa(ipoint)/Atmo%Rho(ipoint) ! Convert to cm^2/g 
      AvOp=(Kappa(ipoint) + Kappa(ipoint-1))/2. ! cm-1
      Atmo%Z_scale(ipoint)=Atmo%Z_scale(ipoint-1) - &
-          dtau/AvOp/1.e5
+                    dtau/AvOp/1.e5
+!          dtau*(1./Kappa(ipoint)+1./Kappa(ipoint-1))/2./1.e5
   End do
 
   ! Make z=0 at point with min(abs(ltau_5000))
@@ -118,7 +119,8 @@ Subroutine Tau_to_z(Params, Atmo)
   End if
   dz=-Atmo%ltau_500(i)*(Atmo%z_scale(j)-Atmo%z_scale(i))/(Atmo%ltau_500(j)-Atmo%ltau_500(i))
   Atmo%Z_scale(:)=Atmo%Z_scale(:)+dz
-!
+
+  !
   Return
 !
 End Subroutine Tau_to_z

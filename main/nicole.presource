@@ -1,4 +1,4 @@
-!                      N I C O L E   v 18.03b
+!                      N I C O L E   v 18.04
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 18.03b ******************'
+     Print *,'*************** N I C O L E   v 18.04 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -1275,6 +1275,9 @@ Contains
              ! }}}
           End if
           Call Forward(Params, Line, Region, Guess_model, Syn_profile, Input%set_hydro)
+	  Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
+          If (Params%TwoComp) &
+               Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
           Call Record_to_Model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars,-1) 
           If (debug_level .ge. 1) then
              Write (Debug_FileUnit,*) ' Profile:'
