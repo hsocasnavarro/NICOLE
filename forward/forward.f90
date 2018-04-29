@@ -1698,7 +1698,6 @@ SUBROUTINE ipol_dscale(params, atmo, Line)
      f(k) = atmo%ltau_500(k+k0-1)
   end do
   Call bezier3(nn,x, f, ndep, xx, Atmo%ltau_500)
- 
   !
   ! Now we interpolate in tau (not aind2)
   nullify(x)
@@ -1897,7 +1896,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Type (NLTE_input), Save :: NLTEInput
   Type (NLTE_variables), Save :: NLTE
   Type (Model) :: Atmo, Atmo_in, Saved, Atmo_pre
-  Integer, Parameter :: NQuad=3 ! Number of points in quadrature (2 to 5)
+  Integer, Parameter :: NQuad=5 ! Number of points in quadrature (2 to 5)
   Logical :: Hydro, Incomplete, End
   Real, Dimension (Params%n_data) :: Syn_profile
   Real, Dimension (Params%n_points) :: Source_f, ltau_500_mu, term
@@ -1939,7 +1938,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Stop
   End if
 !  First re-interpolate tau grid according to de la Cruz Rodriguez
-!   (adapterd from Carlsson'¡s MULTI_3D). Changes are not propagated outside
+  !   (adapterd from Carlsson'¡s MULTI_3D). Changes are not propagated outside
+  
   If (Params%Reinterpolate .gt. 0) & 
        Call ipol_dscale(Params, Atmo, Line)  
 ! Check atmosphere for sanity
@@ -2174,8 +2174,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      last_update=-10 ! Make sure that opacities will be computed the first time
      nwlengths=Region(iregion)%nwavelengths
      If (Params%Reference_cont .eq. 0) then ! Do not normalize
-        reference_cont=1.e15 ! For numerical precision. Will remove this factor
-                             ! at the end
+        reference_cont=1.e14 
+                             
      Else If (Params%Reference_cont .eq. 1) then
 !        reference_cont=conhsra(Region(iregion)%First_wlength + &
 !             Region(iregion)%nwavelengths * &
@@ -2398,16 +2398,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Call formal_solution(Params%n_points, Params%formal_solution, &
                 ltau_500_mu, Absorp_height, Source_f, &
                 Stokes, ichoice, Params%formal_boundary_cond) ! Formal solution
-           if (Stokes(1) .gt. 1e25) then
-              print *,'stk=',stokes
-              print *,'tau=',Atmo%ltau_500
-              print *,'temp=',Atmo%temp
-              print *,'elp=',Atmo%el_p
-              print *,'gas_p=',Atmo%gas_p
-              print *,'rho=',Atmo%rho
-              print *,'iwave=',iwave,' lambda=',Wave(iwave)
-              stop
-           endif
            Call time_routine('formalsolution',.False.)
            If (Params%reference_cont .eq. 4) then ! Normalize to local cont
               If (iwave .eq. 1) then ! First point
@@ -2490,8 +2480,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Print *,'Number of Stokes formal solutions using WPM: ',nformal(4)
   End if
 
-  If (Params%Reference_cont .eq. 0) & ! Remove normalization factor
-       Syn_profile=Syn_profile*1.e15 
 !
   If (Debug_errorflags(flag_NLTE) .ge. 1) Debug_errorflags(flag_forward)=1
   If (Debug_warningflags(flag_NLTE) .ge. 1) Debug_warningflags(flag_forward)=1

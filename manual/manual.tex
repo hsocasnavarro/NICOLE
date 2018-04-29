@@ -21,7 +21,7 @@ the Lorien Engine}
 e-mail: \mbox{hsocas@iac.es; jaime@astro.su.se; aasensio@iac.es}\\
 }
 
-\date{Version 18.04}
+\date{Version 18.04b}
 
 \maketitle
 
@@ -759,23 +759,20 @@ mpirun -n 8 ./nicole
   is neglected. This condition is tested at each depth-point and wavelength.
 \item Continuum reference: (Optional, default=1). Switch to control
   the normalization of the spectral profiles.  Select 0 for no
-  normalization (output will be in c.g.s. units,
+  normalization (output will be in 10$^{14}$ c.g.s. units,
   e.g. erg~cm$^{-2}$~s$^{-1}$~cm$^{-1}$ for flux and the same per
-  strad for intensity). It is not recommended to use this option in
-  inversion mode since the large values obtained (of the order of 1e14
-  for average suiet Sun) will give rise to numerical precision issues,
-  unless you use it in combination with the Continuum value field (see
-  below) specifying a value of $\sim$1e14 to have the inverted data of
-  the order of unity; 1 for HSRA continuum intensity {\bf at disk
-    center} at a wavelength in the middle of each spectral range
-  (default); 2 for normalization to HSRA continuum intensity {\bf at
-    disk center} at 5000~\AA ; 3 for normalization to HSRA continuum
-  intensity at a wavelength in the middle of each spectral range and
-  at the heliocentric angle of the observations (spècified above); 4
-  for {\bf local} normalization to the first point of each region 
-  (useful to normalize to the local continuum) but note that this
-  option eliminates all information on absolute photometry. Therefore
-  the temperature scale retrieved is not physical.
+  strad for intensity). If you use this mode for inversions, make sure
+  to normalize your input observed profiles to 10$^{14}$ first; 1 for
+  HSRA continuum intensity {\bf at disk center} at a wavelength in the
+  middle of each spectral range (default); 2 for normalization to HSRA
+  continuum intensity {\bf at disk center} at 5000~\AA ; 3 for
+  normalization to HSRA continuum intensity at a wavelength in the
+  middle of each spectral range and at the heliocentric angle of the
+  observations (spècified above); 4 for {\bf local} normalization to
+  the first point of each region (useful to normalize to the local
+  continuum) but note that this option eliminates all information on
+  absolute photometry. Therefore the temperature scale retrieved is
+  not physical.
 \item Continuum value: (Optional, default=1). This is simply a
   normalization factor that will be applied to the input
   profiles. This is useful for instance if you are using data

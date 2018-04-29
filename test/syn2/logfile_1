@@ -1,13 +1,13 @@
-12:46:28:Point:1(x=1,y=1) assigned to processor:1
-12:46:28:Point:2(x=1,y=2) assigned to processor:1
-12:46:28:Point:3(x=1,y=3) assigned to processor:1
-12:46:29:Point:4(x=1,y=4) assigned to processor:1
-12:46:29:Point:5(x=1,y=5) assigned to processor:1
-12:46:29:Point:6(x=1,y=6) assigned to processor:1
-12:46:29:Point:7(x=1,y=7) assigned to processor:1
-12:46:29:Point:8(x=1,y=8) assigned to processor:1
-12:46:29:Point:9(x=1,y=9) assigned to processor:1
-12:46:29:Point:10(x=1,y=10) assigned to processor:1
+18:03:07:Point:1(x=1,y=1) assigned to processor:1
+18:03:07:Point:2(x=1,y=2) assigned to processor:1
+18:03:07:Point:3(x=1,y=3) assigned to processor:1
+18:03:07:Point:4(x=1,y=4) assigned to processor:1
+18:03:07:Point:5(x=1,y=5) assigned to processor:1
+18:03:07:Point:6(x=1,y=6) assigned to processor:1
+18:03:07:Point:7(x=1,y=7) assigned to processor:1
+18:03:07:Point:8(x=1,y=8) assigned to processor:1
+18:03:07:Point:9(x=1,y=9) assigned to processor:1
+18:03:07:Point:10(x=1,y=10) assigned to processor:1
   
  ---PROCESS-STATS---
 host: 1, rank:     0, pixels processed:       0 (  0.00%)

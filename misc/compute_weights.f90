@@ -63,6 +63,7 @@ Subroutine Compute_weights(Params, Profile, Sigma, icycle)
   If (Qmax .lt. Params%Noise*100) Qmax=Params%Noise*100
   If (Umax .lt. Params%Noise*100) Umax=Params%Noise*100
   If (Vmax .lt. Params%Noise*100) Vmax=Params%Noise*100
+  If (Imax .gt. 1e7) Imax=1e6
 !
 ! Fill in the Sigma array with the proper weights
 !
@@ -72,12 +73,6 @@ Subroutine Compute_weights(Params, Profile, Sigma, icycle)
      Sigma(ind+2)=Umax*.01
      Sigma(ind+3)=Vmax*.01
   End do
-!  Do ind=55*4, 82*4, 4
-!     Sigma(ind)=1e10
-!  End do
-!  Do ind=132*4, 161*4, 4
-!     Sigma(ind)=1e10
-!  End do
 !
 ! Normalize weights so that their minimum is the noise
 !

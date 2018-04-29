@@ -168,7 +168,6 @@ Contains
      Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.) 
      Call Compute_chisq(Params, Obs_profile, Trial_profile, Sigma, &
           Nodes, Trial_model, Chisq, NWChisq, Regul)
-     
      If (Debug_errorflags(flag_forward) .ge. 1) Chisq=1e10
      HistChisq(n_iter)=Chisq
      HistLambda(n_iter)=Lambda

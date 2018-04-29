@@ -26,19 +26,20 @@ inversion.mod
 2.7414e+4     ! gravity 
 1.e-3     ! regularization 
 10    ! update_opac 
+0    ! negligible_opac 
 1       !  contref 
 pel       ! inputdens 
  -1   -1   -1   -1   -1   -1   -1   -1        ! Keep: el_p, gas_p, rho, nH, nH-, nH+, nH2, nH2+ 
 t          ! hscale 
 1  1  ! opac, opacUV 
 0 ! elements to ignore in opac
-0  0 1e-1          ! Eq state, Eq state for H, Pe_consistency 
+0  0 1e-4          ! Eq state, Eq state for H, Pe_consistency 
 T     T   0   ! sethydro, setnH, restart 
 1 F   ! depcoef mode, write 
 1   ! nlines 
 1    ! nregions 
 6300. 0.02 200 1.0 1 1.0 0.0 1.0 0.0
-2 FE 1 6301.5080 1.0 3.65000012398 -0.59 P 5 2.0 D 5 2.0 1 -1 -1 -1 -1 -1  0 1.0 1.0 F 0 0 0 0 0 0
+2 FE 1 6301.5080 1.0 3.65000012398 -0.59 P 5 2.0 D 5 2.0 1 -1 -1 -1 -1 -1  0 1.0 1.0 0 0 0 0 0 0 0
 12.0 10.93 1.1 1.4 2.55 8.52 7.92 8.83 4.56 8.08 6.33 7.58 6.47 7.55 5.45 7.33 5.5 6.4 5.12 6.36 3.17 5.02 4.0 5.67 5.39 7.5 4.92 6.25 4.21 4.6 2.88 3.41 -10 -10 -10 -10 2.6 2.97 2.24 2.6 1.42 1.92 -10 1.84 1.12 1.69 0.94 1.77 1.66 2.0 1.0 -10 -10 -10 -10 2.13 1.17 1.58 0.71 1.5 -10 1.01 0.51 1.12 -0.1 1.14 0.26 0.93 0.0 1.08 0.06 0.88 -10 1.11 -10 1.45 1.35 1.8 1.01 -10 0.9 1.95 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 
 4 ! Nodes in T 
 3 ! Nodes in v_los 
