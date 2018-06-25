@@ -32,6 +32,7 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
            keep_nH2:reform(m.keep_nH2,1,1), keep_nH2plus:reform(m.keep_nH2plus,1,1), $
            nH2:reform(m.nH2,1,1,nz),nH2plus:reform(m.nH2plus,1,1,nz),$
            v_mac:reform(m.v_mac,1,1),ffactor:reform(m.ffactor,1,1),$
+           chrom_x:reform(m.chrom_x,1,1),chrom_y:reform(m.chrom_y,1,1), $
            stray_frac:reform(m.stray_frac,1,1),abundance:reform(fltarr(92),1,1,92)}
         nx=1l
         ny=1l
@@ -45,13 +46,13 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
      npix=long(nx)*long(ny)
      nnx=long(n_elements(indx))
      nny=long(n_elements(indy))
-     tmp=lon64arr(22*nz+11+92)
-     tmp(0)=3328834590979877230
-     tmp(1)=2314885530823516726
+     tmp=lon64arr(22*nz+13+92)
+     tmp(0)=4049129056382445934
+     tmp(1)=2314885530819768366
      tmp(2)=nny*long64(2)^32 + nnx
      tmp(3)=nz
      writeu,iunit,tmp
-     tmp=dblarr(22*nz+11+92)
+     tmp=dblarr(22*nz+13+92)
      for iix=0l, nnx-1 do for iiy=0l, nny-1 do begin
         ix=indx(iix)
         iy=indy(iiy)
@@ -89,7 +90,9 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
         tmp(22*nz+8)=m.keep_nHplus(ix,iy)
         tmp(22*nz+9)=m.keep_nH2(ix,iy)
         tmp(22*nz+10)=m.keep_nH2plus(ix,iy)
-        tmp(22*nz+10+1:22*nz+10+92)=m.abundance(ix,iy,0:91)
+        tmp(22*nz+11)=m.chrom_x(ix,iy)
+        tmp(22*nz+12)=m.chrom_y(ix,iy)
+        tmp(22*nz+12+1:22*nz+12+92)=m.abundance(ix,iy,0:91)
         writeu,iunit,tmp
      endfor
      free_lun,iunit

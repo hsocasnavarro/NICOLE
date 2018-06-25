@@ -5,7 +5,7 @@ Module Model_structure
   End interface
 !
   integer, parameter :: n_model_elements=92
-  integer, parameter :: nvarsdepth=22, nvarssingle=11+n_model_elements
+  integer, parameter :: nvarsdepth=22, nvarssingle=13+n_model_elements
   Type Model
 ! temp is in K, v_los and v_mic are in cm/s, el_p and gas_p are in dyn/cm^2, 
 ! rho is in g/cm^3, b_long, b_x, b_y is in gauss, 
@@ -20,7 +20,7 @@ Module Model_structure
      real, dimension(:), allocatable :: bl_x, bl_y, bl_z, vl_x, vl_y, vl_z
      real, dimension(:), allocatable :: ne, nH, nHminus
      real, dimension(:), allocatable :: nHplus, nH2, nH2plus
-     real :: v_mac, stray, ffactor
+     real :: v_mac, stray, ffactor, chrom_x, chrom_y
      real :: keep_el_p, keep_gas_p, keep_rho, keep_nH, keep_nHminus, keep_nHplus
      real :: keep_nH2, keep_nh2plus
      real, dimension(n_model_elements) :: Abundance
@@ -173,6 +173,8 @@ Subroutine Model_assign(A,B)
   A%v_mac=B%v_mac
   A%stray=B%stray
   A%ffactor=B%ffactor
+  A%chrom_x=B%chrom_x
+  A%chrom_y=B%chrom_y
   A%z_scale=B%z_scale
   A%ltau_500=B%ltau_500
   A%temp=B%temp

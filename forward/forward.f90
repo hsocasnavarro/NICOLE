@@ -1915,7 +1915,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Real, Dimension (1) :: imin1, DWave1
   Real, Dimension (NQuad) :: XMU, WMU
   Real :: reference_cont, nu, Wave_cm, Av_mol_weight
-  Real :: mu, DWave, last_update, metal
+  Real :: mu, DWave, last_update, metal, dx
   Real :: PH, PHminus, PHplus, PH2, PH2plus, n2P, Scat
   Integer :: npoints, idepth, iline, iwave, nwlengths, idata, ichoice, iunit, ntrans
   Integer :: iregion, i, j, nw, istart, iend, NMu, imu, itran, imin, irec, iostat
@@ -1952,6 +1952,17 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 !
   Atmo_pre=Atmo
 !
+! Add chrom to temperature
+!
+  Do idepth=1, npoints
+     If (Atmo%ltau_500(idepth) .lt. Atmo%chrom_x-.1) then
+        Atmo%Temp(idepth)=Atmo%Temp(idepth)+Atmo%chrom_y
+     Else if (Atmo%ltau_500(idepth) .lt. Atmo%chrom_x+3) then
+        dx=Atmo%ltau_500(idepth)-Atmo%chrom_x
+        Atmo%Temp(idepth)=Atmo%Temp(idepth)+Atmo%chrom_y*exp( -(dx/0.5)**2 )
+     End if
+  End do
+!  
   Cont_op_5000_2=-10 ! Initialize
   Debug_warningflags(flag_forward)=0
   Debug_errorflags(flag_forward)=0

@@ -27,6 +27,8 @@ pro model_column,m,ix,iy,m2,x2,y2
   m.nH2plus(ix,iy,*)=m2.nH2plus(x2,y2,*)
   m.v_mac(ix,iy)=m2.v_mac(x2,y2)
   m.stray_frac(ix,iy)=m2.stray_frac(x2,y2)
+  m.chrom_x(ix,iy)=m2.chrom_x(x2,y2)
+  m.chrom_y(ix,iy)=m2.chrom_y(x2,y2)
   m.ffactor(ix,iy)=m2.ffactor(x2,y2)
   m.keep_gas_p(ix,iy)=m2.keep_gas_p(x2,y2)
   m.keep_rho(ix,iy)=m2.keep_rho(x2,y2)

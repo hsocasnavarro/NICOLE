@@ -57,6 +57,16 @@ Subroutine Randomize_Model(Params, Nodes, ModelIn, ModelOut)
      ModelOut%ffactor=kk*.5
   End if
 
+  If (Nodes%n_nodes_chrom_x .gt. 0) then
+     Call Random_number(kk)
+     ModelOut%ffactor=-5+(kk-.5)
+  End if
+
+  If (Nodes%n_nodes_chrom_y .gt. 0) then
+     Call Random_number(kk)
+     ModelOut%ffactor=1000.+(kk-.5)*500
+  End if
+
   If (Nodes%n_nodes_mac .gt. 0) then
      Call Random_number(kk)
      ModelOut%v_mac=kk*2.e5

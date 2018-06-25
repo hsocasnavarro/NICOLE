@@ -2,7 +2,7 @@
 ; grid. NOTE: The model is smoothed with a 2-pixel window to 
 ; remove discontinuities if the keyword smooth is present
 
-pro interpolate_model,filein,fileout,newscale,smooth=smootn
+pro interpolate_model,filein,fileout,newscale,smooth=smoot
 
 if filein eq fileout then begin
    print,'Error. Input and output files must be different'
@@ -61,7 +61,7 @@ for ix=0,nx-1 do for iy=0,ny-1 do begin
          if (n_elements(ind) ge 2) then $
             yout[ipoint]=mean( yin[ind] )
       endfor
-      if keyword_set(smooth) then yout=smooth(yout,2)
+      if keyword_set(smoot) then yout=smooth(yout,2)
       tmpout(ivar*nzout:(ivar+1)*nzout-1)=yout
    endfor
    tmpout(22*nzout:*)=tmp(22*nzin:*)

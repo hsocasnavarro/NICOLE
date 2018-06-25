@@ -1,4 +1,4 @@
-!                      N I C O L E   v 18.04
+!                      N I C O L E   v 18.06
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 18.04 ******************'
+     Print *,'*************** N I C O L E   v 18.06 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -595,8 +595,8 @@ Program Nicole
              RealBytes*(nvarsdepth*Params%n_points+nvarssingle))
         Allocate (IntRecord(nvarsdepth*Params%n_points+nvarssingle)) ! Write signature 
         IntRecord(:)=0
-        IntRecord(1)=3328834590979877230_k18
-        IntRecord(2)=2314885530823516726_k18
+        IntRecord(1)=4049129056382445934_k18
+        IntRecord(2)=2314885530819768366_k18
         If (LittleEndian) then
            Integer4(1)=nPix_x
            Integer4(2)=nPix_y
@@ -629,8 +629,8 @@ Program Nicole
              RealBytes*(nvarsdepth*Params%n_points+nvarssingle))
         Allocate (IntRecord(nvarsdepth*Params%n_points+nvarssingle)) ! Write signature 
         IntRecord(:)=0
-        IntRecord(1)=3328834590979877230_k18
-        IntRecord(2)=2314885530823516723_k18
+        IntRecord(1)=4049129056382445934_k18
+        IntRecord(2)=2314885530819768366_k18
         If (LittleEndian) then
            Integer4(1)=nPix_x
            Integer4(2)=nPix_y
@@ -693,12 +693,24 @@ Program Nicole
            If (IprofUnit .gt. 0) then
               Call Read_direct(LittleEndian,IprofUnit,irec+1, &
                    Params%IProf, Params%n_data/4, iost1)
+              If (iost1 .gt. 0) then
+                 Print *,'Error reading Instrumental_profile.dat'
+                 Stop
+              End if
            End if
            Call Read_direct(LittleEndian,modelinunit,irec+1,TmpModel, & 
                 nvarsdepth*Params%n_points+nvarssingle,iost1)           
+              If (iost1 .gt. 0) then
+                 Print *,'Error reading model'
+                 Stop
+              End if
            If (Params%TwoComp) &
            Call Read_direct(LittleEndian,modelinunit2,irec+1,TmpModel2, & 
                 nvarsdepth*Params%n_points+nvarssingle,iost1)           
+              If (iost1 .gt. 0) then
+                 Print *,'Error reading model 2'
+                 Stop
+              End if
            SizeModel=Size(TmpModel)
            If (Starting_at_abund(1) .gt. 0) then
               If (Abs(TmpModel(SizeModel-N_elements+1)-12.0) .gt. 0.001) & 

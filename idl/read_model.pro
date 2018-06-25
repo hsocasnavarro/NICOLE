@@ -19,10 +19,14 @@
 ;      format (currently either '1.6' or '2.3')
 ;   mask (optional): If the file maskinvert.dat exists, it is read and
 ;      the mask returned in this array
+;   chrom (optional): If this keyword is present, add chromospheric
+;      temperature increase as defined by model parameters chrom_x
+;      and chrom_y to temperature stratification
 
 
 function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
-                    nx=nx,ny=ny,formatversion=formatversion,mask=mask
+                    nx=nx,ny=ny,formatversion=formatversion,mask=mask, $
+                    chrom=chrom
 
   ; Check file signature
   openr,inunit,filename,/get_lun,/swap_if_big_endian
@@ -57,6 +61,16 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
      ny=tmp(5)
      npix=long(nx*ny)
   endif
+  if tmp(0) eq 4049129056382445934 and tmp(1) eq 2314885530819768366 then begin
+     formatversion='18.04'
+     openr,inunit,filename,/get_lun,/swap_if_big_endian
+     tmp=lonarr(26)
+     readu,inunit,tmp
+     free_lun,inunit
+     nx=tmp(4)
+     ny=tmp(5)
+     npix=long(nx*ny)
+  endif
   if formatversion eq 'xxx' then begin
      print,'File is not a valid model file:',filename
      stop
@@ -72,6 +86,7 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
      nH: fltarr(nx,ny,nz), nHminus: fltarr(nx,ny,nz), nHplus: fltarr(nx,ny,nz),$
      nH2: fltarr(nx,ny,nz), nh2plus: fltarr(nx,ny,nz), $
      v_mac: fltarr(nx,ny), stray_frac: fltarr(nx,ny),$
+     chrom_x: fltarr(nx,ny), chrom_y: fltarr(nx,ny),$
      keep_el_p: fltarr(nx,ny), keep_gas_p: fltarr(nx,ny), $
      keep_rho: fltarr(nx,ny), keep_nH: fltarr(nx,ny), $
      keep_nHminus: fltarr(nx,ny), keep_nHplus: fltarr(nx,ny), $
@@ -106,6 +121,8 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
         m.v_mac(ix,iy)=tmp(17*nz)
         m.stray_frac(ix,iy)=tmp(17*nz+1)
         m.ffactor(ix,iy)=tmp(17*nz+2)
+        m.chrom_x(ix,iy)=0.
+        m.chrom_y(ix,iy)=0.
      endfor
      ON_IOERROR,NULL
  endif
@@ -150,6 +167,54 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
         m.keep_nH2(ix,iy)=tmp(22*nz+9)
         m.keep_nh2plus(ix,iy)=tmp(22*nz+10)
         m.abundance(ix,iy,0:91)=tmp(22*nz+10+1:22*nz+10+92)
+        m.chrom_x(ix,iy)=0.
+        m.chrom_y(ix,iy)=0.
+     endfor
+     ON_IOERROR,NULL
+ endif
+
+  if formatversion eq '18.04' then begin
+     tmp=dblarr(22*nz+13+92)
+     readu,inunit,tmp           ; Ignore first record (signature)
+     ON_IOERROR,ers4
+     for ix=0l,nx-1 do for iy=0l,ny-1 do begin
+        if not eof(inunit) then readu,inunit,tmp
+        ers4: m.z(ix,iy,*)=tmp(0*nz:(0+1)*nz-1)
+        m.tau(ix,iy,*)=tmp(1*nz:(1+1)*nz-1)
+        m.t(ix,iy,*)=tmp(2*nz:(2+1)*nz-1)
+        m.gas_p(ix,iy,*)=tmp(3*nz:(3+1)*nz-1)
+        m.rho(ix,iy,*)=tmp(4*nz:(4+1)*nz-1)
+        m.el_p(ix,iy,*)=tmp(5*nz:(5+1)*nz-1)
+        m.v_los(ix,iy,*)=tmp(6*nz:(6+1)*nz-1)
+        m.v_mic(ix,iy,*)=tmp(7*nz:(7+1)*nz-1)
+        m.b_los_z(ix,iy,*)=tmp(8*nz:(8+1)*nz-1)
+        m.b_los_x(ix,iy,*)=tmp(9*nz:(9+1)*nz-1)
+        m.b_los_y(ix,iy,*)=tmp(10*nz:(10+1)*nz-1)
+        m.b_x(ix,iy,*)=tmp(11*nz:(11+1)*nz-1)
+        m.b_y(ix,iy,*)=tmp(12*nz:(12+1)*nz-1)
+        m.b_z(ix,iy,*)=tmp(13*nz:(13+1)*nz-1)
+        m.v_x(ix,iy,*)=tmp(14*nz:(14+1)*nz-1)
+        m.v_y(ix,iy,*)=tmp(15*nz:(15+1)*nz-1)
+        m.v_z(ix,iy,*)=tmp(16*nz:(16+1)*nz-1)
+        m.nH(ix,iy,*)=tmp(17*nz:(17+1)*nz-1)
+        m.nHminus(ix,iy,*)=tmp(18*nz:(18+1)*nz-1)
+        m.nHplus(ix,iy,*)=tmp(19*nz:(19+1)*nz-1)
+        m.nH2(ix,iy,*)=tmp(20*nz:(20+1)*nz-1)
+        m.nh2plus(ix,iy,*)=tmp(21*nz:(21+1)*nz-1)
+        m.v_mac(ix,iy)=tmp(22*nz)
+        m.stray_frac(ix,iy)=tmp(22*nz+1)
+        m.ffactor(ix,iy)=tmp(22*nz+2)
+        m.keep_el_p(ix,iy)=tmp(22*nz+3)
+        m.keep_gas_p(ix,iy)=tmp(22*nz+4)
+        m.keep_rho(ix,iy)=tmp(22*nz+5)
+        m.keep_nH(ix,iy)=tmp(22*nz+6)
+        m.keep_nHminus(ix,iy)=tmp(22*nz+7)
+        m.keep_nHplus(ix,iy)=tmp(22*nz+8)
+        m.keep_nH2(ix,iy)=tmp(22*nz+9)
+        m.keep_nh2plus(ix,iy)=tmp(22*nz+10)
+        m.abundance(ix,iy,0:91)=tmp(22*nz+12+1:22*nz+12+92)
+        m.chrom_x(ix,iy)=tmp(22*nz+11)
+        m.chrom_y(ix,iy)=tmp(22*nz+12)
      endfor
      ON_IOERROR,NULL
  endif
@@ -176,6 +241,8 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
         m.v_mac(0,ipix)=tmp(13*nz)
         m.stray_frac(0,ipix)=tmp(13*nz+1)
         m.ffactor(0,ipix)=tmp(13*nz+2)
+        m.chrom_x[0,ipix]=0.
+        m.chrom_y[0,ipix]=0.
      endfor
      ON_IOERROR,NULL
  endif
@@ -247,5 +314,16 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
      free_lun,inunit
   endif
 
+  if (keyword_set(chrom)) then begin
+     nx=(size(m.t))(1)
+     ny=(size(m.t))(2)
+     for ix=0,nx-1 do for iy=0,ny-1 do for ip=0,nz-1 do begin
+        if m.tau[ix,iy,ip] lt m.chrom_x[ix,iy]-.1 then $
+           m.t[ix,iy,ip]=m.t[ix,iy,ip]+m.chrom_y[ix,iy] $
+        else if m.tau[ix,iy,ip] lt m.chrom_x[ix,iy] + 3 then $
+           m.t[ix,iy,ip]=m.t[ix,iy,ip]+m.chrom_y[ix,iy]*exp(  -((m.tau[ix,iy,ip]-m.chrom_x[ix,iy])/(0.5))^2 )
+     endfor
+  endif
+  
   return,m
 end

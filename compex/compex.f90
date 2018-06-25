@@ -105,13 +105,32 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
      X_min(ifree)=(Min_stray/Norm_stray)
      ifree=ifree+1
   End if
-! Field ffactor
+!
+! Chromosphere_x
+!
+  If (Nodes%n_nodes_chrom_x .eq. 1) then
+     X(ifree)=(Guess_model%chrom_x-Ref%chrom_x)/ &
+          Norm_chrom_x
+     X_max(ifree)=(Max_chrom_x-Ref%chrom_x)/Norm_chrom_x
+     X_min(ifree)=Min_chrom_x/Norm_chrom_x
+     ifree=ifree+1
+  End if
+!
+! Chromosphere_y
+!
+  If (nodes%n_nodes_chrom_y .eq. 1) then
+     X(ifree)=(Guess_model%chrom_y-Ref%chrom_y)/ &
+          Norm_chrom_y
+     X_max(ifree)=(Max_chrom_y-Ref%chrom_y)/Norm_chrom_y
+     X_min(ifree)=Min_chrom_y/Norm_chrom_y
+     ifree=ifree+1
+  End if
+! ffactor
   If (Nodes%n_nodes_ffactor .eq. 1) then
      X(ifree)=(Guess_model%ffactor-Ref%ffactor)/ &
           Norm_ffactor
      X_max(ifree)=(Max_ffactor-Ref%ffactor)/Norm_ffactor
      X_min(ifree)=Min_ffactor/Norm_ffactor
-
      ifree=ifree+1
   End if
 ! Abundances
@@ -187,6 +206,26 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
   X_max(ifree:ifree+Nodes%n_nodes_by2-1)=Max_by/Norm_by
   X_min(ifree:ifree+Nodes%n_nodes_by2-1)=Min_by/Norm_by
   ifree=ifree+Nodes%n_nodes_by2
+!
+! Chromosphere_x
+!
+  If (nodes%n_nodes_chrom_x .eq. 1) then
+     X(ifree)=(Guess_model%chrom_x-Ref%chrom_x)/ &
+          Norm_chrom_x
+     X_max(ifree)=(Max_chrom_x-Ref%chrom_x)/Norm_chrom_x
+     X_min(ifree)=Min_chrom_x/Norm_chrom_x
+     ifree=ifree+1
+  End if
+!
+! Chromosphere_y
+!
+  If (nodes%n_nodes_chrom_y .eq. 1) then
+     X(ifree)=(Guess_model%chrom_y-Ref%chrom_y)/ &
+          Norm_chrom_y
+     X_max(ifree)=(Max_chrom_y-Ref%chrom_y)/Norm_chrom_y
+     X_min(ifree)=Min_chrom_y/Norm_chrom_y
+     ifree=ifree+1
+  End if
 ! Abundances
   If (Nodes%n_nodes_ab2 .gt. 0) then
      Do idx=1, Nodes%n_nodes_ab2
@@ -293,6 +332,16 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
      New_model%stray=Ref%stray+X(ifree)*Norm_stray
      ifree=ifree+1
   End if
+! Chromosphere_x
+  If (Nodes%n_nodes_chrom_x .eq. 1) then
+     New_model%chrom_x=Ref%chrom_x+X(ifree)*Norm_chrom_x
+     ifree=ifree+1
+  End if
+! Chromosphere_y
+  If (Nodes%n_nodes_chrom_y .eq. 1) then
+     New_model%chrom_y=Ref%chrom_y+X(ifree)*Norm_chrom_y
+     ifree=ifree+1
+  End if
 ! Field ffactor
   If (Nodes%n_nodes_ffactor .eq. 1) then
      New_model%ffactor=Ref%ffactor+X(ifree)*Norm_ffactor
@@ -373,6 +422,16 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
 !        New_model%b_y(ind)=-New_model%b_y(ind)
 !     End if
 !  End do
+! Chromosphere_x
+  If (Nodes%n_nodes_chrom_x .eq. 1) then
+     New_model%chrom_x=Ref%chrom_x+X(ifree)*Norm_chrom_x
+     ifree=ifree+1
+  End if
+! Chromosphere_y
+  If (Nodes%n_nodes_chrom_y .eq. 1) then
+     New_model%chrom_y=Ref%chrom_y+X(ifree)*Norm_chrom_y
+     ifree=ifree+1
+  End if
 ! Abundances
   If (Nodes%n_nodes_ab2 .gt. 0) then
      Do idx=1, Nodes%n_nodes_ab2
@@ -625,6 +684,16 @@ Subroutine Check_boundaries(Params, Nodes, Guess_model, Trial_model)
        Trial_model%stray .gt. Max_stray) Trial_model%stray = &
        0.5*(Trial_model%stray + Guess_model%stray)
 !
+! Check chrom_x
+!
+  If (Trial_model%chrom_x .lt. Min_chrom_x) Trial_model%chrom_x=Min_chrom_x
+  If (Trial_model%chrom_x .gt. Max_chrom_x) Trial_model%chrom_x=Max_chrom_x
+!
+! Check chrom_y
+!
+  If (Trial_model%chrom_y .lt. Min_chrom_y) Trial_model%chrom_y=Min_chrom_y
+  If (Trial_model%chrom_y .gt. Max_chrom_y) Trial_model%chrom_y=Max_chrom_y
+!
 ! Check expansion
 !
   If (Trial_model%ffactor .lt. Min_ffactor) Trial_model%ffactor=Min_ffactor
@@ -720,6 +789,20 @@ Subroutine Expand_errors(Params, Nodes, Guess_model, X_err, Atmo_errors)
      ifree=ifree+1
   Else
      Atmo_errors%ffactor=-1. ! Negative values signal no error bars
+  End if
+! Chromosphere_x
+  If (Nodes%n_nodes_chrom_x .eq. 1) then
+     Atmo_errors%chrom_x=X_err(ifree)*Norm_chrom_x
+     ifree=ifree+1
+  Else
+     Atmo_errors%chrom_x=-1. ! Negative values signal no error bars
+  End if
+! Chromosphere_y
+  If (Nodes%n_nodes_chrom_y .eq. 1) then
+     Atmo_errors%chrom_y=X_err(ifree)*Norm_chrom_y
+     ifree=ifree+1
+  Else
+     Atmo_errors%chrom_y=-1. ! Negative values signal no error bars
   End if
 ! Abundances
   If (Nodes%n_nodes_ab .gt. 0) then

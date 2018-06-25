@@ -21,7 +21,7 @@ the Lorien Engine}
 e-mail: \mbox{hsocas@iac.es; jaime@astro.su.se; aasensio@iac.es}\\
 }
 
-\date{Version 18.04b}
+\date{Version 18.06}
 
 \maketitle
 
@@ -193,6 +193,30 @@ take no responsibility for any consequence derived from its use.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 
 \chapter{Note for users of previous versions}
+
+\section{For users of versions prior to 18.06}
+\label{explainSx}
+A new mode has been introduced in this section where the chromospheric
+temperature is treated as a step-function temperature increase. This
+is useful in two situations: a) To simulate the effects of a shock in
+the chromosphere; b) To parameterize a hot chromosphere with only two
+free parameters in situations when we don't have enough information
+for a full depth-dependent inferrence with multiple nodes. This last
+scenario has become very frequent, typically with observations of
+CaII 8542 acquired with a Fabry-Perot instrument in low
+spectral resolution.
+
+In the new mode we have two new free parameters, S$_x$ and S$_y$, that
+parameterize the position of the temperature discontinuity (S$_x$, in
+units of $\log(tau_{5000})$) and the increase (S$_y$, in Kelvin). If
+S$_y$ is not zero, then its value is added to the temperature
+stratification above S$_x$. This is true both in synthesis and
+inversion mode. In inversion mode, the nodes in temperature are placed
+below $\log(\tau_{5000})=-3$. It may be somewhat confusing that the
+model temperature is not simply the stratification provided in the
+temperature array of the model. One needs to remember that S$_y$ will
+be added to all grid points above S$_x$.
+
 
 \section{For users of versions prior to 2.6}
 
@@ -965,7 +989,7 @@ line:
 In this section we specify the number of nodes. Valid tokens are:
 Temperature, T, Velocity, Microturbulence,
 Macroturbulence, Bz, Bx, By,
-Stray light, Filling factor, Abundances.
+Stray light, Filling factor, Abundances, Sx, Sy.
 Here is an example of the nodes section:
 
 \begin{verbatim}
@@ -1096,7 +1120,12 @@ He=0.095
 \end{verbatim}
 
 In the override subsection, the abundances can be specified also in
-parts per million simply by following the number with the ppm string
+parts per million simply by following the number with the ppm
+string. Note that, if you have defined abundances in the model
+atmosphere, those will have precedence and will not be overridden by
+the values in this section. The abundances specified in NICOLE.input
+will be used only if the model atmosphere file has zeros in the
+abundance array.
 
 \subsection{The model atmosphere file}
 \label{modelfile}

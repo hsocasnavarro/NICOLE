@@ -6,7 +6,8 @@ Use Model_structure
 ! v_mac is in cm/s, stray and ffactor are dimensionless (0 < stray < 1).
   real, parameter :: Norm_t=2000., Norm_v=2.e5, Norm_mic=1.e5, &
        Norm_blong=1000., Norm_bx=1000., Norm_by=1000., Norm_mac=1.e5, &
-       Norm_stray=0.10, Norm_ffactor=0.10, Norm_ab=0.1
+       Norm_stray=0.10, Norm_ffactor=0.10, Norm_ab=0.1, &
+       Norm_chrom_x=1., Norm_chrom_y=100.
 !  real, parameter :: Max_t=30000., Max_v=2.e6, Max_mic=2.e6, &
 !       Max_b=10000., Max_inc=180., Max_azi=360., Max_mac=5.e5, &
 !       Max_stray=1., Max_ffactor=1.
@@ -15,23 +16,29 @@ Use Model_structure
 !       Min_stray=0., Min_ffactor=1.
   real, parameter :: Max_t=100000., Max_v=2.e6, Max_mic=2.e6, &
        Max_blong=1e4, Max_bx=1e4, Max_by=1e4, Max_mac=5.e5, &
-       Max_stray=1., Max_ffactor=1., Max_ab=12.0
+       Max_stray=1., Max_ffactor=1., Max_ab=12.0, &
+       Max_chrom_x=-3., Max_chrom_y=5000.
   real, parameter :: Min_t=2500., Min_v=-2.e6, Min_mic=0., &
        Min_blong=-1e4, Min_bx=-1e4, Min_by=-1e4, Min_mac=0., &
-       Min_stray=0., Min_ffactor=0., Min_ab=3.0
+       Min_stray=0., Min_ffactor=0., Min_ab=3.0, &
+       Min_chrom_x=-7., Min_chrom_y=00.
   real, dimension(100) :: X_max, X_min
   real, dimension(12,100) :: UserNodeLocations
   Type Nodes_info
      integer :: n_nodes_t, n_nodes_v, n_nodes_mic, & ! Number of nodes 
           n_nodes_blong, n_nodes_bx, n_nodes_by, & ! for each variable.
-          n_nodes_mac, n_nodes_stray, n_nodes_ffactor, n_nodes_ab
+          n_nodes_mac, n_nodes_stray, n_nodes_ffactor, n_nodes_ab, &
+          n_nodes_chrom_x, n_nodes_chrom_y
      integer, dimension(:), pointer :: i_nodes_t, i_nodes_v, i_nodes_mic, &
-          i_nodes_blong, i_nodes_bx, i_nodes_by, i_nodes_ab ! Where are the nodes.
+          i_nodes_blong, i_nodes_bx, i_nodes_by, i_nodes_ab, & ! Where are the nodes.
+          i_nodes_chrom_x, i_nodes_chrom_y
      integer :: n_nodes_t2, n_nodes_v2, n_nodes_mic2, & ! Number of nodes 
           n_nodes_blong2, n_nodes_bx2, n_nodes_by2, & ! for each variable.
-          n_nodes_ffactor2, n_nodes_ab2
+          n_nodes_ffactor2, n_nodes_ab2, &
+          n_nodes_chrom_x2, n_nodes_chrom_y2
      integer, dimension(:), pointer :: i_nodes_t2, i_nodes_v2, i_nodes_mic2, &
-          i_nodes_blong2, i_nodes_bx2, i_nodes_by2, i_nodes_ab2 ! Where are the nodes.
+          i_nodes_blong2, i_nodes_bx2, i_nodes_by2, i_nodes_ab2, & ! Where are the nodes.
+          i_nodes_chrom_x2, i_nodes_chrom_y2
      Type (Model_2comp) :: Reference_model
   End Type Nodes_info
 !

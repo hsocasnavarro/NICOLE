@@ -82,7 +82,9 @@ If (dir .eq. 1) then
    Atmo%keep_nHplus=Vector(nvarsdepth*np+9)
    Atmo%keep_nH2=Vector(nvarsdepth*np+10)
    Atmo%keep_nh2plus=Vector(nvarsdepth*np+11)
-   Atmo%Abundance(:)=Vector(nvarsdepth*np+11+1:nvarsdepth*np+11+n_model_elements)
+   Atmo%chrom_x=Vector(nvarsdepth*np+12)
+   Atmo%chrom_y=Vector(nvarsdepth*np+13)
+   Atmo%Abundance(:)=Vector(nvarsdepth*np+13+1:nvarsdepth*np+13+n_model_elements)
 Else if (dir .eq. -1) then
    Vector(1:np)=Atmo%z_scale(1:np)
    Vector(np+1:2*np)=Atmo%ltau_500(1:np)
@@ -117,7 +119,9 @@ Else if (dir .eq. -1) then
    Vector(nvarsdepth*np+9)=Atmo%keep_nHplus
    Vector(nvarsdepth*np+10)=Atmo%keep_nH2
    Vector(nvarsdepth*np+11)=Atmo%keep_nh2plus
-   Vector(nvarsdepth*np+11+1:nvarsdepth*np+11+n_model_elements)= &
+   Vector(nvarsdepth*np+12)=Atmo%chrom_x
+   Vector(nvarsdepth*np+13)=Atmo%chrom_y
+   Vector(nvarsdepth*np+13+1:nvarsdepth*np+13+n_model_elements)= &
         Atmo%Abundance(:)
 Else
    Print *,'Unknown value for dir in compex/record_to_model.f90'

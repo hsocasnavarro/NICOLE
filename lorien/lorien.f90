@@ -165,7 +165,8 @@ Contains
         Call Hydrostatic(Params, trial_model%Comp2)
         Call Fill_Densities(Params, Params%Input_dens, trial_model%Comp2)
      End if
-     Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.) 
+     Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.)
+     print *,'tt=',trial_model%comp1%chrom_x,trial_model%comp1%chrom_y
      Call Compute_chisq(Params, Obs_profile, Trial_profile, Sigma, &
           Nodes, Trial_model, Chisq, NWChisq, Regul)
      If (Debug_errorflags(flag_forward) .ge. 1) Chisq=1e10
@@ -595,6 +596,7 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
           Reguls(2)=Reguls(2)+(atmo%temp(idepth-1)-atmo%temp(idepth))* &
           (atmo%ltau_500(idepth)-atmo%ltau_500(idepth-1))/500.
   end do
+  Reguls(2)=Reguls(2)+atmo%chrom_y/100. ! chrom_y
   Regul_weights(2)=1.
   !
   ! Filling factor
@@ -682,6 +684,7 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
           Reguls(2)=Reguls(2)+(atmo%temp(idepth-1)-atmo%temp(idepth))* &
           (atmo%ltau_500(idepth)-atmo%ltau_500(idepth-1))/500.
   end do
+  Reguls(2)=Reguls(2)+atmo%chrom_y/100. ! chrom_y
   !
   ! Smooth T
   !
