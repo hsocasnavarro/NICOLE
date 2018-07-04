@@ -41,7 +41,6 @@ Subroutine Select_number_of_nodes(Params, Atmo, Nodes, icall)
      If (Nodes%n_nodes_ffactor .eq. -1) Nodes%n_nodes_ffactor=0
      If (Nodes%n_nodes_chrom_x .eq. -1) Nodes%n_nodes_chrom_x=0
      If (Nodes%n_nodes_chrom_y .eq. -1) Nodes%n_nodes_chrom_y=0
-     print *,'select_number_of_nodes debug'
      If (Maxval(Abs(Params%Stray_prof)) .lt. 1.e-10) &
           Nodes%n_nodes_stray=0
      If (Params%IProfExists) Nodes%n_nodes_mac=0

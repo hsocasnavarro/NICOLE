@@ -1,5 +1,12 @@
- 12:52:30:Started calculations for point:           1 (x=           1 ,y=
-           1 )
+12:44:46:Point:1(x=1,y=1) assigned to processor:1
   
  ---PROCESS-STATS---
 host: 1, rank:     0, pixels processed:       0 (  0.00%)
+host: 2, rank:     1, pixels processed:       0 (  0.00%)
+host: 3, rank:     2, pixels processed:       0 (  0.00%)
+host: 4, rank:     3, pixels processed:       0 (  0.00%)
+host: 5, rank:     4, pixels processed:       0 (  0.00%)
+host: 6, rank:     5, pixels processed:       0 (  0.00%)
+host: 7, rank:     6, pixels processed:       0 (  0.00%)
+host: 8, rank:     7, pixels processed:       0 (  0.00%)
+host: 9, rank:     8, pixels processed:       0 (  0.00%)

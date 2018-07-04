@@ -166,7 +166,6 @@ Contains
         Call Fill_Densities(Params, Params%Input_dens, trial_model%Comp2)
      End if
      Call Forward(Params, Line, Region, Trial_model, Trial_profile,.TRUE.)
-     print *,'tt=',trial_model%comp1%chrom_x,trial_model%comp1%chrom_y
      Call Compute_chisq(Params, Obs_profile, Trial_profile, Sigma, &
           Nodes, Trial_model, Chisq, NWChisq, Regul)
      If (Debug_errorflags(flag_forward) .ge. 1) Chisq=1e10

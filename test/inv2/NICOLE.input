@@ -3,7 +3,7 @@
 Command=../../main/nicole
 Mode = i
 Cycles=2
-start cycle=2
+start cycle=1
 #
 # Fields required for both modes, synthesis and inversion:
 #

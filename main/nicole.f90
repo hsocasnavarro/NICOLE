@@ -724,8 +724,7 @@ Program Nicole
            End if
            Call Record_to_model_2comp(Params%n_points, Guess_model, TmpModel, TmpModel2, KeepVars, 1)
            If (.not. Params%TwoComp) then
-	      Call model_assign(guess_model%comp2,guess_model%comp1) ! debug
-              !Guess_model%Comp2=Guess_model%Comp1
+              Call model_assign(guess_model%comp2,guess_model%comp1)
               Guess_model%Comp1%ffactor=1.0
            End if
            TaskComing=1 ! Notify slave that a new task is coming

@@ -489,7 +489,7 @@ for icycle in range(int(ncycles)):
         nlines=nlines+1
         line=get_value(config,'Line',None,'NICOLE.input','Line '+str(nlines),)
     nlines=str(nlines-1)
-    if nlines == '0':
+    if (nlines == '0') & (mode != 'c'):
         print('Error! No lines have been specified')
         sys.exit(1)
     nregions=0

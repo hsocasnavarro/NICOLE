@@ -1,5 +1,5 @@
 2        ! ncycles 
-2        ! cycle0 
+1        ! cycle0 
 1        ! nx 
 1        ! ny 
 95        ! nz 
@@ -9,7 +9,7 @@
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
 __inputmodel.bin_1  
 
-observed.bin
+__inputprof.bin_1  
 inversion.bin
 inversion.model
 
