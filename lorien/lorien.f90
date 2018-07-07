@@ -126,6 +126,7 @@ Contains
      Call Fill_Densities(Params, Params%Input_dens, Guess_model%Comp2)
   End if
   Call Forward(Params, Line, Region, Guess_model, Syn_profile, .TRUE.)
+
   If (Debug_errorflags(flag_forward) .ge. 1) then
      Print *,'This guess model produces errors in the synthesis'
      Call Debug_Log('Lorien: This guess model produces errors in the synthesis',2)

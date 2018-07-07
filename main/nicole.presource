@@ -1,4 +1,4 @@
-!                      N I C O L E   v 18.06b
+!                      N I C O L E   v 18.07
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 18.06b ******************'
+     Print *,'*************** N I C O L E   v 18.07 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -250,6 +250,8 @@ Program Nicole
   Read (headerunit, *) nodes%n_nodes_blong
   Read (headerunit, *) nodes%n_nodes_bx
   Read (headerunit, *) nodes%n_nodes_by
+  Read (headerunit, *) nodes%n_nodes_chrom_x
+  Read (headerunit, *) nodes%n_nodes_chrom_y
   Read (headerunit, *) nodes%n_nodes_stray
   Read (headerunit, *) nodes%n_nodes_mac
   Read (headerunit, *) nodes%n_nodes_ffactor
@@ -266,6 +268,8 @@ Program Nicole
   Read (headerunit, *) nodes%n_nodes_blong2
   Read (headerunit, *) nodes%n_nodes_bx2
   Read (headerunit, *) nodes%n_nodes_by2
+  Read (headerunit, *) nodes%n_nodes_chrom_x2
+  Read (headerunit, *) nodes%n_nodes_chrom_y2
   Read (headerunit, *) nodes%n_nodes_ab2
   ! Read abundances to invert
   If (nodes%n_nodes_ab2 .gt. 0) then

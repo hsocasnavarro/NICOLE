@@ -332,7 +332,7 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
      New_model%stray=Ref%stray+X(ifree)*Norm_stray
      ifree=ifree+1
   End if
-! Chromosphere_x
+  ! Chromosphere_x
   If (Nodes%n_nodes_chrom_x .eq. 1) then
      New_model%chrom_x=Ref%chrom_x+X(ifree)*Norm_chrom_x
      ifree=ifree+1
