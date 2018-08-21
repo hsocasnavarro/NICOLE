@@ -39,6 +39,7 @@ Module Line_data_structure
      Integer :: NLTEgridsize ! Size of wavelength grid for NLTE computation
      Real, Dimension(:), Allocatable :: NLTEgrid
      Real, Dimension(:,:), Allocatable :: NLTESource_f
+     Real, Dimension(:), Allocatable :: NLTESource_l_f
      Real, Dimension(:), Allocatable :: b_low, b_up
   End Type Line_data
 !

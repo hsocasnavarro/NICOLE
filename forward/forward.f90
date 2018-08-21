@@ -455,9 +455,9 @@ End Subroutine Formal_solution
 !**********************************************************************
 ! This subroutine computes the Zeeman-split profiles
 !
-Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dldop, &
+Subroutine Profiles(Params, Line, nwlengths, Wave, Atmo, Damp, Dldop, &
              Line_op, Phi_I, Phi_Q, Phi_U, Phi_V, Psi_Q, Psi_U, Psi_V, &
-             Cont_op_5000, Incomplete)
+             Cont_op_5000)
   Use Param_structure
   Use Model_structure
   Use Line_data_structure
@@ -466,11 +466,9 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
   Type (Parameters) :: Params
   Type (Line_data) :: Line
   Type (Model) :: Atmo
-  Integer :: ind, npoints, nr, nl, np, nwlengths, nw
+  Integer :: ind, npoints, nr, nl, np, nwlengths
   Real, Parameter :: ZeroFieldThreshold=1.E-6
-  Real, Dimension(nwlengths) :: Wave, DWave
-  Real, Dimension(nw) :: vv
-  Integer, Dimension(nwlengths) :: IndexWave
+  Real, Dimension(nwlengths) :: Wave, DWave, vv
   Integer, Dimension(2) :: ji, jf, mult
   Character, Dimension(2) :: desig
   Real, Dimension (transitions) :: dlp, dll, dlr, sp, sl, sr
@@ -492,7 +490,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
   Real :: dlo, wc
   Real, Dimension (2) :: tam
   Integer :: iwave
-  Logical :: Incomplete, Exists
+  Logical :: Exists
   Logical, Save :: FirstTime
 ! For Hyperfine Structure case
   Integer, Save :: Unit, nHFlines, ilin
@@ -538,7 +536,6 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
 !     FirstTime=.FALSE.
   End if
 !
-  Incomplete=.FALSE.
   Phi_I(:,:)=0.
   Phi_Q(:,:)=0.
   Phi_U(:,:)=0.
@@ -599,7 +596,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
         a=Damp(ind)
         dldopcm=Dldop(ind)*1.E-8 ! Dldop in cm
         dldopcms=Dldop(ind)/Line%Wlength*cc ! Dldop in cm/s
-        vv(1:nw)=DWave(IndexWave(1:nw))/Dldop(ind) - Atmo%v_los(ind)/dldopcms
+        vv(1:nwlengths)=DWave(1:nwlengths)/Dldop(ind) - Atmo%v_los(ind)/dldopcms
         mag=B_str(ind)/dldopcm
         If (Line%Hyperfine .eq. 1) then
            If (.not. Constant_B .or. ind .eq. npoints) then
@@ -609,7 +606,7 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
            mag=1.d-8*line%Wlength**2/dldop(ind)
         End if
         If (Params%speed .eq. 0) then ! Use old point-by-point voigt
-           Do iwave=1, nw
+           Do iwave=1, nwlengths
               v=vv(iwave)
               call mvoigt(nr,dlr,sr,a,v,mag,t13,t14,wc,dldopcm,etar,vetar, &
                    getar,ettar,ettvr,esar,vesar,gesar,essar,essvr, &
@@ -626,36 +623,32 @@ Subroutine Profiles(Params, Line, nwlengths, nw, IndexWave, Wave, Atmo, Damp, Dl
               sn=.5*(esar-esal)
               tpm=.5*(etap-tm)
               spm=.5*(esap-sm)
-              Phi_I(IndexWave(iwave),ind)=Line_op(ind)*0.5*(etap*s2g(ind)+tm*c2g(ind))
-              Phi_Q(IndexWave(iwave),ind)=Line_op(ind)*tpm*s2g(ind)*cf(ind)
-              Phi_U(IndexWave(iwave),ind)=Line_op(ind)*tpm*s2g(ind)*sf(ind)
-              Phi_V(IndexWave(iwave),ind)=Line_op(ind)*tn*cg(ind)
-              Psi_Q(IndexWave(iwave),ind)=Line_op(ind)*spm*s2g(ind)*cf(ind)
-              Psi_U(IndexWave(iwave),ind)=Line_op(ind)*spm*s2g(ind)*sf(ind)
-              Psi_V(IndexWave(iwave),ind)=Line_op(ind)*sn*cg(ind)
+              Phi_I(iwave,ind)=Line_op(ind)*0.5*(etap*s2g(ind)+tm*c2g(ind))
+              Phi_Q(iwave,ind)=Line_op(ind)*tpm*s2g(ind)*cf(ind)
+              Phi_U(iwave,ind)=Line_op(ind)*tpm*s2g(ind)*sf(ind)
+              Phi_V(iwave,ind)=Line_op(ind)*tn*cg(ind)
+              Psi_Q(iwave,ind)=Line_op(ind)*spm*s2g(ind)*cf(ind)
+              Psi_U(iwave,ind)=Line_op(ind)*spm*s2g(ind)*sf(ind)
+              Psi_V(iwave,ind)=Line_op(ind)*sn*cg(ind)
            End do
         Else ! Use new vector voigt function
-           Call mvoigt2(nr,nw,dlr,sr,a,vv,mag,wc,dldopcm,vec_etar,vec_esar)
-           Call mvoigt2(nl,nw,dll,sl,a,vv,mag,wc,dldopcm,vec_etal,vec_esal)
-           Call mvoigt2(np,nw,dlp,sp,a,vv,mag,wc,dldopcm,vec_etap,vec_esap)
-           vtm(1:nw)=.5*(vec_etar(1:nw)+vec_etal(1:nw))
-           vtn(1:nw)=.5*(vec_etar(1:nw)-vec_etal(1:nw))
-           vsm(1:nw)=.5*(vec_esar(1:nw)+vec_esal(1:nw))
-           vsn(1:nw)=.5*(vec_esar(1:nw)-vec_esal(1:nw))
-           vtpm(1:nw)=.5*(vec_etap(1:nw)-vtm(1:nw))
-           vspm(1:nw)=.5*(vec_esap(1:nw)-vsm(1:nw))
-           Phi_I(IndexWave(1:nw),ind)=Line_op(ind)*0.5*(vec_etap(1:nw)*s2g(ind)+vtm(1:nw)*c2g(ind))
-           Phi_Q(IndexWave(1:nw),ind)=Line_op(ind)*vtpm(1:nw)*s2g(ind)*cf(ind)
-           Phi_U(IndexWave(1:nw),ind)=Line_op(ind)*vtpm(1:nw)*s2g(ind)*sf(ind)
-           Phi_V(IndexWave(1:nw),ind)=Line_op(ind)*vtn(1:nw)*cg(ind)
-           Psi_Q(IndexWave(1:nw),ind)=Line_op(ind)*vspm(1:nw)*s2g(ind)*cf(ind)
-           Psi_U(IndexWave(1:nw),ind)=Line_op(ind)*vspm(1:nw)*s2g(ind)*sf(ind)
-           Psi_V(IndexWave(1:nw),ind)=Line_op(ind)*vsn(1:nw)*cg(ind)
+           Call mvoigt2(nr,nwlengths,dlr,sr,a,vv,mag,wc,dldopcm,vec_etar,vec_esar)
+           Call mvoigt2(nl,nwlengths,dll,sl,a,vv,mag,wc,dldopcm,vec_etal,vec_esal)
+           Call mvoigt2(np,nwlengths,dlp,sp,a,vv,mag,wc,dldopcm,vec_etap,vec_esap)
+           vtm(1:nwlengths)=.5*(vec_etar(1:nwlengths)+vec_etal(1:nwlengths))
+           vtn(1:nwlengths)=.5*(vec_etar(1:nwlengths)-vec_etal(1:nwlengths))
+           vsm(1:nwlengths)=.5*(vec_esar(1:nwlengths)+vec_esal(1:nwlengths))
+           vsn(1:nwlengths)=.5*(vec_esar(1:nwlengths)-vec_esal(1:nwlengths))
+           vtpm(1:nwlengths)=.5*(vec_etap(1:nwlengths)-vtm(1:nwlengths))
+           vspm(1:nwlengths)=.5*(vec_esap(1:nwlengths)-vsm(1:nwlengths))
+           Phi_I(1:nwlengths,ind)=Line_op(ind)*0.5*(vec_etap(1:nwlengths)*s2g(ind)+vtm(1:nwlengths)*c2g(ind))
+           Phi_Q(1:nwlengths,ind)=Line_op(ind)*vtpm(1:nwlengths)*s2g(ind)*cf(ind)
+           Phi_U(1:nwlengths,ind)=Line_op(ind)*vtpm(1:nwlengths)*s2g(ind)*sf(ind)
+           Phi_V(1:nwlengths,ind)=Line_op(ind)*vtn(1:nwlengths)*cg(ind)
+           Psi_Q(1:nwlengths,ind)=Line_op(ind)*vspm(1:nwlengths)*s2g(ind)*cf(ind)
+           Psi_U(1:nwlengths,ind)=Line_op(ind)*vspm(1:nwlengths)*s2g(ind)*sf(ind)
+           Psi_V(1:nwlengths,ind)=Line_op(ind)*vsn(1:nwlengths)*cg(ind)
         End if
-        If (Phi_I(1, ind) .gt. 1.e-2*Cont_op_5000(ind)) &
-             Incomplete=.TRUE.
-        If (Phi_I(nwlengths, ind) .gt. 1.e-2*Cont_op_5000(ind)) &
-             Incomplete=.TRUE.
      End do ! Do ind=npoints, 1, -1
   End if ! If (MaxVal(Abs(Dwave(:))) .gt. Line%Width)
   Call Time_routine('profiles',.False.)
@@ -1868,8 +1861,7 @@ Subroutine Forward(Params, Line, Region, Atmo, Syn_profile, Hydro)
 
 !
 ! Use macroturbulence and stray light factor from the first component
-  If (Params%Skip_lambda .eq. 1) &
-       Call Convolve_profile(Params, Region, Atmo%Comp1, Syn_profile) ! Macroturbulence
+  Call Convolve_profile(Params, Region, Atmo%Comp1, Syn_profile) ! Macroturbulence
   If (Atmo%Comp1%stray .gt. 0.001) &
        Call Add_stray_light(Params, Atmo%Comp1, Region, Syn_profile) ! Add stray light &
 ! Apply observational additive and multiplicative constants
@@ -1897,9 +1889,9 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Type (NLTE_variables), Save :: NLTE
   Type (Model) :: Atmo, Atmo_in, Saved, Atmo_pre
   Integer, Parameter :: NQuad=5 ! Number of points in quadrature (2 to 5)
-  Logical :: Hydro, Incomplete, End
+  Logical :: Hydro,  End
   Real, Dimension (Params%n_data) :: Syn_profile
-  Real, Dimension (Params%n_points) :: Source_f, ltau_500_mu, term
+  Real, Dimension (Params%n_points) :: Source_f, ltau_500_mu, term, PlanckSF, source_l_f
   Real, Dimension (Params%n_points) :: Cont_op_5000, Cont_op, Cont_op_5000_2
   Real, Dimension (Params%n_points) :: ng_i, ng_j, tmp
   Real, Dimension (Params%n_lines, Params%n_points) :: Dldop, Damp, Line_op
@@ -1908,17 +1900,16 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Real, Dimension (:,:), Allocatable :: Phi_I, Phi_Q, Phi_U, Phi_V
   Real, Dimension (:,:), Allocatable :: Psi_Q, Psi_U, Psi_V, TotEmis
   Real, Dimension (:), Allocatable :: Wave
-  Integer, Dimension (:), Allocatable :: IndexWave
   Real, Dimension (10) :: Pp
   Real, Dimension (4) :: Stokes
   Real, Dimension (3) :: x, y
   Real, Dimension (1) :: imin1, DWave1
   Real, Dimension (NQuad) :: XMU, WMU
   Real :: reference_cont, nu, Wave_cm, Av_mol_weight
-  Real :: mu, DWave, last_update, metal, dx
+  Real :: mu, DWave, DWave2, last_update, metal, dx
   Real :: PH, PHminus, PHplus, PH2, PH2plus, n2P, Scat
   Integer :: npoints, idepth, iline, iwave, nwlengths, idata, ichoice, iunit, ntrans
-  Integer :: iregion, i, j, nw, istart, iend, NMu, imu, itran, imin, irec, iostat
+  Integer :: iregion, i, j,  NMu, imu, itran, imin, irec, iostat
   Integer, Parameter :: nformalsolutions=8
   Integer, Dimension(nformalsolutions) :: nformal
   Logical, Save :: do_NLTE
@@ -1926,9 +1917,9 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   Logical :: CheckNaN
   Character (len=256) :: String
   Real, Parameter :: Min_Pe=1e-4
-!
+  !
   Call Time_routine('forward',.True.)
-  
+
   npoints=Params%n_points  
   Atmo=Atmo_in ! Model assign operation
 
@@ -1937,23 +1928,23 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Print *,"Something's wrong with the abundance scale. Aborting (in forward)"
      Stop
   End if
-!  First re-interpolate tau grid according to de la Cruz Rodriguez
+  !  First re-interpolate tau grid according to de la Cruz Rodriguez
   !   (adapterd from Carlsson'¡s MULTI_3D). Changes are not propagated outside
-  
+
   If (Params%Reinterpolate .gt. 0) & 
        Call ipol_dscale(Params, Atmo, Line)  
-! Check atmosphere for sanity
+  ! Check atmosphere for sanity
   Do idepth=1, npoints
      If (Atmo%El_p(idepth) .lt. Min_Pe) then
         Call Debug_log('In forward. Pe .lt. Min_Pe parameter. Clipping it',2)
         Atmo%El_p(idepth)=Min_Pe
      End if
   End do
-!
+  !
   Atmo_pre=Atmo
-!
-! Add chrom to temperature
-!
+  !
+  ! Add chrom to temperature
+  !
   Do idepth=1, npoints
      If (Atmo%ltau_500(idepth) .lt. Atmo%chrom_x-.1) then
         Atmo%Temp(idepth)=Atmo%Temp(idepth)+Atmo%chrom_y
@@ -1962,12 +1953,12 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         Atmo%Temp(idepth)=Atmo%Temp(idepth)+Atmo%chrom_y*exp( -(dx/0.5)**2 )
      End if
   End do
-!  
+  !  
   Cont_op_5000_2=-10 ! Initialize
   Debug_warningflags(flag_forward)=0
   Debug_errorflags(flag_forward)=0
   NLTE_done=.FALSE.
-!
+  !
   Params%def_abund=0 ! Force to not use ANN. Need to revise this
   Do iline=1, Params%n_lines
      ! Complete line information
@@ -1977,7 +1968,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         Stop
      End if
   End do
-!
+  !
   nfudge=0
   Do iregion=1, Params%n_regions ! Set background opacity enhancement factors
      nfudge=nfudge+1
@@ -2017,7 +2008,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   End if
 
-! If flux computation is required, set Gaussian weights
+  ! If flux computation is required, set Gaussian weights
   If (Params%heliocentric .ne. 0) then
      NMu=1
      XMU(1)=Params%heliocentric
@@ -2031,12 +2022,12 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      XMU(1:NQuad)=XMU_Gauss_Quad(NQuad,1:Nquad)
      WMU(1:NQuad)=WMU_Gauss_Quad(NQuad,1:Nquad)
   End if
-! Now let's put the model in hydrostatic equilibrium and fill in
-! the columns Gas_P, El_p, Rho and Z_scale of the model.
-!
+  ! Now let's put the model in hydrostatic equilibrium and fill in
+  ! the columns Gas_P, El_p, Rho and Z_scale of the model.
+  !
   Saved=Atmo
   If (.not. Hydro) then ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
-       !       nH2 columns of the model
+     !       nH2 columns of the model
 
      Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
           Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)
@@ -2049,32 +2040,32 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      If (Atmo%Keep_nHplus .gt. 0.9) Atmo%nHplus=Saved%nHplus
      If (Atmo%Keep_nH2 .gt. 0.9) Atmo%nH2=Saved%nH2
      If (Atmo%Keep_nH2plus .gt. 0.9) Atmo%nH2plus=Saved%nH2plus
-!
+     !
   End if
-!
+  !
 
   metal=at_abund(26)-7.5
   Call compute_others_from_T_Pe_Pg(Params%n_points,Atmo%Temp, Atmo%el_p, Atmo%Gas_p,&
        Atmo%nH,Atmo%nHminus,Atmo%nHplus,Atmo%nH2,Atmo%nH2plus)
-    Call Reset_densities(Atmo, Saved)
-!
+  Call Reset_densities(Atmo, Saved)
+  !
 
   nformal(1:nformalsolutions)=0. ! Initialize the f. s. counter
   idata=1 ! Index for Syn_profile
   Syn_profile(:)=-1e10
-!
-! Calculate line- and wavelength-independent data.
-!
+  !
+  ! Calculate line- and wavelength-independent data.
+  !
   Do idepth=1, npoints !$$ PARALLEL LOOP START 
      n2P=BK*Atmo%Temp(idepth)
      Cont_op_5000(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), Atmo%Gas_p(idepth), &
-     Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, &
+          Atmo%nH(idepth)*n2P, Atmo%nHminus(idepth)*n2P, Atmo%nHplus(idepth)*n2P, Atmo%nH2(idepth)*n2P, &
           Atmo%nH2plus(idepth)*n2P, 5000., Scat)
   End do !$$ PARALLEL LOOP ENDe
   Cont_op_5000=Cont_op_5000/Atmo%Rho ! Convert to cm^2/g  
-!
-! Loop in spectral lines. Compute line-dependent, wave-independent data.
-!
+  !
+  ! Loop in spectral lines. Compute line-dependent, wave-independent data.
+  !
   Do iline=1,Params%n_lines !$$ PARALLEL LOOP START 
      Dldop(iline, 1:npoints)=Line(iline)%Wlength/cc* & ! Doppler width in A
           Sqrt( 2.*bk*Atmo%Temp(1:npoints)/&
@@ -2109,7 +2100,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         NLTE%Atmo=Atmo
         If (NLTEInput%VelFree) NLTE%Atmo%v_los=0.
         If (NLTE_done .eqv. .FALSE.) then
-!           Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+           !           Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
            NLTE%linear=Params%NLTE_Linear
            NLTEInput%UseColSwitch=0
            Call SolveStat(NLTE, NLTEInput, Atom)
@@ -2171,6 +2162,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         ng_j(:)=NLTE%N(j,:)/Atom%g(j)*Line(iline)%NLTE_nu_ratio
         Line(iline)%NLTESource_f(1:npoints,1:Line(iline)%NLTEgridsize)= &
              NLTE%Source_f(1:npoints,1:Atom%NQ(itran),itran)
+        Line(iline)%NLTESource_l_f(1:npoints)= &
+             NLTE%Source_l_f(1:npoints,itran)
      End if
      Line_op(iline, 1:npoints)=4.9947E-21*(10.**Line(iline)%loggf)* & 
           (ng_i(1:npoints)-ng_j(1:npoints))/Dldop(iline, 1:npoints)* &
@@ -2178,27 +2171,27 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Line_op(iline, 1:npoints)=Line_op(iline, 1:npoints) / &
           Atmo%Rho(1:npoints) ! cm^2/cm^3 to cm^2/g
   End do ! End line loop
-!
-! Start loop in spectral regions and wavelengths.
-!
+  !
+  ! Start loop in spectral regions and wavelengths.
+  !
   Do iregion=1, Params%n_regions
      last_update=-10 ! Make sure that opacities will be computed the first time
      nwlengths=Region(iregion)%nwavelengths
      If (Params%Reference_cont .eq. 0) then ! Do not normalize
         reference_cont=1.e14 
-                             
+
      Else If (Params%Reference_cont .eq. 1) then
-!        reference_cont=conhsra(Region(iregion)%First_wlength + &
-!             Region(iregion)%nwavelengths * &
-!             Region(iregion)%Wave_step/2.) ! HSRA continuum at middlepoint
+        !        reference_cont=conhsra(Region(iregion)%First_wlength + &
+        !             Region(iregion)%nwavelengths * &
+        !             Region(iregion)%Wave_step/2.) ! HSRA continuum at middlepoint
         reference_cont=syn_hsra(Region(iregion)%First_wlength + &
              Region(iregion)%nwavelengths * &
              Region(iregion)%Wave_step/2., 1.0)! HSRA continuum
      Else If (Params%Reference_cont .eq. 2) then
-!        reference_cont=conhsra(5000.) ! HSRA continuum at 500nm
+        !        reference_cont=conhsra(5000.) ! HSRA continuum at 500nm
         reference_cont=syn_hsra(5000., 1.0)! HSRA continuum
      Else If (Params%Reference_cont .eq. 3) then
-      reference_cont=syn_hsra(Region(iregion)%First_wlength + &
+        reference_cont=syn_hsra(Region(iregion)%First_wlength + &
              Region(iregion)%nwavelengths * &
              Region(iregion)%Wave_step/2., Params%heliocentric)! HSRA continuum
      Else If (Params%Reference_cont .eq. 4) then
@@ -2208,7 +2201,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         Stop
      End if
 
-! Compute wavelength profiles
+     ! Compute wavelength profiles
      If (Allocated(TotAbsorp)) then
         Deallocate (TotAbsorp)
         Deallocate (TotEmis)
@@ -2242,74 +2235,57 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
 
      Do iline=1, Params%n_lines ! Loop in lines to blend		
         If (MaxVal(Line_op(iline,:)/Cont_op_5000(:)) .gt. Params%negligible_opacity) then ! Consider line			
-           Incomplete=.TRUE.
-           Do While (Incomplete)
-              istart= (Line(iline)%Wlength-Line(iline)%Width - Wave(1))/ &
-                   Region(iregion)%Wave_step -1
-              iend= (Line(iline)%Wlength+Line(iline)%Width - Wave(1))/ &
-                   Region(iregion)%Wave_step +1
-              If (istart .gt. nwlengths) istart=nwlengths-2
-              If (istart .lt. 1) istart=1
-              If (iend .lt. 1) iend=3
-              If (iend .gt. nwlengths) iend=nwlengths
-              If (iend .le. istart+2) then
-                 istart=istart-2
-                 iend=istart+2
-              End if
-              If (istart .lt. 1) istart=1
-              If (iend .gt. nwlengths) iend=nwlengths
-              nw=0
-              Do iwave=istart, iend, Params%Skip_lambda
-                 nw=nw+1
-              End do
-              If (Allocated(IndexWave)) Deallocate(IndexWave)
-              Allocate (IndexWave(nw))
-              nw=0
-              Do iwave=istart, iend, Params%Skip_lambda
-                 nw=nw+1
-                 IndexWave(nw)=iwave
-              End do
-              Call Profiles(Params, Line(iline), nwlengths, nw, IndexWave, Wave(:), Atmo, &
-                   Damp(iline,:), Dldop(iline,:), Line_op(iline,:), &
-                   Phi_I(:,:), Phi_Q(:,:), &
-                   Phi_U(:,:), Phi_V(:,:), Psi_Q(:,:), &
-                   Psi_U(:,:), Psi_V(:,:), &
-                   Cont_op_5000(:), Incomplete) ! Compute profiles
-              If (istart .eq. 1 .and. iend .eq. nwlengths) Incomplete=.FALSE.
-              If (Line(iline)%Width .gt. 5.) Incomplete=.FALSE.
-              If (Incomplete) Line(iline)%Width=Line(iline)%Width*2.
-           End do ! While incomplete
+           Call Profiles(Params, Line(iline), nwlengths, Wave(:), Atmo, &
+                Damp(iline,:), Dldop(iline,:), Line_op(iline,:), &
+                Phi_I(:,:), Phi_Q(:,:), &
+                Phi_U(:,:), Phi_V(:,:), Psi_Q(:,:), &
+                Psi_U(:,:), Psi_V(:,:), &
+                Cont_op_5000(:)) ! Compute profiles
            Call Abs_matrix(npoints, nwlengths,  Phi_I(:,:), Phi_Q(:,:), &
                 Phi_U(:,:), Phi_V(:,:), &
                 Psi_Q(:,:), Psi_U(:,:), Psi_V(:,:), &
                 Cont_op_5000, Absorp(:,:,:,:)) ! Build normalized absorp. m.
-           Do iwave=1, nwlengths, Params%skip_lambda
+
+           Do iwave=1, nwlengths
               DWave=Wave(iwave)-Line(iline)%Wlength
               If (Line(iline)%NLTEtransition .ge. 1) then
                  If (Dwave .lt. MinVal(Line(iline)%NLTEgrid)) DWave=Abs(DWave)
               Endif
               nu=cc/(Wave(iwave)*1e-8) ! s^-1
               Wave_cm=cc/nu
+              PlanckSF(:)=  2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
+                   (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs), default
+              DWave2=DWave
+              if (MinVal(Line(iline)%NLTEgrid) .ge. 0) then ! one-sided wlength grid in NLTE
+                 DWave2=abs(DWave) ! assume symmetric form
+              End if
               If (Line(iline)%NLTEtransition .gt. 0) then
-                 If (DWave .ge. MinVal(Line(iline)%NLTEgrid) .and. &
-                   DWave .le. MaxVal(Line(iline)%NLTEgrid)) then ! Interpolate NLTE source function
-                    Do idepth=1, Params%n_points
-                       Dwave1(1)=Dwave
-                       Call bezier3(Line(iline)%NLTEgridsize,&
-                            Line(iline)%NLTEgrid(:), &
-                            Line(iline)%NLTESource_f(idepth,:),1, &
-                            DWave1,Source_f(idepth))
-                    End do
-! S has units of 2*hh*nu^3/cc^2, we need  2*hh*c^2/(lambda^5). 
-                    Source_f(:)=Source_f(:)*(nu/cc)*nu
-                    Term=Absorp(iwave,:,1,1)*Source_f(:)
+                 If (DWave2 .ge. MinVal(Line(iline)%NLTEgrid) .and. &
+                      DWave2 .le. MaxVal(Line(iline)%NLTEgrid)) then ! Interpolate NLTE source function
+!                    Do idepth=1, Params%n_points
+!                       Dwave1(1)=Dwave2
+!                       Call bezier3(Line(iline)%NLTEgridsize,&
+!                            Line(iline)%NLTEgrid(:), &
+!                            Line(iline)%NLTESource_f(idepth,:),1, &
+!                            DWave1,Source_l_f(idepth)) ! line source function
+!                    End do
+!                    ! S has units of 2*hh*nu^3/cc^2, we need  2*hh*c^2/(lambda^5). 
+                    Source_l_f(:)=Line(iline)%NLTESource_l_f(:)
+                    Source_l_f(:)=Source_l_f(:)*(nu/cc)*nu
+                    Term=Absorp(iwave,:,1,1)*Source_l_f(:)
                     If (Line(iline)%DepCoefMode .eq. 1) &
                          Term=Term*Line(iline)%b_up ! Apply departure coeff
                     TotEmis(iwave,:)=TotEmis(iwave,:)+Term(:)
+
+                    ! debug
+                    if (iwave .eq. 1)  &
+                       open (85,file='borrame2.dat')
+                    write (85,*) source_l_f(40),plancksf(40)
+                    if (iwave .eq. nwlengths) close(85)
+                       
+                    
                  Else ! LTE
-                    Term(:)=Absorp(iwave,:,1,1)* &
-                         2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
-                         (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs)
+                    Term(:)=Absorp(iwave,:,1,1)*PlanckSF(:)
                     If(Line(iline)%DepCoefMode .eq. 2) then
                        Term(:) = Absorp(iwave,:,1,1)* &
                             2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
@@ -2320,9 +2296,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                     TotEmis(iwave,:)=TotEmis(iwave,:)+Term(:)
                  End if
               Else ! LTE
-                 Term(:)=Absorp(iwave,:,1,1)* &
-                      2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
-                      (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs)
+                 Term(:)=Absorp(iwave,:,1,1)*PlanckSF(:)
                  If(Line(iline)%DepCoefMode .eq. 2) then
                     Term(:) = Absorp(iwave,:,1,1)* &
                          2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
@@ -2339,15 +2313,15 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                     Do idepth=1,npoints
                        If (Absorp(iwave,idepth,1,1) .lt. 0) then
                           Write (String,*) 'idepth, Ab, T, el_p, gas_p, ng_i, ng_j=', &
-      idepth,absorp(iwave,idepth,1,1),atmo%temp(idepth),atmo%el_p(idepth),&
-      atmo%gas_p(idepth),ng_i(idepth),ng_j(idepth),iwave 
+                               idepth,absorp(iwave,idepth,1,1),atmo%temp(idepth),atmo%el_p(idepth),&
+                               atmo%gas_p(idepth),ng_i(idepth),ng_j(idepth),iwave 
                           Call Debug_Log('Negative absorption in routine forward',1)
                        End if
                     End do
                  End if
               End if
            End do ! Do in iwave
-
+           
            If (Line(iline)%DepCoefMode .eq. 1) then
               Do idepth=1, Params%n_points ! Apply depature coefficients
                  Absorp(:,idepth,:,:)=Absorp(:,idepth,:,:)* &
@@ -2359,14 +2333,14 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                 Absorp(:,:,:,:) ! Total absorption of all blends (normalized)
         End if ! Consider line
      End do ! End loop in lines to blend
-!
-     Do iwave=1, nwlengths, Params%skip_lambda !$$ PARALLEL LOOP START
+     !
+     Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
+          Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)     
+     Call Reset_densities(Atmo, Atmo_pre)
+     Do iwave=1, nwlengths !$$ PARALLEL LOOP START
         If (abs(last_update-Wave(iwave)) .gt. Params%Update_opac) then !Update background opacities
            nu=cc/(Wave(iwave)*1e-8) ! s^-1
            Wave_cm=cc/nu
-           Call Compute_others_from_T_Pe_Pg(Params%n_points, Atmo%Temp, Atmo%El_p, Atmo%Gas_p, &
-                Atmo%nH, Atmo%nHminus, Atmo%nHplus, Atmo%nH2, Atmo%nH2plus)     
-           Call Reset_densities(Atmo, Atmo_pre)
            Do idepth=1, npoints
               n2P=BK*Atmo%Temp(idepth)
               Cont_op(idepth)=Background_opacity(Atmo%Temp(idepth), Atmo%El_p(idepth), &
@@ -2383,22 +2357,31 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               Cont_op_5000_2=Cont_op_5000_2/Atmo%rho ! Convert to cm2/g
            End if
            Cont_op=Cont_op/Atmo%rho ! Convert to cm2/g
-!           Cont_op=Cont_op/Cont_op_5000_2
+           !           Cont_op=Cont_op/Cont_op_5000_2
            Last_update=Wave(iwave)
         End if
- ! Add continuum opacity and emission at this wlength
+        ! Add continuum opacity and emission at this wlength
         Do i=1, 4
            TotAbsorp(iwave, 1:Params%n_points, i, i)= &
                 TotAbsorp(iwave, 1:Params%n_points, i, i)+ &
                 Cont_op(1:Params%n_points)/ & 
                 Cont_op_5000(1:Params%n_points)
         End do
- !
-        TotEmis(iwave,:)=TotEmis(iwave,:)+Cont_op(:)/Cont_op_5000(:)* &
-              2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
-                      (exp(hh*nu/bk/Atmo%Temp(1:npoints))-1.) ! Planck f (cgs)
+
+        !
+        TotEmis(iwave,:)=TotEmis(iwave,:)+Cont_op(:)/Cont_op_5000(:)*  &
+             PlanckSF(:)
+
+        ! debug
+!        open (84,file='borrame.dat')
+!        write (84,*) phi_i(:,40)
+!        write (84,*) absorp(:,40,1,1)
+!        write (84,*) totemis(:,40)
+!        write (84,*) totabsorp(:,40,1,1)
+!        close(84)
+
         Source_f=TotEmis(iwave,:)/TotAbsorp(iwave,:,1,1)
-!
+        !
         Syn_profile(idata:idata+3)=0. 
         Absorp_height(:,:,:)=TotAbsorp(iwave,:,:,:)
 
@@ -2467,7 +2450,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         End if
         nformal(ichoice)=nformal(ichoice)+1 ! How many solutions of each type
         Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/reference_cont
-        idata=idata+4*Params%Skip_lambda ! Update the data index
+        idata=idata+4 ! Update the data index
         If (Debug_errorflags(flag_NLTE) .ge. 1) Syn_profile(idata:idata+3)=-1e20
      End do !$$ PARALLEL LOOP END
 
@@ -2483,7 +2466,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Deallocate (Psi_U)
      Deallocate (Psi_V)
      Deallocate (Wave)
-     If (Allocated(IndexWave)) Deallocate (IndexWave)
   End do !$$ PARALLEL LOOP END
 
   If (Params%printout .ge. 4 .and.  Params%formal_solution .eq. 0) then
@@ -2491,10 +2473,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Print *,'Number of Stokes formal solutions using WPM: ',nformal(4)
   End if
 
-!
+  !
   If (Debug_errorflags(flag_NLTE) .ge. 1) Debug_errorflags(flag_forward)=1
   If (Debug_warningflags(flag_NLTE) .ge. 1) Debug_warningflags(flag_forward)=1
-! Additional outputs?
+  ! Additional outputs?
   If (Debug_OutputPop .or. Debug_OutputContOp .or. Debug_OutputNLTEsf) then
      Call Open_file(iunit,'debug.txt')
      Write (iunit,*) Debug_OutputPop,Debug_OutputContOp,Debug_OutputNLTEsf
@@ -2550,10 +2532,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      End do
      Close (iunit)
   End if
-!
+  !
   Call Time_routine('forward',.False.)
   Return
-!
+  !
 End Subroutine Forward_1comp
 
 

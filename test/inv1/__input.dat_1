@@ -47,6 +47,8 @@ T     T   0   ! sethydro, setnH, restart
 1 ! Nodes in B_long 
 1 ! Nodes in B_x 
 1 ! Nodes in B_y 
+-1 ! Nodes in Sx 
+-1 ! Nodes in Sy 
 0 ! Nodes in Stray light 
 0 ! Nodes in v_mac 
 0 ! Nodes in ffactor 
@@ -57,6 +59,8 @@ T     T   0   ! sethydro, setnH, restart
 0 ! Nodes in B_long 2
 0 ! Nodes in B_x 2
 0 ! Nodes in B_y 2
+-1 ! Nodes in Sx 2 
+-1 ! Nodes in Sy 2 
 1 ! Number of abundances to invert 2
 0  ! Abundances to invert 2
 3 0 F F F ! debug, optimize grid, outputpop, outputcontop, outputNLTEsf

@@ -620,8 +620,10 @@ for icycle in range(int(ncycles)):
     elim1=get_value(config,'Elim','-','NICOLE.input','NLTE')
     if elim1 == '-':
         elim1=get_value(config,'Populations relative change','-','NICOLE.input','NLTE')
+    if elim1 == '-':
+        elim1=get_value(config,'conv','-','NICOLE.input','NLTE')
     if elim1 == '-': 
-        elim1='1e-3'
+        elim1='1e-4'
         if mode == 'i': elim1='1e-4'
     isum=get_value(config,'isum','1','NICOLE.input','NLTE')
     istart=get_value(config,'istart','1','NICOLE.input','NLTE')

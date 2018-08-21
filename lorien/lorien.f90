@@ -125,6 +125,7 @@ Contains
      Call Hydrostatic(Params, Guess_model%Comp2)
      Call Fill_Densities(Params, Params%Input_dens, Guess_model%Comp2)
   End if
+  Call Model_Assign_2comp(Nodes%Reference_model, Guess_model) ! Model_assign operation
   Call Forward(Params, Line, Region, Guess_model, Syn_profile, .TRUE.)
 
   If (Debug_errorflags(flag_forward) .ge. 1) then
@@ -212,6 +213,7 @@ Contains
              Pertur, Guess_model, Obs_profile, Syn_profile, Sigma, Derivatives, Dydx, &
              DchiDx, D2ChiD2x)
         n_failed=0
+!        pause ! debug
      Else
         Lambda=Lambda*10
         If (Lambda .lt. 1.e-4) Lambda=1.e-4
@@ -328,7 +330,6 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
   DyDx(:,:)=0.
   If (Params%always_compute_deriv .eq. 1 .or. &
        Params%recompute_deriv .eq. 1) then
-     Nodes%Reference_model=Guess_model ! Model_assign operation
      Call Compress(Params, Nodes, Guess_model, X)
      Call Compress_deriv(Params, Nodes, Derivatives, Dydx)
      Call Compute_chisq(Params, Obs_profile, Syn_profile, Sigma, &
@@ -501,7 +502,6 @@ Subroutine Compute_trial_model(Params, Nodes, Guess_model, Lambda, &
   Integer :: i_param, j_param, i_data, ndata
   Logical, Dimension (Params%n_free_parameters) :: Zeroed
 !
-  Nodes%Reference_model=Guess_model ! Model_assign operation
   Call Compress(Params, Nodes, Guess_model, X)
   Chisq=WChisq
 !
@@ -565,7 +565,7 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
   Type (model) :: Atmo, Ref
   Type (Nodes_info) :: Nod
   Real :: Deviation, Mean, Norm, sigma, x1, expo
-  Integer :: i_param, inode, ifree, nodes, idepth, idepth2
+  Integer :: i_param, inode, ifree, nodes, idepth, idepth2, icomp, ncomp
   Real, Dimension(Params%n_free_parameters) :: X, tau
   Real, Dimension(Params%n_free_parameters, Params%n_free_parameters) :: &
        PRD2, D2RegulD2x
@@ -575,176 +575,114 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
 !
   Reguls(:)=0.
   Regul_weights(:)=1.
-  ! Component 1
-  Atmo=Atmo_2comp%Comp1
-  ! 
-  ! Velocity. Square deviation from the mean
-  !
-  Mean=Sum(Atmo%v_los)/Params%n_points
-  y=(Atmo%v_los-Mean)/1e5
-  Reguls(1)=0.
-  Do idepth=2, params%n_points
-     Reguls(1)=Reguls(1)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+  ncomp=1
+  If (Params%TwoComp) ncomp=2
+  Do icomp=1, ncomp
+     if (icomp .eq. 1) then
+        ! Component 1
+        Atmo=Atmo_2comp%Comp1
+        Ref=Nod%Reference_model%Comp1
+     Else
+        ! Component 2
+        Atmo=Atmo_2comp%Comp2
+        Ref=Nod%Reference_model%Comp2
+     End if
+     ! 
+     ! Velocity. Square deviation from the mean
+     !
+     Mean=Sum(Atmo%v_los)/Params%n_points
+     y=(Atmo%v_los-Mean)/1e5
+     Do idepth=2, params%n_points
+        Reguls(1)=Reguls(1)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+     End do
+     Regul_weights(1)=10.
+     !
+     ! Temperature increase
+     !
+     Do idepth=2, params%n_points
+        if (atmo%temp(idepth) .lt. atmo%temp(idepth-1)) &
+             Reguls(2)=Reguls(2)+(atmo%temp(idepth-1)-atmo%temp(idepth))* &
+             (atmo%ltau_500(idepth)-atmo%ltau_500(idepth-1))/500.
+     end do
+     Reguls(2)=Reguls(2)+atmo%chrom_y/100. ! chrom_y
+     Regul_weights(2)=1.
+     !
+     ! Filling factor
+     !
+     Reguls(3)=1.-Atmo%ffactor
+     Regul_weights(3)=1.
+     !
+     ! Smooth T
+     !
+     y=Atmo%Temp-ref%temp
+     xx=Atmo%ltau_500
+     y2(:)=0.
+     sigma=1. ! Half-width of smoothing Gaussian (in ltau units)
+     Do idepth=1, Params%n_points
+        Norm=0.
+        Do idepth2=1, Params%n_points
+           x1=xx(idepth2)-xx(idepth)
+           If (x1*x1/sigma/sigma .lt. 25.) then ! closer than 5-sigma
+              expo=exp(-x1*x1/sigma/sigma)
+              y2(idepth)=y2(idepth)+y(idepth2)*expo
+              Norm=Norm+expo
+           End if
+        End do
+        y2(idepth)=y2(idepth)/Norm
+     End do
+     y=exp( abs(y-y2)/100. )
+     Reguls(4)=Sum(y)*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))
+     Regul_weights(4)=.01
+!     print *,'r1=',reguls(4) ! debug
+!     open (84,file='test.dat')
+!     write (84,*) atmo%temp
+!     write (84,*) ref%temp
+!     write (84,*) y
+!     write (84,*) y2
+!     close (84)
+     !
+     ! Constant T
+     !
+     Norm=Sum(Atmo%Temp(:))/Params%n_points
+     Reguls(4)=Reguls(4)+Sqrt(Sum( (y(:)-Norm)**2 ) )*.01
+     !
+     ! v_mic
+     !
+     Reguls(5)=Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
+          Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 ) ! v_mic in km/s
+     Regul_weights(5)=0.1
+     ! 
+     ! B. Square deviation from the mean
+     !
+     Reguls(6)=0.
+
+     Mean=Sum(Atmo%B_long)/Params%n_points
+     y=(Atmo%B_long-Mean)
+     Do idepth=2, params%n_points
+        Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+     End do
+
+     Mean=Sum(Atmo%B_x)/Params%n_points
+     y=(Atmo%B_x-Mean)
+     Do idepth=2, params%n_points
+        Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+     End do
+
+     Mean=Sum(Atmo%B_y)/Params%n_points
+     y=(Atmo%B_y-Mean)
+     Do idepth=2, params%n_points
+        Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
+     End do
+
+     Reguls(6)=Sqrt(Reguls(6))
+     Regul_weights(6)=10.
   End do
+
   Reguls(1)=Sqrt(Reguls(1))
-  Regul_weights(1)=10.
-  !
-  ! Temperature increase
-  !
-  Do idepth=2, params%n_points
-     if (atmo%temp(idepth) .lt. atmo%temp(idepth-1)) &
-          Reguls(2)=Reguls(2)+(atmo%temp(idepth-1)-atmo%temp(idepth))* &
-          (atmo%ltau_500(idepth)-atmo%ltau_500(idepth-1))/500.
-  end do
-  Reguls(2)=Reguls(2)+atmo%chrom_y/100. ! chrom_y
-  Regul_weights(2)=1.
-  !
-  ! Filling factor
-  !
-  Reguls(3)=1.-Atmo%ffactor
-  Regul_weights(3)=1.
-  !
-  ! Smooth T
-  !
-  y=Atmo%Temp
-  xx=Atmo%ltau_500
-  y2(:)=0.
-  sigma=1. ! Half-width of smoothing Gaussian (in ltau units)
-  Do idepth=1, Params%n_points
-     Norm=0.
-     Do idepth2=1, Params%n_points
-        x1=xx(idepth2)-xx(idepth)
-        If (x1*x1/sigma/sigma .lt. 25.) then ! closer than 5-sigma
-           expo=exp(-x1*x1/sigma/sigma)
-           y2(idepth)=y2(idepth)+y(idepth2)*expo
-           Norm=Norm+expo
-        End if
-     End do
-     y2(idepth)=y2(idepth)/Norm
-  End do
-  y=Atmo%Temp-y2
-  Reguls(4)=Sqrt(Sum( y**2 ) )*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))/500.
-  Regul_weights(4)=0.01
-  !
-  ! Constant T
-  !
-  Norm=Sum(y(:))/Params%n_points
-  Reguls(4)=Reguls(4)+Sqrt(Sum( (y(:)-Norm)**2 ) )
-  !
-  ! v_mic
-  !
-  Reguls(5)=Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
-       Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 ) ! v_mic in km/s
-  Regul_weights(5)=0.1
-  ! 
-  ! B. Square deviation from the mean
-  !
-  Reguls(6)=0.
-
-  Mean=Sum(Atmo%B_long)/Params%n_points
-  y=(Atmo%B_long-Mean)
-  Do idepth=2, params%n_points
-     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-
-  Mean=Sum(Atmo%B_x)/Params%n_points
-  y=(Atmo%B_x-Mean)
-  Do idepth=2, params%n_points
-     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-
-  Mean=Sum(Atmo%B_y)/Params%n_points
-  y=(Atmo%B_y-Mean)
-  Do idepth=2, params%n_points
-     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-
   Reguls(6)=Sqrt(Reguls(6))
-  Regul_weights(6)=10.
-
-  !
-  !
-  ! Component 2
-  !
-  !
-  Atmo=Atmo_2comp%Comp2
-  ! 
-  ! Velocity. Square deviation from the mean
-  !
-  Mean=Sum(Atmo%v_los)/Params%n_points
-  y=(Atmo%v_los-Mean)/1e5
-  Do idepth=2, params%n_points
-     Reguls(1)=Reguls(1)+ Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-  !
-  ! Temperature increase
-  !
-  Do idepth=2, params%n_points
-     if (atmo%temp(idepth) .lt. atmo%temp(idepth-1)) &
-          Reguls(2)=Reguls(2)+(atmo%temp(idepth-1)-atmo%temp(idepth))* &
-          (atmo%ltau_500(idepth)-atmo%ltau_500(idepth-1))/500.
-  end do
-  Reguls(2)=Reguls(2)+atmo%chrom_y/100. ! chrom_y
-  !
-  ! Smooth T
-  !
-  y=Atmo%Temp
-  xx=Atmo%ltau_500
-  y2(:)=0.
-  sigma=1. ! Half-width of smoothing Gaussian (in ltau units)
-  Do idepth=1, Params%n_points
-     Norm=0.
-     Do idepth2=1, Params%n_points
-        x1=xx(idepth2)-xx(idepth)
-        If (x1*x1/sigma/sigma .lt. 25.) then ! closer than 5-sigma
-           expo=exp(-x1*x1/sigma/sigma)
-           y2(idepth)=y2(idepth)+y(idepth2)*expo
-           Norm=Norm+expo
-        End if
-     End do
-     y2(idepth)=y2(idepth)/Norm
-  End do
-  y=Atmo%Temp-y2
-  Reguls(4)=Reguls(4) + Sqrt(Sum( y**2 ) )*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))/500.
-  !
-  ! Constant T
-  !
-  Norm=Sum(y(:))/Params%n_points
-  Reguls(4)=Reguls(4)+Sqrt(Sum( (y(:)-Norm)**2 ) )
-  !
-  ! v_mic
-  !
-  Reguls(5)=Reguls(5) + Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
-       Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 )
-  ! 
-  ! B. Square deviation from the mean
-  !
-
-  Mean=Sum(Atmo%B_long)/Params%n_points
-  y=(Atmo%B_long-Mean)
-  Do idepth=2, params%n_points
-     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-
-  Mean=Sum(Atmo%B_x)/Params%n_points
-  y=(Atmo%B_x-Mean)
-  Do idepth=2, params%n_points
-     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-
-  Mean=Sum(Atmo%B_y)/Params%n_points
-  y=(Atmo%B_y-Mean)
-  Do idepth=2, params%n_points
-     Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
-  End do
-
-  Reguls(6)=Sqrt(Reguls(6))
-  Regul_weights(6)=10.
-
 
   Deviation=Sum(Reguls*Regul_weights)
 !  print *,'reguls=',reguls(1:4)*regul_weights(1:4)
-
 
   Return
 !

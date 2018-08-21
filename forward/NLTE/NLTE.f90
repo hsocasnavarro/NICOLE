@@ -415,6 +415,7 @@ Module NLTE_vars
      Integer :: NDEP, MQ, NMU, NRAD, Linear
      Real, Dimension(:,:), pointer :: Nstar, N, BPlanck, WPhi, Sl
      Real, Dimension(:,:,:), pointer :: W, F, C, Source_f
+     Real, Dimension(:,:), pointer :: Source_l_f
      Real, Dimension(:), pointer :: XMu, WMu, Xnorm
      Real :: OptThin, OptThick
      Logical :: Error=.False.
@@ -540,6 +541,7 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
         Allocate (NLTE%WPhi(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
         Allocate (NLTE%Sl(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
         Allocate (NLTE%Source_f(NLTE%NDEP,MaxNFreqs,Atom%NLIN+Atom%NCNT))
+        Allocate (NLTE%Source_l_f(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
 !
         Return
       End Subroutine NLTE_allocations
@@ -4227,8 +4229,12 @@ Subroutine Read_NLTE_lines(Params, NLTEInput, NLTE, Atom, Line)
      Line(iline)%NLTEgrid(1)=0.
      If (Allocated(Line(iline)%NLTESource_f)) &
           Deallocate(Line(iline)%NLTESource_f)
+     If (Allocated(Line(iline)%NLTESource_l_f)) &
+          Deallocate(Line(iline)%NLTESource_l_f)
      Allocate (Line(iline)%NLTESource_f(NLTE%NDEP,1))
+     Allocate (Line(iline)%NLTESource_l_f(NLTE%NDEP))
      Line(iline)%NLTESource_f(NLTE%NDEP,1)=0.
+     Line(iline)%NLTESource_l_f(NLTE%NDEP)=0.
      i2=Line(iline)%NLTEtransition
      If (i2 .ge. 1) then
         Line(iline)%NLTEgridsize=Atom%NQ(i2)
@@ -4237,10 +4243,14 @@ Subroutine Read_NLTE_lines(Params, NLTEInput, NLTE, Atom, Line)
         Allocate(Line(iline)%NLTEgrid(Atom%NQ(i2)))
         If (Allocated(Line(iline)%NLTESource_f)) &
              Deallocate(Line(iline)%NLTESource_f)
+        If (Allocated(Line(iline)%NLTESource_l_f)) &
+             Deallocate(Line(iline)%NLTESource_l_f)
         Allocate(Line(iline)%NLTESource_f(NLTE%NDEP,Atom%NQ(i2)))
+        Allocate(Line(iline)%NLTESource_l_f(NLTE%NDEP))
         Line(iline)%NLTEgrid=Atom%Q(1:Atom%NQ(i2),i2)*NLTEInput%QNORM* &
              1.e5/cc*Atom%Alamb(i2) ! NLTE grid in A from line center
         Line(iline)%NLTESource_f(:,:)=NLTE%Source_f(:,1:Atom%NQ(i2),i2) ! cgs units
+        Line(iline)%NLTESource_l_f(:)=NLTE%Source_l_f(:,i2) ! cgs units
      End if
   End do
 !
@@ -4578,6 +4588,8 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
      Saved_NLTE%N(:,:)=0.
      Allocate(Saved_NLTE%Source_f(NLTE%NDEP,MaxNFreqs,Atom%NLIN+Atom%NCNT))
      Saved_NLTE%Source_f(:,:,:)=0.
+     Allocate(Saved_NLTE%Source_l_f(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
+     Saved_NLTE%Source_l_f(:,:)=0.
   Else
      If (MaxVal(Abs(NLTE%atmo%temp-Saved_NLTE%atmo%temp)) .lt. 1e-5 &
           .and. ( MaxVal(Abs(NLTE%atmo%v_los-Saved_NLTE%atmo%v_los)) .lt. 1e-5 &
@@ -4590,6 +4602,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
         Call time_routine('solvestat',.False.)
         NLTE%N(:,:)=Saved_NLTE%N(:,:)
         NLTE%Source_f(:,:,:)=Saved_NLTE%Source_f(:,:,:)
+        NLTE%Source_l_f(:,:)=Saved_NLTE%Source_l_f(:,:)
         NLTE%Error=Saved_NLTE%Error
         NLTE%atmo=Saved_NLTE%atmo
         Return
@@ -4699,6 +4712,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 ! Compute monochromatic radiation field and local operator
               If (imu .eq. 1) NLTE%Source_f(:,inu,itran)=S(:)             
 !              If (imu .eq. 1) NLTE%Source_f(:,inu,itran)=NLTE%Sl(:,itran)
+              If (imu .eq. 1) NLTE%Source_l_f(:,itran)=NLTE%Sl(:,itran)    
 
               Call time_routine('NLTE_formalsolution',.True.)
               Call FormalSolution(NLTE, imu, inu, itran, NLTEInput%NLTE_formal_solution, &
@@ -5032,6 +5046,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
   If (RelChg .lt. NLTEInput%elim2 .and. .not. NLTE%Error) then
      Saved_NLTE%N(1:Atom%NK,1:NLTE%NDEP)=NLTE%N(1:Atom%NK,1:NLTE%NDEP)
      Saved_NLTE%Source_f(:,:,:)=NLTE%Source_f(:,:,:)
+     Saved_NLTE%Source_l_f(:,:)=NLTE%Source_l_f(:,:)
      Saved_NLTE%Error=NLTE%Error
      !Saved_NLTE%atmo=NLTE%atmo
      Call Model_assign(Saved_NLTE%atmo,NLTE%atmo)
