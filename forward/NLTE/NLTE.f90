@@ -194,16 +194,20 @@ Module VirtualFiles
       If (Virtual) then ! Memory storage
          If (File .eq. 'JNY') then
             lJNY=-10
-            Allocate (DJNY(NDEP*NRAD*MQ))
+            If (.not. Allocated(DJNY)) &
+                 Allocate (DJNY(NDEP*NRAD*MQ))
          Else if (File .eq. 'OPC') then
             lOPC=-20
             ipointopc=1
-            Allocate (DXCONT(NDEP*NRAD*MQ))
-            Allocate (DSCAT(NDEP*NRAD*MQ))
-            ALLOCATE (DSC(NDEP*NRAD*MQ))
+            If (.not. allocated(DXCONT)) then
+               Allocate (DXCONT(NDEP*NRAD*MQ))
+               Allocate (DSCAT(NDEP*NRAD*MQ))
+               ALLOCATE (DSC(NDEP*NRAD*MQ))
+            End if
          Else if (File .eq. 'PHI') then
             lPHI=-30
             ipointphi=1
+            If (.not. allocated(DPHI)) &
             Allocate (DPHI(NDEP*NRAD*MQ*NMU))
          End if
          Return
@@ -241,16 +245,19 @@ Module VirtualFiles
       If (iunit .gt. 0) then ! Disk file
          Call Close_file (iunit)
       Else ! Memory file
-         If (iunit .eq. -10) Deallocate (DJNY)
+         If (iunit .eq. -10 .and. Allocated(DJNY)) Deallocate (DJNY)
          If (iunit .eq. -20) then
             ipointopc=1
-            Deallocate (DXCONT)
-            Deallocate (DSCAT)
-            Deallocate (DSC)
+            If (Allocated(DXCONT)) then
+               Deallocate (DXCONT)
+               Deallocate (DSCAT)
+               Deallocate (DSC)
+            End if
          End If
          If (iunit .eq. -30) Then
             ipointphi=1
-            Deallocate (DPHI)
+            If (Allocated(DPHI)) &
+                 Deallocate (DPHI)
          End if
       End if
       Return
@@ -452,7 +459,7 @@ Contains
 ! The model is set in hydrostatic equilibrium in order to fill in the 
 ! required arrays (such as ne, nH, rho, etc)
 !
-Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, ForceInit)
   Implicit None
   Type (Parameters) :: Params
   Type (Model) :: Atmo
@@ -462,9 +469,10 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   Integer :: ielem, idepth
   Real, Dimension (:), Allocatable :: tmp1
   Logical, Save :: FirstTime=.TRUE.
-  Logical :: Error
+  Logical :: Error, ForceInit
   Real, Dimension (10) :: Pp
   !
+  If (ForceInit) FirstTime=.True.
   If (FirstTime) then ! All intializations
      Call Read_atom(Atom)
      Call Find_atomic_number
@@ -4595,7 +4603,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
           .and. ( MaxVal(Abs(NLTE%atmo%v_los-Saved_NLTE%atmo%v_los)) .lt. 1e-5 &
                    .or. NLTEInput%VelFree ) &
           .and. MaxVal(Abs(NLTE%atmo%v_mic-Saved_NLTE%atmo%v_mic)) .lt. 1e-5 &
-          .and. .not. NLTE%Error) &
+          .and. .not. NLTE%Error ) & 
      then 
         If (NLTEInput%Verbose .ge. 3) &
              Print *,'Using previous populations'

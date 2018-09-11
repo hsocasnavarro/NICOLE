@@ -1,5 +1,5 @@
 # CaII lines from NIST database
-[CaII 8542_0]
+[CaII 8542]
   Element='Ca'
   Ionization stage=2
   Wavelength= 8542.0857

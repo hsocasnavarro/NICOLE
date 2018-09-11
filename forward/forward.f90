@@ -1991,7 +1991,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
   If (do_NLTE) then
      NLTEInput%Hydro=Hydro
      NLTE%Atmo=Atmo
-     Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+     Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, .False.)
      Call Read_NLTE_lines(Params, NLTEInput, NLTE, Atom, Line)
   End if
   If (.not. Allocated(Line(1)%b_low) ) then
@@ -2001,11 +2001,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         Allocate (Line(iline)%b_up(Params%n_points))
         Line(iline)%b_up(:)=1.
      End do
-  End if
-  If (do_NLTE) then
-     NLTEInput%Hydro=Hydro
-     NLTE%Atmo=Atmo
-     Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
   End if
 
   ! If flux computation is required, set Gaussian weights
@@ -2100,45 +2095,47 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         NLTE%Atmo=Atmo
         If (NLTEInput%VelFree) NLTE%Atmo%v_los=0.
         If (NLTE_done .eqv. .FALSE.) then
-           !           Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo)
+           Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, .True.)
            NLTE%linear=Params%NLTE_Linear
            NLTEInput%UseColSwitch=0
            Call SolveStat(NLTE, NLTEInput, Atom)
-           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
-              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
-              NLTE%linear=1
-              Call SolveStat(NLTE, NLTEInput, Atom)
-           End if
-           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
-              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
-              NLTE%N=NLTE%NStar
-              NLTEInput%NGacc=.False.
-              NLTEInput%MaxIters=300
-              NLTEInput%IStart=0
-              Call SolveStat(NLTE, NLTEInput, Atom)
-              ! Reset values
-              NLTEInput%NGacc=.True.
-              NLTEInput%MaxIters=500
-              NLTEInput%IStart=1
-           End if
-           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different colswitch
-              If (Params%printout .ge. 3) Print *,'Again NLTE iteration did not converge. One more try...'
-              NLTE%N=NLTE%NStar
-              NLTEInput%NGacc=.False.
-              NLTEInput%MaxIters=300
-              NLTEInput%UseColSwitch=1
-              NLTEInput%IStart=0
-              Call SolveStat(NLTE, NLTEInput, Atom)
-              ! Reset values
-              NLTEInput%NGacc=.True.
-              NLTEInput%MaxIters=500
-              NLTEInput%UseColSwitch=0
-              NLTEInput%IStart=1
-           End if
-           If (Debug_errorflags(flag_NLTE) .ge. 1) then 
-              If (Params%printout .ge. 3) Print *,'NLTE calculation: Giving up'
-           End if
-           NLTE_done=.TRUE.
+
+           If (Debug_errorflags(flag_NLTE) .ge. 1) & ! Try again with different init
+              print *,'error 1',atmo%chrom_x,atmo%chrom_y
+!!$            If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
+!!$              NLTE%linear=1
+!!$              Call SolveStat(NLTE, NLTEInput, Atom)
+!!$           End if
+!!$           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
+!!$              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
+!!$              NLTE%N=NLTE%NStar
+!!$              NLTEInput%NGacc=.False.
+!!$              NLTEInput%MaxIters=300
+!!$              NLTEInput%IStart=0
+!!$              Call SolveStat(NLTE, NLTEInput, Atom)
+!!$              ! Reset values
+!!$              NLTEInput%NGacc=.True.
+!!$              NLTEInput%MaxIters=500
+!!$              NLTEInput%IStart=1
+!!$           End if
+!!$           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different colswitch
+!!$              If (Params%printout .ge. 3) Print *,'Again NLTE iteration did not converge. One more try...'
+!!$              NLTE%N=NLTE%NStar
+!!$              NLTEInput%NGacc=.False.
+!!$              NLTEInput%MaxIters=300
+!!$              NLTEInput%UseColSwitch=1
+!!$              NLTEInput%IStart=0
+!!$              Call SolveStat(NLTE, NLTEInput, Atom)
+!!$              ! Reset values
+!!$              NLTEInput%NGacc=.True.
+!!$              NLTEInput%MaxIters=500
+!!$              NLTEInput%UseColSwitch=0
+!!$              NLTEInput%IStart=1
+!!$           End if
+!!$           If (Debug_errorflags(flag_NLTE) .ge. 1) then 
+!!$              If (Params%printout .ge. 1) Print *,'NLTE calculation: Giving up'
+!!$           End if
+              NLTE_done=.TRUE.
         End if
         If (Debug_errorflags(flag_NLTE) .ge. 1) then
            Syn_profile(:)=2e25
@@ -2256,10 +2253,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               PlanckSF(:)=  2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
                    (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs), default
               DWave2=DWave
-              if (MinVal(Line(iline)%NLTEgrid) .ge. 0) then ! one-sided wlength grid in NLTE
-                 DWave2=abs(DWave) ! assume symmetric form
-              End if
               If (Line(iline)%NLTEtransition .gt. 0) then
+                 if (MinVal(Line(iline)%NLTEgrid) .ge. 0) then ! one-sided wlength grid in NLTE
+                    DWave2=abs(DWave) ! assume symmetric form
+                 End if
                  If (DWave2 .ge. MinVal(Line(iline)%NLTEgrid) .and. &
                       DWave2 .le. MaxVal(Line(iline)%NLTEgrid)) then ! Interpolate NLTE source function
 !                    Do idepth=1, Params%n_points
@@ -2276,14 +2273,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
                     If (Line(iline)%DepCoefMode .eq. 1) &
                          Term=Term*Line(iline)%b_up ! Apply departure coeff
                     TotEmis(iwave,:)=TotEmis(iwave,:)+Term(:)
-
-                    ! debug
-                    if (iwave .eq. 1)  &
-                       open (85,file='borrame2.dat')
-                    write (85,*) source_l_f(40),plancksf(40)
-                    if (iwave .eq. nwlengths) close(85)
-                       
-                    
                  Else ! LTE
                     Term(:)=Absorp(iwave,:,1,1)*PlanckSF(:)
                     If(Line(iline)%DepCoefMode .eq. 2) then
@@ -2372,14 +2361,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         TotEmis(iwave,:)=TotEmis(iwave,:)+Cont_op(:)/Cont_op_5000(:)*  &
              PlanckSF(:)
 
-        ! debug
-!        open (84,file='borrame.dat')
-!        write (84,*) phi_i(:,40)
-!        write (84,*) absorp(:,40,1,1)
-!        write (84,*) totemis(:,40)
-!        write (84,*) totabsorp(:,40,1,1)
-!        close(84)
-
         Source_f=TotEmis(iwave,:)/TotAbsorp(iwave,:,1,1)
         !
         Syn_profile(idata:idata+3)=0. 
@@ -2450,8 +2431,8 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         End if
         nformal(ichoice)=nformal(ichoice)+1 ! How many solutions of each type
         Syn_profile(idata:idata+3)=Syn_profile(idata:idata+3)/reference_cont
-        idata=idata+4 ! Update the data index
         If (Debug_errorflags(flag_NLTE) .ge. 1) Syn_profile(idata:idata+3)=-1e20
+        idata=idata+4 ! Update the data index
      End do !$$ PARALLEL LOOP END
 
 
