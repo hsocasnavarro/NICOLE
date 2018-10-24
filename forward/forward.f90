@@ -2100,41 +2100,43 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            NLTEInput%UseColSwitch=0
            Call SolveStat(NLTE, NLTEInput, Atom)
 
-           If (Debug_errorflags(flag_NLTE) .ge. 1) & ! Try again with different init
-              print *,'error 1',atmo%chrom_x,atmo%chrom_y
-!!$            If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
-!!$              NLTE%linear=1
-!!$              Call SolveStat(NLTE, NLTEInput, Atom)
-!!$           End if
-!!$           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
-!!$              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
-!!$              NLTE%N=NLTE%NStar
-!!$              NLTEInput%NGacc=.False.
-!!$              NLTEInput%MaxIters=300
-!!$              NLTEInput%IStart=0
-!!$              Call SolveStat(NLTE, NLTEInput, Atom)
-!!$              ! Reset values
-!!$              NLTEInput%NGacc=.True.
-!!$              NLTEInput%MaxIters=500
-!!$              NLTEInput%IStart=1
-!!$           End if
-!!$           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different colswitch
-!!$              If (Params%printout .ge. 3) Print *,'Again NLTE iteration did not converge. One more try...'
-!!$              NLTE%N=NLTE%NStar
-!!$              NLTEInput%NGacc=.False.
-!!$              NLTEInput%MaxIters=300
-!!$              NLTEInput%UseColSwitch=1
-!!$              NLTEInput%IStart=0
-!!$              Call SolveStat(NLTE, NLTEInput, Atom)
-!!$              ! Reset values
-!!$              NLTEInput%NGacc=.True.
-!!$              NLTEInput%MaxIters=500
-!!$              NLTEInput%UseColSwitch=0
-!!$              NLTEInput%IStart=1
-!!$           End if
-!!$           If (Debug_errorflags(flag_NLTE) .ge. 1) then 
-!!$              If (Params%printout .ge. 1) Print *,'NLTE calculation: Giving up'
-!!$           End if
+           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
+              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
+              Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, .True.)
+              NLTE%linear=1
+              Call SolveStat(NLTE, NLTEInput, Atom)
+           End if
+           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different init
+              If (Params%printout .ge. 3) Print *,'NLTE iteration did not converge. Trying again'
+              Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, .True.)
+              NLTE%N=NLTE%NStar
+              NLTEInput%NGacc=.False.
+              NLTEInput%MaxIters=300
+              NLTEInput%IStart=0
+              Call SolveStat(NLTE, NLTEInput, Atom)
+              ! Reset values
+              NLTEInput%NGacc=.True.
+              NLTEInput%MaxIters=500
+              NLTEInput%IStart=1
+           End if
+           If (Debug_errorflags(flag_NLTE) .ge. 1) then ! Try again with different colswitch
+              If (Params%printout .ge. 3) Print *,'Again NLTE iteration did not converge. One more try...'
+              Call NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, .True.)
+              NLTE%N=NLTE%NStar
+              NLTEInput%NGacc=.False.
+              NLTEInput%MaxIters=300
+              NLTEInput%UseColSwitch=1
+              NLTEInput%IStart=0
+              Call SolveStat(NLTE, NLTEInput, Atom)
+              ! Reset values
+              NLTEInput%NGacc=.True.
+              NLTEInput%MaxIters=500
+              NLTEInput%UseColSwitch=0
+              NLTEInput%IStart=1
+           End if
+           If (Debug_errorflags(flag_NLTE) .ge. 1) then 
+              If (Params%printout .ge. 1) Print *,'NLTE calculation: Giving up'
+           End if
               NLTE_done=.TRUE.
         End if
         If (Debug_errorflags(flag_NLTE) .ge. 1) then

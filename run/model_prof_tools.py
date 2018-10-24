@@ -63,7 +63,7 @@ def check_model (filename):
     f=open(filename,'rb')
     header=f.read(16+4+4+8)
     [string,ny,nz]=struct.unpack('<16s'+intf+intf,header)
-    string=string[0:11] # Remove padding zeros at the end
+    string=string.strip()
     if string == 'nicole1.6bm': # Older format version
         filetype='nicole1.6'
         nx=1
@@ -95,8 +95,8 @@ def check_model (filename):
             print 'The file is probably corrupted. Proceeding anyway...'
 #            sys.exit(1)
         return [filetype,nx,ny,nz]
-    if string == 'nicole18.04': # Current format version
-        filetype='nicole18.04'
+    if string == 'nicole1804m': # Current format version
+        filetype='nicole1804'
         [string,nx,ny,nz]=struct.unpack('<16s'+int4f+int4f+intf,header)
         f.close()
         filesize=os.path.getsize(filename)
@@ -218,7 +218,7 @@ def check_prof (filename):
     f=open(filename,'rb')
     header=f.read(16+8+8)
     [readstr,ny,nlam]=struct.unpack('<16s'+intf+intf,header)
-    readstr=readstr[0:11]
+    readstr=readstr.strip()
     if readstr == 'nicole1.6bp': # Older format version
         filetype='nicole1.6'
         nx=1
@@ -365,7 +365,7 @@ def read_prof(filename, filetype, nx, ny, nlam, ix, iy, sequential=0):
         for i in range(len(data)): data[i]=float(data[i])
         return data
     else:
-        print 'Unknown file type'
+        print 'Unknown profile file type:'+filetype
         sys.exit(1)
 
 def read_model(filename, filetype, nx, ny, nz, ix, iy, sequential=0):
@@ -566,7 +566,7 @@ def read_model(filename, filetype, nx, ny, nz, ix, iy, sequential=0):
         data.insert(22*nz+11,1.)
         data.insert(22*nz+11,-5.)
         return data
-    elif filetype == 'nicole18.04':
+    elif filetype == 'nicole1804':
         if (sequential == 0):
             irec=iy+ix*ny
         else:
@@ -821,5 +821,5 @@ def read_model(filename, filetype, nx, ny, nz, ix, iy, sequential=0):
         for i in range(len(data)): data[i]=float(data[i])
         return data
     else:
-        print 'Unknown file type'
+        print 'Unknown model file type:'+filetype
         sys.exit(1)

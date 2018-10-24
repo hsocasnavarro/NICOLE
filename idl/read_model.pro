@@ -61,7 +61,7 @@ function read_model,filename,outfile=outfile,nz=nz,npix=npix,chisq=chisq, $
      ny=tmp(5)
      npix=long(nx*ny)
   endif
-  if tmp(0) eq 4049129056382445934 and tmp(1) eq 2314885530819768366 then begin
+  if tmp(0) eq 4049129056382445934 and tmp(1) eq 2314885530823504944 then begin
      formatversion='18.04'
      openr,inunit,filename,/get_lun,/swap_if_big_endian
      tmp=lonarr(26)

@@ -11,7 +11,7 @@ __inputmodel.bin_1
 
 __inputprof.bin_1  
 inversion.pro
-inversion.mod
+inversion.model
 
 0 0      ! formal boundarycond 
 1.0    ! helio 

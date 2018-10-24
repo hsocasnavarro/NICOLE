@@ -953,7 +953,7 @@ for icycle in range(int(ncycles)):
             print 'But there are ',nlam2,' in the observed profile file:',obsprof
             sys.exit(1)
         useorigfileprof=0
-        if filemodeprof == 'nicole18.04' or icycle >= 1:
+        if filemodeprof == 'nicole2.3' or icycle >= 1:
             useorigfileprof=1
         else:
             f=open('__inputprof.bin'+suffix,'wb')
@@ -985,7 +985,7 @@ for icycle in range(int(ncycles)):
             nxmod=nxout ; nymod=nyout ; nz=nzout
         if inputmodel2 !='':
             [filemodemod2,nxmod2,nymod2,nz2]=check_model(inputmodel2)
-            if (filemodemod2 != 'nicole18.04' or nxmod2 != nxmod or nymod2 != nymod
+            if (filemodemod2 != 'nicole1804' or nxmod2 != nxmod or nymod2 != nymod
                 or nz2 != nz): 
                 print 'Error. Model 2 is not in native binary format or is not'
                 print 'compatible with model 1'
@@ -1002,12 +1002,12 @@ for icycle in range(int(ncycles)):
             if nxprof*nyprof > nxmod*nymod:
                 print 'The input model will be padded by repeating the last model'
             padding=1
-        if padding == 0 and (filemodemod == 'nicole18.04' or icycle >= 1):
+        if padding == 0 and (filemodemod == 'nicole1804' or icycle >= 1):
             useorigfilemod=1
         else:
             useorigfilemod=0
             f=open('__inputmodel.bin'+suffix,'wb')
-            f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxprof,nyprof,nz)) # First record
+            f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole1804m     ',nxprof,nyprof,nz)) # First record
             for i in range(22*nz+13+92-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
             percent=-1
             seq=0
@@ -1053,7 +1053,7 @@ for icycle in range(int(ncycles)):
                 print 'has ',nxstray,'x',nystray,'=',nxstray*nystray,' profiles.'
                 print 'The input profile has ',nxprof*nyprof
                 sys.exit(1)
-            if filemodestray == 'nicole18.04' or icycle >= 1:
+            if filemodestray == 'nicole2.3' or icycle >= 1:
                 useorigfilestray=1
             else:
                 f=open('__strayprof.bin'+suffix,'wb')
@@ -1094,7 +1094,7 @@ for icycle in range(int(ncycles)):
         nx=nxmod
         ny=nymod
         useorigfileprof=0
-        if filemodemod == 'nicole18.04' or icycle >= 1:
+        if filemodemod == 'nicole1804' or icycle >= 1:
             useorigfilemod=1
         else:
             useorigfilemod=0
@@ -1135,7 +1135,7 @@ for icycle in range(int(ncycles)):
                     print 'The last profiles in the stray light file will be ignored'
                 if nxmod*nymod > nxstray*nystray:
                     print 'The stray light file will be padded by repeating the last profile'
-            if filemodestray == 'nicole18.04' or icycle >= 1:
+            if filemodestray == 'nicole1804' or icycle >= 1:
                 useorigfilestray=1
             else:
                 f=open('__strayprof.bin'+suffix,'wb')

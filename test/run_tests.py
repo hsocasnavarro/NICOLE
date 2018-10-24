@@ -56,19 +56,19 @@ def test_nicole(dir,message,interactive=1,nicolecommand='../../main/nicole'):
     try:
         os.remove('Chisq.dat_1')
     except:
-        donothing=1
+        pass
     try:
         import glob
         for filename in glob.glob('profiling*.txt') :
             os.remove( filename ) 
     except:
-        donothing=1
+        pass
     try:
         import glob
         for filename in glob.glob('core*.txt') :
             os.remove( filename ) 
     except:
-        donothing=1
+        pass
     if interactive == 1:
         print 'Starting run. Output will be kept in '+dir+'/log.txt'
         print '     (Starting at '+str(time.localtime()[3])+':'+ \
@@ -128,7 +128,7 @@ if interactive != 0 or clean == 1:
         os.remove('log.txt')
         os.remove('modelout.model')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -171,7 +171,7 @@ if interactive != 0 or clean == 1:
         os.remove('log.txt')
         os.remove('modelout.model')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -215,7 +215,7 @@ if interactive != 0 or clean == 1:
         os.remove('log.txt')
         os.remove('hsra_mag.pro')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -262,7 +262,7 @@ if interactive != 0 or clean == 1:
         os.remove('log.txt')
         os.remove('manyhsra_mag.pro')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -314,7 +314,7 @@ if interactive != 0 or clean == 1:
         os.remove('log.txt')
         os.remove('valc_mag.pro')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -371,7 +371,7 @@ if interactive != 0 or clean == 1:
         os.remove('log.txt')
         os.remove('inversion.pro')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -384,12 +384,12 @@ if result != 0:
     success=0
 else:
     print '    Checking the results produced...'
-    [mode,nx,ny,nlam]=check_model('inversion.mod')
+    [mode,nx,ny,nlam]=check_model('inversion.model')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,1,56]:
         print '     ** ERROR!! NICOLE produced an incorrect file'
         success=0
     else:
-        data=read_model('inversion.mod',mode, 1,1,56, 0,0)
+        data=read_model('inversion.model',mode, 1,1,56, 0,0)
         f=open('Chisq.dat_2')
         chisq=struct.unpack('<1'+flf,f.read(8))
         if chisq < 10 and \
@@ -403,13 +403,17 @@ else:
 dir='inv2'
 os.chdir(cwd)
 os.chdir(dir)
+try:
+    os.remove('inversion.model')
+except:
+    pass
 
 if interactive != 0 or clean == 1:
     try:
         os.remove('log.txt')
         os.remove('inversion.pro')
     except:
-        do_nothing=1
+        pass
 if clean == 1:
     print '\n'+dir+': Removing output files...\n'
     result = 1
@@ -422,12 +426,12 @@ if result != 0:
     success=0
 else:
     print '    Checking the results produced...'
-    [mode,nx,ny,nz]=check_model('inversion.mod_2')
+    [mode,nx,ny,nz]=check_model('inversion.model_2')
     if [mode[0:6],nx,ny,nz] != ['nicole',1,1,95]:
         print '     ** ERROR!! NICOLE produced an incorrect file'
         success=0
     else:
-        data=read_model('inversion.mod_2',mode, 1,1,95, 0,0)
+        data=read_model('inversion.model_2',mode, 1,1,95, 0,0)
         f=open('Chisq.dat_2')
         chisq=struct.unpack('<1'+flf,f.read(8))
         if chisq < 10 and \

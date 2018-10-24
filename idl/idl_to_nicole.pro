@@ -48,7 +48,7 @@ pro idl_to_nicole,model=m_in,i=i,q=q,u=u,v=v,file=filename,extractx=indx,$
      nny=long(n_elements(indy))
      tmp=lon64arr(22*nz+13+92)
      tmp(0)=4049129056382445934
-     tmp(1)=2314885530819768366
+     tmp(1)=2314885530823504944
      tmp(2)=nny*long64(2)^32 + nnx
      tmp(3)=nz
      writeu,iunit,tmp

@@ -30,15 +30,13 @@ Use Model_structure
           n_nodes_mac, n_nodes_stray, n_nodes_ffactor, n_nodes_ab, &
           n_nodes_chrom_x, n_nodes_chrom_y
      integer, dimension(:), pointer :: i_nodes_t, i_nodes_v, i_nodes_mic, &
-          i_nodes_blong, i_nodes_bx, i_nodes_by, i_nodes_ab, & ! Where are the nodes.
-          i_nodes_chrom_x, i_nodes_chrom_y
+          i_nodes_blong, i_nodes_bx, i_nodes_by, i_nodes_ab ! Where are the nodes.
      integer :: n_nodes_t2, n_nodes_v2, n_nodes_mic2, & ! Number of nodes 
           n_nodes_blong2, n_nodes_bx2, n_nodes_by2, & ! for each variable.
           n_nodes_ffactor2, n_nodes_ab2, &
           n_nodes_chrom_x2, n_nodes_chrom_y2
      integer, dimension(:), pointer :: i_nodes_t2, i_nodes_v2, i_nodes_mic2, &
-          i_nodes_blong2, i_nodes_bx2, i_nodes_by2, i_nodes_ab2, & ! Where are the nodes.
-          i_nodes_chrom_x2, i_nodes_chrom_y2
+          i_nodes_blong2, i_nodes_bx2, i_nodes_by2, i_nodes_ab2 ! Where are the nodes.
      Type (Model_2comp) :: Reference_model
   End Type Nodes_info
 !

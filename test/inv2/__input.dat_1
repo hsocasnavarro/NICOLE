@@ -9,7 +9,7 @@
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
 __inputmodel.bin_1  
 
-__inputprof.bin_1  
+observed.bin
 inversion.bin
 inversion.model
 

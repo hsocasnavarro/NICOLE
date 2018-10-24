@@ -1,4 +1,4 @@
-!                      N I C O L E   v 18.09
+!                      N I C O L E   v 18.10
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -600,7 +600,7 @@ Program Nicole
         Allocate (IntRecord(nvarsdepth*Params%n_points+nvarssingle)) ! Write signature 
         IntRecord(:)=0
         IntRecord(1)=4049129056382445934_k18
-        IntRecord(2)=2314885530819768366_k18
+        IntRecord(2)=2314885530823504944_k18
         If (LittleEndian) then
            Integer4(1)=nPix_x
            Integer4(2)=nPix_y
@@ -634,7 +634,7 @@ Program Nicole
         Allocate (IntRecord(nvarsdepth*Params%n_points+nvarssingle)) ! Write signature 
         IntRecord(:)=0
         IntRecord(1)=4049129056382445934_k18
-        IntRecord(2)=2314885530819768366_k18
+        IntRecord(2)=2314885530823504944_k18
         If (LittleEndian) then
            Integer4(1)=nPix_x
            Integer4(2)=nPix_y
@@ -1321,3 +1321,15 @@ Contains
 
 
 End Program Nicole
+
+Subroutine getmyrank(myrank)
+
+  Integer :: myrank, status
+
+  Include 'mpif.h'
+
+  myrank=0
+   Call MPI_COMM_RANK(MPI_COMM_WORLD, myrank, status)
+  Return
+
+End Subroutine getmyrank
