@@ -1057,7 +1057,7 @@ for icycle in range(int(ncycles)):
                 useorigfilestray=1
             else:
                 f=open('__strayprof.bin'+suffix,'wb')
-                f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxprof,nyprof,nlam)) # First record
+                f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole2.3bp     ',nxprof,nyprof,nlam)) # First record
                 for i in range(nlam*4-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
                 percent=-1
                 seq=0
@@ -1135,11 +1135,11 @@ for icycle in range(int(ncycles)):
                     print 'The last profiles in the stray light file will be ignored'
                 if nxmod*nymod > nxstray*nystray:
                     print 'The stray light file will be padded by repeating the last profile'
-            if filemodestray == 'nicole1804' or icycle >= 1:
+            if filemodestray == 'nicole2.3' or icycle >= 1:
                 useorigfilestray=1
             else:
                 f=open('__strayprof.bin'+suffix,'wb')
-                f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxmod,nymod,nlam)) # First record
+                f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole2.3bp     ',nxmod,nymod,nlam)) # First record
                 for i in range(nlam*4-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
                 percent=-1
                 for ix in range(nxmod):

@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 18.09 ******************'
+     Print *,'*************** N I C O L E   v 18.10 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
