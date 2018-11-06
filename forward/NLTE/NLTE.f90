@@ -473,6 +473,7 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, ForceInit)
   Real, Dimension (10) :: Pp
   !
   If (ForceInit) FirstTime=.True.
+  !
   If (FirstTime) then ! All intializations
      Call Read_atom(Atom)
      Call Find_atomic_number
@@ -534,22 +535,24 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, ForceInit)
 !
     contains
       Subroutine NLTE_allocations
-        Allocate (NLTE%C(Atom%NK, Atom%NK, NLTE%NDEP))
-        NLTE%C(:,:,:)=0.
-        Allocate (NLTE%F(Atom%NK, Atom%NK, NLTE%NDEP))
-        NLTE%F(:,:,:)=0.
-        Allocate (NLTE%W(Atom%NK, Atom%NK, NLTE%NDEP))
-        NLTE%W(:,:,:)=0.
-        Allocate (NLTE%Nstar(Atom%NK, NLTE%NDEP))
-        Allocate (NLTE%N(Atom%NK, NLTE%NDEP))
-        Allocate (NLTE%Xnorm(NLTE%NDEP))
-        Allocate (NLTE%BPlanck(NLTE%NDEP, Atom%NLIN+Atom%NCNT))
-        Allocate (NLTE%XMu(NLTEInput%NMU))
-        Allocate (NLTE%WMu(NLTEInput%NMU))
-        Allocate (NLTE%WPhi(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
-        Allocate (NLTE%Sl(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
-        Allocate (NLTE%Source_f(NLTE%NDEP,MaxNFreqs,Atom%NLIN+Atom%NCNT))
-        Allocate (NLTE%Source_l_f(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
+        If (.not. Associated(NLTE%C)) then
+           Allocate (NLTE%C(Atom%NK, Atom%NK, NLTE%NDEP))
+           NLTE%C(:,:,:)=0.
+           Allocate (NLTE%F(Atom%NK, Atom%NK, NLTE%NDEP))
+           NLTE%F(:,:,:)=0.
+           Allocate (NLTE%W(Atom%NK, Atom%NK, NLTE%NDEP))
+           NLTE%W(:,:,:)=0.
+           Allocate (NLTE%Nstar(Atom%NK, NLTE%NDEP))
+           Allocate (NLTE%N(Atom%NK, NLTE%NDEP))
+           Allocate (NLTE%Xnorm(NLTE%NDEP))
+           Allocate (NLTE%BPlanck(NLTE%NDEP, Atom%NLIN+Atom%NCNT))
+           Allocate (NLTE%XMu(NLTEInput%NMU))
+           Allocate (NLTE%WMu(NLTEInput%NMU))
+           Allocate (NLTE%WPhi(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
+           Allocate (NLTE%Sl(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
+           Allocate (NLTE%Source_f(NLTE%NDEP,MaxNFreqs,Atom%NLIN+Atom%NCNT))
+           Allocate (NLTE%Source_l_f(NLTE%NDEP,Atom%NLIN+Atom%NCNT))
+        End if
 !
         Return
       End Subroutine NLTE_allocations
@@ -603,39 +606,41 @@ Subroutine Allocate_atom_arrays(Atom)
   Implicit None
   Type (NLTE_Atom) :: Atom
   Integer :: status
-!
-  Allocate (Atom%cm_1(Atom%NK),stat=status)
-  Allocate (Atom%eV(Atom%NK),stat=status)
-  Allocate (Atom%g(Atom%NK),stat=status)
-  Allocate (Atom%lvl_label(Atom%NK),stat=status)
-  Allocate (Atom%ion(Atom%NK),stat=status)
-!
-  Allocate (Atom%GA(Atom%NLIN),stat=status)
-  Allocate (Atom%GW(Atom%NLIN),stat=status)
-  Allocate (Atom%GQ(Atom%NLIN),stat=status)
-!
-  Allocate (Atom%A(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%i(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%j(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%NQ(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%Q0(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%QMAX(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%f(Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%Alamb(Atom%NLIN+Atom%NCNT),stat=status)
-!
-  Allocate (Atom%iFIX(Atom%NFIX),stat=status)
-  Allocate (Atom%jFIX(Atom%NFIX),stat=status)
-  Allocate (Atom%ITRad(Atom%NFIX),stat=status)
-  Allocate (Atom%IPho(Atom%NFIX),stat=status)
-  Allocate (Atom%A0(Atom%NFIX),stat=status)
-  Allocate (Atom%TRad(Atom%NFIX),stat=status)
-!
-  Allocate (Atom%krad(Atom%NK,Atom%NK),stat=status)
-  Allocate (Atom%B(Atom%NK,Atom%NK),stat=status)
-  Allocate (Atom%FRQ(0:MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%Q(MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%WQ(MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
-  Allocate (Atom%AlphaC(MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
+  !
+  If (.not. Associated(Atom%cm_1)) then
+     Allocate (Atom%cm_1(Atom%NK),stat=status)
+     Allocate (Atom%eV(Atom%NK),stat=status)
+     Allocate (Atom%g(Atom%NK),stat=status)
+     Allocate (Atom%lvl_label(Atom%NK),stat=status)
+     Allocate (Atom%ion(Atom%NK),stat=status)
+     !
+     Allocate (Atom%GA(Atom%NLIN),stat=status)
+     Allocate (Atom%GW(Atom%NLIN),stat=status)
+     Allocate (Atom%GQ(Atom%NLIN),stat=status)
+     !
+     Allocate (Atom%A(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%i(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%j(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%NQ(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%Q0(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%QMAX(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%f(Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%Alamb(Atom%NLIN+Atom%NCNT),stat=status)
+     !
+     Allocate (Atom%iFIX(Atom%NFIX),stat=status)
+     Allocate (Atom%jFIX(Atom%NFIX),stat=status)
+     Allocate (Atom%ITRad(Atom%NFIX),stat=status)
+     Allocate (Atom%IPho(Atom%NFIX),stat=status)
+     Allocate (Atom%A0(Atom%NFIX),stat=status)
+     Allocate (Atom%TRad(Atom%NFIX),stat=status)
+     !
+     Allocate (Atom%krad(Atom%NK,Atom%NK),stat=status)
+     Allocate (Atom%B(Atom%NK,Atom%NK),stat=status)
+     Allocate (Atom%FRQ(0:MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%Q(MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%WQ(MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
+     Allocate (Atom%AlphaC(MaxNFreqs,Atom%NLIN+Atom%NCNT),stat=status)
+  End if
 !
   Return
 !
@@ -823,7 +828,8 @@ Subroutine BackgroundOpac(NLTE, NLTEInput, Atom)
 !
 
   If (FirstTime) then
-     Allocate(Cont_op_5000_2(NLTE%NDEP))
+     If (.not. Allocated(Cont_op_5000_2)) &
+          Allocate(Cont_op_5000_2(NLTE%NDEP))
      Cont_op_5000_2(:)=-10
      FirstTime=.False.
   End if
