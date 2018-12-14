@@ -423,12 +423,12 @@ Subroutine Expand(Params, Nodes, X, New_model_2comp)
 !     End if
 !  End do
 ! Chromosphere_x
-  If (Nodes%n_nodes_chrom_x .eq. 1) then
+  If (Nodes%n_nodes_chrom_x2 .eq. 1) then
      New_model%chrom_x=Ref%chrom_x+X(ifree)*Norm_chrom_x
      ifree=ifree+1
   End if
 ! Chromosphere_y
-  If (Nodes%n_nodes_chrom_y .eq. 1) then
+  If (Nodes%n_nodes_chrom_y2 .eq. 1) then
      New_model%chrom_y=Ref%chrom_y+X(ifree)*Norm_chrom_y
      ifree=ifree+1
   End if
