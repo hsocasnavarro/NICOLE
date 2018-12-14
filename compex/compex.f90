@@ -209,7 +209,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
 !
 ! Chromosphere_x
 !
-  If (nodes%n_nodes_chrom_x .eq. 1) then
+  If (nodes%n_nodes_chrom_x2 .eq. 1) then
      X(ifree)=(Guess_model%chrom_x-Ref%chrom_x)/ &
           Norm_chrom_x
      X_max(ifree)=(Max_chrom_x-Ref%chrom_x)/Norm_chrom_x
@@ -219,7 +219,7 @@ Subroutine Compress(Params, Nodes, Guess_model_2comp, X)
 !
 ! Chromosphere_y
 !
-  If (nodes%n_nodes_chrom_y .eq. 1) then
+  If (nodes%n_nodes_chrom_y2 .eq. 1) then
      X(ifree)=(Guess_model%chrom_y-Ref%chrom_y)/ &
           Norm_chrom_y
      X_max(ifree)=(Max_chrom_y-Ref%chrom_y)/Norm_chrom_y
