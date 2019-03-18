@@ -132,10 +132,10 @@ Subroutine Hydrostatic(Params, Atmo)
         Else
            Avmolweight=Wsum/(Asum+ &
                 Atmo%El_p(ipoint-1)/Atmo%Gas_p(ipoint-1))
-           Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1) + &
+           Atmo%Gas_p(ipoint)=Atmo%Gas_p(ipoint-1)* &
                 exp(-Gravity/Avog/BK*Avmolweight* &
                 .5*(1./Atmo%Temp(ipoint)+1./Atmo%Temp(ipoint-1))* &
-                 (Atmo%Z_scale(ipoint-1)-Atmo%Z_scale(ipoint)))
+                (Atmo%Z_scale(ipoint)-Atmo%Z_scale(ipoint-1))*1e5)
         Endif
   
         !       Hydrostatic equilibrium equation.
@@ -189,7 +189,7 @@ Subroutine Hydrostatic(Params, Atmo)
         End if
      End if
   End if
-
+  
   imin=MinLoc(Abs(Atmo%ltau_500))
   If (Params%hscale .eq. 't') &
        Atmo%Z_scale(1:Params%n_points)=Atmo%Z_scale(1:Params%n_points) - &

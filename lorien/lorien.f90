@@ -271,7 +271,7 @@ Subroutine Compute_chisq(Params, Obs_profile, Syn_profile, Sigma, &
 ! Add regularization
 !
   Call Regul_term(Params, Nodes, Guess_model, Deviation)
-!  Chisq=Chisq*(1.+Params%Regularization*Deviation)
+  !  Chisq=Chisq*(1.+Params%Regularization*Deviation)
   Chisq=Chisq+Params%Regularization*Deviation
 !
   Return
@@ -571,6 +571,7 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
        PRD2, D2RegulD2x
   Real, Dimension(Params%n_points) :: xx, y, y2, kernel
   Real, Dimension(10) :: Reguls, Regul_weights
+  Logical :: Abort
 
 !
   Reguls(:)=0.
@@ -617,9 +618,14 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
      y=Atmo%Temp-ref%temp
      xx=Atmo%ltau_500
      y2(:)=0.
+     Abort=.False.
      sigma=1. ! Half-width of smoothing Gaussian (in ltau units)
      Do idepth=1, Params%n_points
         Norm=0.
+        If (idepth .ge. 2) then
+           If (xx(idepth)-xx(idepth-1) > .2*sigma) &
+              Abort=.True.
+        End if
         Do idepth2=1, Params%n_points
            x1=xx(idepth2)-xx(idepth)
            If (x1*x1/sigma/sigma .lt. 25.) then ! closer than 5-sigma
@@ -630,8 +636,11 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
         End do
         y2(idepth)=y2(idepth)/Norm
      End do
-     y=exp( abs(y-y2)/100. )
-     Reguls(4)=Sum(y)*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))
+     If (.not. Abort) then
+!        y=exp( abs(y-y2)/100. )
+        y=abs(y-y2)/100. 
+        Reguls(4)=Reguls(4)+Sum(y)*(atmo%ltau_500(Params%n_points)-atmo%ltau_500(1))
+     End if
      Regul_weights(4)=.01
 !     print *,'r1=',reguls(4) ! debug
 !     open (84,file='test.dat')
@@ -648,14 +657,12 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
      !
      ! v_mic
      !
-     Reguls(5)=Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
+     Reguls(5)=Reguls(5)+Sum( .1*(10**(Atmo%ltau_500(2:Params%n_points)- &
           Atmo%ltau_500(1:Params%n_points-1)))*Atmo%v_mic(1:Params%n_points-1)*1e-5 ) ! v_mic in km/s
      Regul_weights(5)=0.1
      ! 
      ! B. Square deviation from the mean
      !
-     Reguls(6)=0.
-
      Mean=Sum(Atmo%B_long)/Params%n_points
      y=(Atmo%B_long-Mean)
      Do idepth=2, params%n_points
@@ -674,15 +681,13 @@ Subroutine Regul_term(Params, Nod, Atmo_2comp, Deviation)
         Reguls(6)=Reguls(6)+Abs( y(idepth)*(Atmo%ltau_500(idepth)-Atmo%ltau_500(idepth-1)) )
      End do
 
-     Reguls(6)=Sqrt(Reguls(6))
-     Regul_weights(6)=10.
+     Regul_weights(6)=3.
   End do
 
   Reguls(1)=Sqrt(Reguls(1))
   Reguls(6)=Sqrt(Reguls(6))
 
   Deviation=Sum(Reguls*Regul_weights)
-!  print *,'reguls=',reguls(1:4)*regul_weights(1:4)
 
   Return
 !

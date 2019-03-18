@@ -20,7 +20,8 @@ print,'nzin:',nzin,' nzout:',nzout
 
 modelout=new_model(nx,ny,nzout)
 for ix=0,nx-1 do for iy=0,ny-1 do begin
-   modelout.tau=newscale
+   for iz=0, nzout-1 do $
+      modelout.tau[*,*,iz]=newscale[iz]
    tauin=modelin.tau[ix,iy,*]
    modelout.t[ix,iy,*]=interpol(modelin.t[ix,iy,*],tauin,newscale)
    modelout.v_mic[ix,iy,*]=interpol(modelin.v_mic[ix,iy,*],tauin,newscale)
