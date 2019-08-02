@@ -85,8 +85,9 @@ pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=half
   if min(atlasx) gt min(spectrumx) or max(atlasx) lt max(spectrumx) then begin
      ftsread,atlasy,fix(min(spectrumx))-1,fix(max(spectrumx))+1,xlam=atlasx
      atlasy=atlasy/1e4
-  endif  
-  ampatlas=max(atlasy)-min(atlasy)
+  endif
+  ind=where(atlasx ge min(spectrumx) and atlasx le max(spectrumx))
+  ampatlas=max(atlasy[ind])-min(atlasy[ind])
   ampspec=max(spectrumy)-min(spectrumy)
   spectrumy2=(spectrumy-min(spectrumy))*ampatlas/ampspec+min(atlasy)
 
