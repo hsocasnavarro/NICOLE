@@ -123,12 +123,12 @@ Subroutine Select_number_of_nodes(Params, Atmo, Nodes, icall)
   Allocate(Nodes%i_nodes_mic(Max(Nodes%n_nodes_mic,1)), Stat=status)
   Allocate(Nodes%i_nodes_bx(Max(Nodes%n_nodes_bx,1)), Stat=status)
   Allocate(Nodes%i_nodes_by(Max(Nodes%n_nodes_by,1)), Stat=status)
-  Allocate(Nodes%i_nodes_t2(Max(Nodes%n_nodes_t,1)), Stat=status)
-  Allocate(Nodes%i_nodes_v2(Max(Nodes%n_nodes_v,1)), Stat=status)
-  Allocate(Nodes%i_nodes_blong2(Max(Nodes%n_nodes_blong,1)), Stat=status)
-  Allocate(Nodes%i_nodes_mic2(Max(Nodes%n_nodes_mic,1)), Stat=status)
-  Allocate(Nodes%i_nodes_bx2(Max(Nodes%n_nodes_bx,1)), Stat=status)
-  Allocate(Nodes%i_nodes_by2(Max(Nodes%n_nodes_by,1)), Stat=status)
+  Allocate(Nodes%i_nodes_t2(Max(Nodes%n_nodes_t2,1)), Stat=status)
+  Allocate(Nodes%i_nodes_v2(Max(Nodes%n_nodes_v2,1)), Stat=status)
+  Allocate(Nodes%i_nodes_blong2(Max(Nodes%n_nodes_blong2,1)), Stat=status)
+  Allocate(Nodes%i_nodes_mic2(Max(Nodes%n_nodes_mic2,1)), Stat=status)
+  Allocate(Nodes%i_nodes_bx2(Max(Nodes%n_nodes_bx2,1)), Stat=status)
+  Allocate(Nodes%i_nodes_by2(Max(Nodes%n_nodes_by2,1)), Stat=status)
 !
 ! Place the nodes
 !

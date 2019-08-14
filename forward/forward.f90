@@ -2230,6 +2230,10 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
      Do iwave=1, nwlengths
         Wave(iwave)=Region(iregion)%First_wlength + &
              (iwave-1)*Region(iregion)%Wave_step ! Lambda in A
+        nu=cc/(Wave(iwave)*1e-8) ! s^-1
+        Wave_cm=cc/nu
+        PlanckSF(:)=  2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
+             (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs), default
      End do
 
      Do iline=1, Params%n_lines ! Loop in lines to blend		
@@ -2250,10 +2254,6 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
               If (Line(iline)%NLTEtransition .ge. 1) then
                  If (Dwave .lt. MinVal(Line(iline)%NLTEgrid)) DWave=Abs(DWave)
               Endif
-              nu=cc/(Wave(iwave)*1e-8) ! s^-1
-              Wave_cm=cc/nu
-              PlanckSF(:)=  2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
-                   (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs), default
               DWave2=DWave
               If (Line(iline)%NLTEtransition .gt. 0) then
                  if (MinVal(Line(iline)%NLTEgrid) .ge. 0) then ! one-sided wlength grid in NLTE
