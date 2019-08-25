@@ -98,34 +98,13 @@ pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=half
   xx=atlasx[ind]
   yy=interpol(spectrumy2,spectrumx,xx)
 
-  if not keyword_set(prefilter) then begin
-     yvec=yy/atlasy[ind]
-     yvec=smooth(yvec,n_elements(yvec)/20)
-     result=poly_fit(findgen(n_elements(xx)),yvec,3,yfit=prefilter,/double)
-
-     plot,xx,yy
-     oplot,xx,prefilter,lin=2,th=3
-     print,'Divide by this prefilter shape? (y/n)'
-     ans=''
-     while ans ne 'y' and ans ne 'n' do begin
-        read,ans
-     endwhile
-
-     if ans eq 'y' then $
-        yy=yy/prefilter
-
-     plot,xx,yy
-     oplot,atlasx,atlasy,lin=2
-
-  endif else prefilter=yy*0.+1.
-     
   if not keyword_set(halfwidth) then begin
      print,'Enter convolution kernel half width at half maximum (0 for no convolution)'
      print,'Units are Angstroms'
      read,halfwidth
   endif
   sigma=halfwidth/1.17740
-  if halfwidth gt 0 then begin
+  if halfwidth gt 1e-3 then begin
       dx=median(deriv(atlasx))
      nkernel=fix(sigma/dx*5)*2
      nkernel2=fix(sigma/dx*5)
@@ -136,8 +115,37 @@ pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=half
      convlvatlas=convol(atlasy,kernely)
      convlvatlas[0:nkernel2]=convlvatlas[nkernel2]
      convlvatlas[n_elements(convlvatlas)-nkernel2:n_elements(convlvaltas)-1]=convlvatlas[n_elements(convlvatlas)-nkernel2]
+     ind=where(atlasx ge min(spectrumx) and atlasx le max(spectrumx))
+     ampatlas=max(convlvatlas[ind])-min(convlvatlas[ind])
+     ampspec=max(spectrumy)-min(spectrumy)
+     spectrumy2=(spectrumy-min(spectrumy))*ampatlas/ampspec+min(convlvatlas)
+     yy=interpol(spectrumy2,spectrumx,xx)
   endif else convlvatlas=atlasy
 
+
+  if not keyword_set(prefilter) then begin
+     yvec=yy/convlvatlas[ind]
+     yvec=smooth(yvec,n_elements(yvec)/20)
+     result=poly_fit(findgen(n_elements(xx)),yvec,3,yfit=prefilter,/double)
+
+     plot,xx,yy,yran=[0.,1.1]
+     oplot,atlasx,convlvatlas,lin=1
+     oplot,xx,prefilter,lin=2,th=3
+
+     print,'Divide by this prefilter shape? (y/n)'
+     ans=''
+     while ans ne 'y' and ans ne 'n' do begin
+        read,ans
+     endwhile
+
+     if ans eq 'y' then $
+        yy=yy/prefilter
+
+     plot,xx,yy
+     oplot,atlasx,convlvatlas,lin=2
+
+  endif else prefilter=yy*0.+1.
+  
   plot,xx,yy
   oplot,atlasx,convlvatlas,lin=2
 
