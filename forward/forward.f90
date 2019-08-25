@@ -1858,20 +1858,20 @@ Subroutine Forward(Params, Line, Region, Atmo, Syn_profile, Hydro)
      Call Forward_1comp(Params,Line,Region,Atmo%Comp2,syn2,Hydro)
      Syn_profile=Atmo%Comp1%ffactor*Syn_profile + (1.-Atmo%Comp1%ffactor)*syn2
   End if
-
 !
 ! Use macroturbulence and stray light factor from the first component
   Call Convolve_profile(Params, Region, Atmo%Comp1, Syn_profile) ! Macroturbulence
   If (Atmo%Comp1%stray .gt. 0.001) &
        Call Add_stray_light(Params, Atmo%Comp1, Region, Syn_profile) ! Add stray light &
 ! Apply observational additive and multiplicative constants
+  i0=0
   Do iregion=1, Params%n_regions
      Do iwave=1, Region(iregion)%nwavelengths
-        i0=(iwave-1)*4
         Syn_profile(i0+1)=(Syn_profile(i0+1)+Region(iregion)%obs_additive)* &
              Region(iregion)%obs_multiplicative
         Syn_profile(i0+2:i0+4)=(Syn_profile(i0+2:i0+4))* &
              Region(iregion)%obs_multiplicative
+        i0=i0+4
      End do
   End do
 !
