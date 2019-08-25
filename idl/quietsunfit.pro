@@ -146,14 +146,15 @@ pro quietsunfit,spectrumy,spectrumx=spectrumx,prefilter=prefilter,halfwidth=half
   plot,spectrumx,spectrumy/prefilter
   ampspec=max(spectrumy/prefilter)-min(spectrumy/prefilter)
 
-  ampatlas=max(convlvatlas)-min(convlvatlas)
+  ind=where(atlasx ge min(spectrumx) and atlasx le max(spectrumx))
+  ampatlas=max(convlvatlas[ind])-min(convlvatlas[ind])
   norm=ampspec/ampatlas
 ;  oplot,atlasx,(convlvatlas-min(convlvatlas))*ampspec/ampatlas+min(spectrumy),lin=2
   oplot,atlasx,( convlvatlas +min(spectrumy/prefilter)/norm-min(convlvatlas) )*norm,lin=2
   print,'Width (sigma, Angstroms)=',sigma
   print,'Multiplicative constant=',norm
   print,'Additive constant=',min(spectrumy/prefilter)/norm-min(convlvatlas)
-  
+
   save,file='fit.idl',/var,/compress
   
 end
