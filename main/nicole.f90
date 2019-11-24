@@ -1,4 +1,4 @@
-!                      N I C O L E   v 19.08
+!                      N I C O L E   v 19.11
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 19.08 ******************'
+     Print *,'*************** N I C O L E   v 19.11 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -698,21 +698,21 @@ Program Nicole
               Call Read_direct(LittleEndian,IprofUnit,irec+1, &
                    Params%IProf, Params%n_data/4, iost1)
               If (iost1 .gt. 0) then
-                 Print *,'Error reading Instrumental_profile.dat'
+                 Print *,'Error reading Instrumental_profile.dat',iost1
                  Stop
               End if
            End if
            Call Read_direct(LittleEndian,modelinunit,irec+1,TmpModel, & 
                 nvarsdepth*Params%n_points+nvarssingle,iost1)           
               If (iost1 .gt. 0) then
-                 Print *,'Error reading model'
+                 Print *,'Error reading model',iost1
                  Stop
               End if
            If (Params%TwoComp) &
            Call Read_direct(LittleEndian,modelinunit2,irec+1,TmpModel2, & 
                 nvarsdepth*Params%n_points+nvarssingle,iost1)           
               If (iost1 .gt. 0) then
-                 Print *,'Error reading model 2'
+                 Print *,'Error reading model 2',iost1
                  Stop
               End if
            SizeModel=Size(TmpModel)

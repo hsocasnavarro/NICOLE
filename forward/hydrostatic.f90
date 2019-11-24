@@ -21,13 +21,14 @@ Subroutine Hydrostatic(Params, Atmo)
   Real, Parameter :: niters=30, Precision=1e-5
   Real, Dimension (Params%n_points) :: Kappa, Tau, temp
   Real, Dimension (10) :: Pp
-  Real, Parameter :: nu500 = cc/(5000.*1.e-8), Min_temp = 2500., &
+  Real, Parameter :: nu500 = cc/(5000.*1.e-8), Min_temp = 2000., &
        Mu=12.566370614 ! Vacuum permeability (G^2 cm^3/erg)=4*Pi, P_m=B^2/2/Mu
   Real :: dtau, dif, n2P, Scat, chi_0, chi_e, eta
   Real :: Avmolweight, Asum, Wsum, Pg_Old, OldKappa, metal
   Logical :: Warning1, Warning2
   Logical, Save :: FirstTime=.True.
-!
+  !
+
   Debug_warningflags(flag_hydrostatic)=0
   Debug_errorflags(flag_hydrostatic)=0
   Call time_routine('hydrostatic',.True.)
@@ -91,7 +92,6 @@ Subroutine Hydrostatic(Params, Atmo)
   ! solutions in the upper layers when running chromospheric inversions. 
   !
   !  Call Compute_Pg(1, temp(1), Atmo%El_p(1), Atmo%Gas_p(1))
-
   If (Params%Input_dens .ne. 'pel')  then
      Call Compute_Pe(1, temp(1), Atmo%Gas_p(1), Atmo%El_p(1))
   else

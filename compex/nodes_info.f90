@@ -18,7 +18,7 @@ Use Model_structure
        Max_blong=1e4, Max_bx=1e4, Max_by=1e4, Max_mac=5.e5, &
        Max_stray=1., Max_ffactor=1., Max_ab=12.0, &
        Max_chrom_x=-3., Max_chrom_y=5000.
-  real, parameter :: Min_t=2500., Min_v=-2.e6, Min_mic=0., &
+  real, parameter :: Min_t=2000., Min_v=-2.e6, Min_mic=0., &
        Min_blong=-1e4, Min_bx=-1e4, Min_by=-1e4, Min_mac=0., &
        Min_stray=0., Min_ffactor=0., Min_ab=3.0, &
        Min_chrom_x=-7., Min_chrom_y=00.
