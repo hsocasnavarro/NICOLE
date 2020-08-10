@@ -1425,16 +1425,16 @@ then try changing the formal solution from 1 to 2 or viceversa.
 
 The format of the file that you have just obtained, HSRA.pro, is
 explained in section~\ref{profilefile} below. You can read it in IDL
-with the read\_profile.pro procedure. On exit, NICOLE produces a file
-with profiling information, named profiling\_\_n.txt, where n is the 
-process number. In case of the serial build there is only one file but
-the parallel build produces one file per process. This file shows the
-code execution time and also breaks down how this time is spent inside
-the most time-consuming routines. Note that some of the routines
-profiled are actually called by others. For example, solvestat is
-called by forward, which in turn is called by
-compute\_dchisq\_dx. Because of this the percentages don't add up to
-100\%.
+with the read\_profile.pro procedure or in Python using the
+nicole\_profile class. On exit, NICOLE produces a file with profiling
+information, named profiling\_\_n.txt, where n is the process
+number. In case of the serial build there is only one file but the
+parallel build produces one file per process. This file shows the code
+execution time and also breaks down how this time is spent inside the
+most time-consuming routines. Note that some of the routines profiled
+are actually called by others. For example, solvestat is called by
+forward, which in turn is called by compute\_dchisq\_dx. Because of
+this the percentages don't add up to 100\%.
 
 \subsection{The profile file}
 \label{profilefile}
@@ -1582,7 +1582,8 @@ field, the fraction of stray light, etc.
 
 Once the inversion is finished you can check how good it was by
 reading the profiles and models with the read\_profile.pro and
-read\_model.pro IDL procedures.
+read\_model.pro IDL procedures or using the Python classes in the
+python directory.
 
 Congratulations! You have successfully inverted your first spectrum
 with NICOLE.
@@ -2081,16 +2082,17 @@ In the full distribution you will find the following subdirectories:
       parameters, and vice versa, i.e.\ to expand this free parameters 
       vector to a model atmosphere.
 \item time\_code: Routines to profile the code (determine where most
-      of the time is spent)
+      of the time is spent).
 \item misc: These are miscellaneous routines used to print out information, 
       read and write models, profiles, etc.
 \item run: This is the directory where you can run the examples described 
       in this manual.
-      You will find here the input files referenced in chapter~2
+      You will find here the input files referenced in chapter~2.
 \item test: After compiling the code, try running the tests in this
   directory. Simply run the Python script run\_tests.py
-\item numerical\_recipes: Place here the source files from the Numerical Recipes book
-\item idl: Some useful IDL procedures to read/write files in various formats
+\item numerical\_recipes: Place here the source files from the Numerical Recipes book.
+\item idl: Some useful IDL procedures to read/write files in various formats.
+\item python: Python classes to work with nicole models and profiles.
 \end{itemize}
 
 \section{The dependency tree}

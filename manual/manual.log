@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=latex 2016.4.12)  24 NOV 2019 17:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=latex 2016.4.12)  10 MAR 2020 15:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -219,7 +219,7 @@ Overfull \hbox (7.903pt too wide) in paragraph at lines 1426--1438
  []
 
 [35] [36] [37]
-Overfull \hbox (9.45218pt too wide) in paragraph at lines 1603--1613
+Overfull \hbox (9.45218pt too wide) in paragraph at lines 1604--1614
 []\OT1/cmr/m/n/10 The de-fault weights can be over-rid-den by cre-at-ing a file
  named Weights.pro
  []
@@ -229,31 +229,31 @@ Overfull \hbox (9.45218pt too wide) in paragraph at lines 1603--1613
 ]
 Chapter 4.
 [45]
-Overfull \hbox (14.88521pt too wide) in paragraph at lines 1906--1909
+Overfull \hbox (14.88521pt too wide) in paragraph at lines 1907--1910
 \OT1/cmr/m/n/10 This can make NICOLE crash un-der some cir-cum-stances. A sim-p
 le workaround
  []
 
 
-Overfull \hbox (5.53212pt too wide) in paragraph at lines 1911--1911
+Overfull \hbox (5.53212pt too wide) in paragraph at lines 1912--1912
 []\OT1/cmtt/m/n/10 ./create_makefile.py --otherflags='-fast -O3 -heap-arrays 16
 00'[] 
  []
 
 [46]
-Overfull \hbox (0.28217pt too wide) in paragraph at lines 1948--1948
+Overfull \hbox (0.28217pt too wide) in paragraph at lines 1949--1949
 []\OT1/cmtt/m/n/10 ./run_tests.py --nicolecommand='mpirun -n 8 ../../main/nicol
 e'[] 
  []
 
 
-Overfull \hbox (5.53212pt too wide) in paragraph at lines 1968--1968
+Overfull \hbox (5.53212pt too wide) in paragraph at lines 1969--1969
 []\OT1/cmtt/m/n/10 ./run_nicole.py --nicolecommand='mpirun -n 2 ../../main/nico
 le'[] 
  []
 
 [47] [48]
-Overfull \hbox (0.28217pt too wide) in paragraph at lines 2041--2041
+Overfull \hbox (0.28217pt too wide) in paragraph at lines 2042--2042
 []\OT1/cmtt/m/n/10 ./create_makefile.py --compiler=ifort --otherflags='-fast -r
 8'[] 
  []
@@ -263,7 +263,7 @@ Overfull \hbox (0.28217pt too wide) in paragraph at lines 2041--2041
 ]
 Chapter 5.
 [51] [52] [53] [54] [55] [56] [57] [58] [59] [60] [61] [62]
-Overfull \hbox (0.28217pt too wide) in paragraph at lines 3062--3062
+Overfull \hbox (0.28217pt too wide) in paragraph at lines 3064--3064
 []\OT1/cmtt/m/n/10 ....................................../main/phys_constants.f
 90[] 
  []
@@ -273,7 +273,7 @@ Overfull \hbox (0.28217pt too wide) in paragraph at lines 3062--3062
 ]
 Chapter 6.
 
-Overfull \hbox (17.56029pt too wide) detected at line 3101
+Overfull \hbox (17.56029pt too wide) detected at line 3103
 \OML/cmm/m/it/10 ^^N\OT1/cmr/m/n/10 ([] \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 ) =
  \OMS/cmsy/m/n/10 ^^@ [] \OML/cmm/m/it/10 ^^M^^N^^M \OT1/cmr/m/n/10 = [] \OML/c
 mm/m/it/10 ^^M[] [] ^^_[] [] ^^R^^N^^M[] \OMS/cmsy/m/n/10 ^^@ [] \OML/cmm/m/it/
@@ -284,7 +284,7 @@ mm/m/it/10 ^^M[] [] ^^_[] [] ^^R^^N^^M[] \OMS/cmsy/m/n/10 ^^@ [] \OML/cmm/m/it/
 [77] [78]
 Chapter 7.
 
-Overfull \hbox (30.53215pt too wide) in paragraph at lines 3136--3136
+Overfull \hbox (30.53215pt too wide) in paragraph at lines 3138--3138
  []\OT1/cmtt/m/n/10 ./create_makefile --compiler='/absolutepathtoyourmpi/bin/mp
 if90[] 
  []
@@ -292,7 +292,7 @@ if90[]
 [79
 
 ] [80]
-Overfull \hbox (2.26549pt too wide) in paragraph at lines 3194--3196
+Overfull \hbox (2.26549pt too wide) in paragraph at lines 3196--3198
 []\OT1/cmr/bx/n/10 I mod-i-fied the source code and now some-thing is go-ing wr
 ong.
  []
@@ -313,10 +313,10 @@ LaTeX Warning: There were undefined references.
 Here is how much of TeX's memory you used:
  464 strings out of 493651
  5524 string characters out of 6151148
- 86717 words of memory out of 5000000
+ 86723 words of memory out of 5000000
  3998 multiletter control sequences out of 15000+600000
  19815 words of font info for 72 fonts, out of 8000000 for 9000
  783 hyphenation exceptions out of 8191
  23i,7n,21p,169b,250s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on manual.dvi (86 pages, 215256 bytes).
+Output written on manual.dvi (86 pages, 215500 bytes).

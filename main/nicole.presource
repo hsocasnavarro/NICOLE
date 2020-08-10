@@ -1090,11 +1090,11 @@ Contains
             .and. iy .ge. iy1 .and. iy .le. iy2 &
             .and. irec .ge. irec0 )  )
           If (i_inv .gt. 1) then
-             Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model%Comp1)
+             Call Randomize_Model(Params, Nodes, Start_Model%Comp1, Guess_Model%Comp1)
              Call Hydrostatic(Params, Guess_Model%Comp1)
              Call Fill_densities(Params, Input%input_dens, Guess_model%Comp1)
              If (Params%TwoComp) then
-                Call Randomize_Model(Params, Nodes, Start_Model, Guess_Model%Comp2)
+                Call Randomize_Model(Params, Nodes, Start_Model%Comp2, Guess_Model%Comp2)
                 Call Hydrostatic(Params, Guess_Model%Comp2)
                 Call Fill_densities(Params, Input%input_dens, Guess_model%Comp2)
              End if

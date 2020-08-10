@@ -30,6 +30,7 @@ pro model_column,m,ix,iy,m2,x2,y2
   m.chrom_x(ix,iy)=m2.chrom_x(x2,y2)
   m.chrom_y(ix,iy)=m2.chrom_y(x2,y2)
   m.ffactor(ix,iy)=m2.ffactor(x2,y2)
+  m.abundance(ix,iy,*)=m2.abundance(x2,y2,*)
   m.keep_gas_p(ix,iy)=m2.keep_gas_p(x2,y2)
   m.keep_rho(ix,iy)=m2.keep_rho(x2,y2)
   m.keep_nH(ix,iy)=m2.keep_nH(x2,y2)
