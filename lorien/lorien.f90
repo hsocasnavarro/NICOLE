@@ -318,14 +318,9 @@ Subroutine Compute_dchisq_dx(Params, Line, Region, Nodes, Brute_force, &
   Debug_errorflags(flag_dchisq_dx)=0
   Debug_warningflags(flag_dchisq_dx)=0
   If (.not. Allocated(Dydx_saved)) then
-     If (Params%n_free_parameters .gt. 100) then
-        Print *,'Need to redimension Dydx_saved in compute_dydx.f90'
-        print *,'Number of free parameters:',Params%n_free_parameters
-        Stop
-     End if
-     Allocate(Dydx_saved(Params%n_data, 100))
-     Allocate(DChiDx_saved(Params%n_data))
-     Allocate(D2ChiD2X_saved(Params%n_data, Params%n_data))
+     Allocate(Dydx_saved(Params%n_data, Params%n_free_parameters))
+     Allocate(DChiDx_saved(Params%n_free_parameters))
+     Allocate(D2ChiD2X_saved(Params%n_free_parameters, Params%n_free_parameters))
   End if
   DyDx(:,:)=0.
   If (Params%always_compute_deriv .eq. 1 .or. &

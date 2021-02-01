@@ -500,10 +500,9 @@ Subroutine NLTE_init(Params, NLTEinput, NLTE, Atom, Atmo, ForceInit)
 
 ! From here on may be needed for repeated calls with different atmospheres
 
+
   If (NLTEInput%Hydro) then
-
      Call Hydrostatic(Params, NLTE%Atmo) ! To fill in some arrays in Atmo
-
   Else ! Trust El_P, rho and Gas_P and fill the nH, nHplus, nHminus, 
      !       nH2 columns of the model
 
@@ -4285,7 +4284,7 @@ Subroutine VoigtProfs(NLTE, NLTEInput, Atom)
 !
   Call RewindVirtualFile('PHI')
   NLTE%WPhi(:,:)=0.
-!
+  !
   Do itran=1, Atom%NLIN
      Line%Wlength=Atom%Alamb(itran)
      Line%ion_stage=Atom%ion(Atom%i(itran))
@@ -4299,7 +4298,7 @@ Subroutine VoigtProfs(NLTE, NLTEInput, Atom)
            Do idepth=1, NLTE%NDEP
               DlDop=Atom%Alamb(itran)/cc* &
                    Sqrt(2.*bk*NLTE%Atmo%Temp(idepth)/Atom%AWgt/mass_pr+ &
-                   NLTE%Atmo%v_mic(idepth)**2.)  ! Angstroms
+                   NLTE%Atmo%v_mic(idepth)**2.)  ! Angstroms ! debug
               DlDopcms=DlDop/Atom%Alamb(itran)*cc ! DlDop in cm/s
               DlDopkms=DlDopcms*1e-5 ! DlDop in km/s
               If (.not. NLTEInput%VelFree .or. imu .eq. 1) then
@@ -4593,6 +4592,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
   If (NLTE%Linear .eq. 1) UseLinear(:)=.True.
   Debug_errorflags(flag_NLTE)=0
   Debug_warningflags(flag_NLTE)=0
+
   If (FirstTime) then
      Call Allocate_model(Saved_NLTE%Atmo, NLTE%NDEP)
      Saved_NLTE%Atmo%temp(:)=0.
@@ -4896,7 +4896,7 @@ Subroutine SolveStat(NLTE, NLTEInput, Atom)
 !
 ! Ok. Matrices are now ready. Update populations
 !
-     
+
      NOld(:,:)=NLTE%N(:,:)
      Do idepth=1,NLTE%NDEP
         If (.not. Depth_converged(idepth)) then 

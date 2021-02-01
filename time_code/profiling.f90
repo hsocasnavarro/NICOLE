@@ -1,6 +1,3 @@
-! Written by Hector Socas-Navarro
-!
-!
 ! Module to do code profiling, i.e. to track code execution times
 !  and routine-by-routine analysis
 ! Usage:

@@ -2143,6 +2143,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
            Syn_profile(:)=2e25
            Debug_errorflags(flag_forward)=1
         End if
+     
         i=Atom%i(itran)
         j=Atom%j(itran)
         If (Line(iline)%DepCoefMode .eq. 2) then   ! Contents of b_low and b_up 
@@ -2235,7 +2236,7 @@ Subroutine Forward_1comp(Params, Line, Region, Atmo_in, Syn_profile, Hydro)
         PlanckSF(:)=  2.*hh/Wave_cm*cc*cc/(Wave_cm**4)/  & 
              (exp(hh*nu/bk/Atmo%Temp(:))-1.) ! Planck f (cgs), default
      End do
-
+     
      Do iline=1, Params%n_lines ! Loop in lines to blend		
         If (MaxVal(Line_op(iline,:)/Cont_op_5000(:)) .gt. Params%negligible_opacity) then ! Consider line			
            Call Profiles(Params, Line(iline), nwlengths, Wave(:), Atmo, &
