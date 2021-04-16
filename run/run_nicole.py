@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Script to prepare inputs for use with nicole, run nicole and prepare outputs
 #  for human use
@@ -60,7 +60,7 @@ def validate(source,filestocheck,keysinfile,quiet=0):
     #   Loop through files and check lines against keys
 
     for ifile in range(len(filestocheck)):
-        if quiet != 1: print ('Checking syntax in file:'+filestocheck[ifile])
+        if quiet != 1: print('Checking syntax in file:'+filestocheck[ifile])
         errors=0
         try:
             f=open(filestocheck[ifile],'r')
@@ -96,7 +96,7 @@ def validate(source,filestocheck,keysinfile,quiet=0):
                             badlines.append(' '+suggestion+'=')
 
 #        if errors == 0:
-#            print '  ... no errors found'
+#            print('  ... no errors found')
 
     return badlines
 
@@ -123,8 +123,8 @@ def get_value(config,key,default,filename,section='',subsection=''):
             readstr=''
             if section != '': readstr=readstr+', section: \"'+section+'\"'
             if subsection != '': readstr=readstr+', subsection: \"'+subsection+'\"'
-            print ('Error in ',filename+readstr)
-            print ('Required field \"'+key+'\" was not found')
+            print('Error in ',filename+readstr)
+            print('Required field \"'+key+'\" was not found')
             sys.exit(1)
         else:
             value=default
@@ -171,9 +171,9 @@ outprof_argv=''
 try:
     opts, args = getopt.getopt(sys.argv[1:],"", ["nicolecommand=","modelin=","profout="])
 except:
-    print ('Command-line option not recognized')
-    print ('Usage:')
-    print ("run_nicole.py [--nicolecommand='command' --modelin='inputmodel' --profout='outputprofiles']")
+    print('Command-line option not recognized')
+    print('Usage:')
+    print("run_nicole.py [--nicolecommand='command' --modelin='inputmodel' --profout='outputprofiles']")
     sys.exit(2)
 for o, a in opts:
     if o == '--nicolecommand':
@@ -183,7 +183,7 @@ for o, a in opts:
     if o == '--profout':
         outprof_argv=a
 
-if ((inputmodel_argv <> '') and (outprof_argv <> '')): print ('Command-line options, model ', inputmodel_argv,', profiles output ',outprof_argv)
+if ((inputmodel_argv != '') and (outprof_argv != '')): print('Command-line options, model ', inputmodel_argv,', profiles output ',outprof_argv)
 
 # Check sizes of default types
 [int4f,intf,flf]=check_types()
@@ -212,7 +212,7 @@ for icycle in range(int(ncycles)):
     keys[0]=list()
     keys[0][:]=elements
 
-    if ncycles > 1: print ('Preparing cycle',icycle+1)
+    if int(ncycles) > 1: print('Preparing cycle',icycle+1)
     suffix='_'+str(icycle+1)
     if os.path.isfile('NICOLE.input'+suffix):
         f=open('NICOLE.input'+suffix,'r')
@@ -226,11 +226,11 @@ for icycle in range(int(ncycles)):
         files.append('NICOLE.input')
         badlines=badlines+validate('run_nicole.py',files,keys)
     if len(badlines) >= 1:
-        print ('The following errors have been found in the input files')
-        for l in badlines: print (l)
+        print('The following errors have been found in the input files')
+        for l in badlines: print(l)
         sys.exit(1)
     else:
-        print ('  ... no errors found\n')
+        print('  ... no errors found\n')
     NICOLE_input_lines=f.readlines()
     f.close()
     NICOLE_input_lower=['']
@@ -321,8 +321,8 @@ for icycle in range(int(ncycles)):
     elif (eqstate == '2' or eqstate == 'wittmann' or eqstate == 'wittman'):
         eqstate = '2'
     else:
-        print ('Unknown value for "Eq state"')
-        print ('Must be NICOLE, ANN or Wittmann')
+        print('Unknown value for "Eq state"')
+        print('Must be NICOLE, ANN or Wittmann')
         sys.exit(1)
     eqstateH=get_value(config,'Eq state for H','0','NICOLE.input')
     eqstateH=eqstateH.lower()
@@ -336,8 +336,8 @@ for icycle in range(int(ncycles)):
     elif (eqstateH == '3' or eqstateH == 'wittmann' or eqstateH == 'wittman'):
         eqstateH = '3'
     else:
-        print ('Unknown value for "Eq state for H"')
-        print ('Must be NICOLE, Asensio, Asensio273 or Wittmann')
+        print('Unknown value for "Eq state for H"')
+        print('Must be NICOLE, Asensio, Asensio273 or Wittmann')
         sys.exit(1)
     peconsistency=get_value(config,'Pe consistency','1e-4','NICOLE.input')
     debug=get_value(config,'Debug mode','0','NICOLE.input')
@@ -357,31 +357,31 @@ for icycle in range(int(ncycles)):
     if outputmodel == None: outputmodel=''
     if outputmodel2 == None: outputmodel2=''
     if len(inputmodel) > 256 :
-        print (inputmodel,' is too long. Must be under 256 characters')
+        print(inputmodel,' is too long. Must be under 256 characters')
     if len(inputmodel2) > 256 :
-        print (inputmodel2,' is too long. Must be under 256 characters')
+        print(inputmodel2,' is too long. Must be under 256 characters')
     if len(outprof) > 256 :
-        print (outprof,' is too long. Must be under 256 characters')
+        print(outprof,' is too long. Must be under 256 characters')
     if len(obsprof) > 256 :
-        print (obsprof,' is too long. Must be under 256 characters')
+        print(obsprof,' is too long. Must be under 256 characters')
     if len(outputmodel) > 256 :
-        print (outputmodel,' is too long. Must be under 256 characters')
+        print(outputmodel,' is too long. Must be under 256 characters')
     if len(outputmodel2) > 256 :
-        print (outputmodel2,' is too long. Must be under 256 characters')
+        print(outputmodel2,' is too long. Must be under 256 characters')
     if len(stray) > 256 :
-        print (stray,' is too long. Must be under 256 characters')
+        print(stray,' is too long. Must be under 256 characters')
 
     mode=mode.lower()
     mode=mode[0:1]
     if mode != 's' and mode != 'i' and mode != 'c':
-        print ('Error in NICOLE.input')
-        print ('Unknown mode. Must be either Synthesis, Inversion or Convert')
+        print('Error in NICOLE.input')
+        print('Unknown mode. Must be either Synthesis, Inversion or Convert')
         sys.exit(1)
     if inputdens != 'pel' and inputdens != 'pgas' and inputdens != 'nel' and inputdens != 'dens':
-        print ('Error in NICOLE.input. Input density must be either Pel, Pgas, Nel or Dens')
+        print('Error in NICOLE.input. Input density must be either Pel, Pgas, Nel or Dens')
         sys.exit(1)
     if formal < '0' or formal > '9':
-        print ('Error in NICOLE.input. Invalid formal solution method')
+        print('Error in NICOLE.input. Invalid formal solution method')
         sys.exit(1)
     boundarycond=boundarycond.lower()
     if boundarycond == 'normal' or boundarycond == 'difussion':
@@ -389,19 +389,19 @@ for icycle in range(int(ncycles)):
     elif boundarycond == 'zero':
         boundarycond = '1'
     else:
-        print ('Error in NICOLE.input. Invalid formal solution boundary condition')
-        print ('Must be Normal, Difusion or Zero')
+        print('Error in NICOLE.input. Invalid formal solution boundary condition')
+        print('Must be Normal, Difusion or Zero')
         sys.exit(1)    
     if hscale != 't' and hscale != 'z':
-        print ('Error in NICOLE.input. Input density must be either tau or z')
+        print('Error in NICOLE.input. Input density must be either tau or z')
         sys.exit(1)
     if opacities == 'natasha' or opacities == 'sopas' or opacities == 'shchukina': opacities = 'sopa'
     if opacities == 'andres' or opacities == 'asensio': opacities = 'andres'
     if opacities != 'andres' and opacities != 'sopa' and opacities != 'wittmann':
-        print ('Error in NICOLE.input. Unknown opacity package:',opacities)
+        print('Error in NICOLE.input. Unknown opacity package:',opacities)
         sys.exit(1)
     if opacitiesUV != 'top' and opacitiesUV != 'dm' and opacitiesUV != 'sopa':
-        print ('Error in NICOLE.input. Unknown opacity package UV:',opacitiesUV)
+        print('Error in NICOLE.input. Unknown opacity package UV:',opacitiesUV)
         sys.exit(1)
     if opacities == 'wittmann': opacities = '1'
     if opacities == 'andres': opacities = '2'
@@ -410,14 +410,14 @@ for icycle in range(int(ncycles)):
     if opacitiesUV == 'dm': opacitiesUV = '2'
     if opacitiesUV == 'sopa': opacitiesUV = '3'
     if opacities == '3' and opacitiesUV != '3':
-        print ('If you select SOPA as opacity package, you cannot select a different')
-        print ('opacity package for the UV. Leave it blank or set it to SOPA as well')
+        print('If you select SOPA as opacity package, you cannot select a different')
+        print('opacity package for the UV. Leave it blank or set it to SOPA as well')
         sys.exit(1)
     always_compute_der=always_compute_der.lower()
     always_compute_der=always_compute_der[0:1]
     if always_compute_der != 'y' and always_compute_der != 'n':
-        print ('Error in NICOLE.input')
-        print ('Always compute derivatives must be either Y or N')
+        print('Error in NICOLE.input')
+        print('Always compute derivatives must be either Y or N')
         sys.exit(1)
     if always_compute_der == 'y': 
         always_compute_der='1' 
@@ -425,8 +425,8 @@ for icycle in range(int(ncycles)):
         always_compute_der='0'
     cent_der=cent_der.lower()
     if cent_der != 'y' and cent_der != 'n' and cent_der !='1' and cent_der != '0':
-        print ('Error in NICOLE.input')
-        print ('Centered derivatives must be either Y or N')
+        print('Error in NICOLE.input')
+        print('Centered derivatives must be either Y or N')
         sys.exit(1)
     if cent_der == 'y': 
         cent_der='1' 
@@ -442,45 +442,45 @@ for icycle in range(int(ncycles)):
     sethydro=sethydro.lower()
     sethydro=sethydro[0:1]
     if sethydro != 'y' and sethydro != 'n':
-        print ('Error in NICOLE.input')
-        print ('Impose hydrostatic equilibrium must be either Y or N')
+        print('Error in NICOLE.input')
+        print('Impose hydrostatic equilibrium must be either Y or N')
         sys.exit(1)
     if sethydro == 'y': 
         sethydro = 'T'
     else: 
         sethydro = 'F'
     if restart != '-1' and restart != '0' and restart !='1':
-        print ('Error in NICOLE.input')
-        print ('Restart must be either -1, 0 or 1')
+        print('Error in NICOLE.input')
+        print('Restart must be either -1, 0 or 1')
         sys.exit(1)
     setnH=setnH.lower()
     setnH=setnH[0:1]
     if setnH != 'y' and setnH != 'n':
-        print ('Error in NICOLE.input')
-        print ('Compute Hydrogen populations must be either Y or N')
+        print('Error in NICOLE.input')
+        print('Compute Hydrogen populations must be either Y or N')
         sys.exit(1)
     if setnH == 'y': 
         setnH = 'T'
     else: 
         setnH = 'F'
     if depcoef != '1' and depcoef != '2':
-        print ('Incorrect choice for depcoef behavior:',depcoef)
-        print ('Must be 1 or 2')
+        print('Incorrect choice for depcoef behavior:',depcoef)
+        print('Must be 1 or 2')
         sys.exit(1)
     write_depcoef=write_depcoef[0:1]
     write_depcoef=write_depcoef.lower()
     if write_depcoef != 'y' and write_depcoef != 'n':
-        print ('Incorrect "Write depcoef":',depcoef)
-        print ('Must be Y or N')
+        print('Incorrect "Write depcoef":',depcoef)
+        print('Must be Y or N')
         sys.exit(1)
     if write_depcoef == 'y':
         write_depcoef = 'T'
     else:
         write_depcoef = 'F'
     if mode == 'i' and (obsprof == None or outputmodel == None):
-        print ('Error in NICOLE.input')
-        print ('When Mode is Inversion, the fields "Observed profiles" and')
-        print ('"Ouptut model" are mandatory')
+        print('Error in NICOLE.input')
+        print('When Mode is Inversion, the fields "Observed profiles" and')
+        print('"Ouptut model" are mandatory')
         sys.exit(1)
     # Parse spectral information
     nlines=0
@@ -504,7 +504,7 @@ for icycle in range(int(ncycles)):
                       ,'Region '+str(iregion+1))
         nlam=nlam+int(tmp3)
     if (nlam == 0):
-        print ('Error in NICOLE.input. At least one wavelength is required')
+        print('Error in NICOLE.input. At least one wavelength is required')
         sys.exit(1)
     # 
     # Parse abundance data now because it may be needed
@@ -560,25 +560,25 @@ for icycle in range(int(ncycles)):
                      0.93,0.00,1.08,0.06,0.88,-10,1.11,-10,1.45,1.35,1.8,1.01,-10,
                      0.9,1.95,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
     elif abund_set.lower() != 'model':
-        print ('Abundance set not known in NICOLE.input, section Abundances')
-        print ('Must be one of Grevesse_Sauval_1998, Asplund_et_al_2009,')
-        print ('Thevenin_1989, or Grevesse_1984')
+        print('Abundance set not known in NICOLE.input, section Abundances')
+        print('Must be one of Grevesse_Sauval_1998, Asplund_et_al_2009,')
+        print('Thevenin_1989, or Grevesse_1984')
         sys.exit(1)
     if abund_set.lower() == 'model': 
         abundances=[0]*len(elements)
         abundances[0]=-1 # Flag to use abundance set in the model
     if len(abundances) != len(elements):
-        print ('Error in abundances section of run_nicole.py')
+        print('Error in abundances section of run_nicole.py')
         sys.exit(1)
-    abundances=dict(zip(elements,abundances))
+    abundances=dict(list(zip(elements,abundances)))
     abund_file=get_value(config,'Abundance file',None,'NICOLE.input','Abundances')
     if abund_file != None:
-        print ('Reading abundance file:',abund_file)
+        print('Reading abundance file:',abund_file)
         try:
             fa=open(abund_file,'r')
         except IOError:
-            print ('Error reading abundance file:',abund_file)
-            print ('in NICOLE.input, section: Abundances')
+            print('Error reading abundance file:',abund_file)
+            print('in NICOLE.input, section: Abundances')
             sys.exit(1)
         ab_lines=fa.readlines()
         fa.close()
@@ -589,8 +589,8 @@ for icycle in range(int(ncycles)):
         ablist=get_value(config_ab,'abundances',None,abund_file)
         if ablist != None:
             if len(ablist) != 92:
-                print ('Error in ',abundfile)
-                print ('Need 92 values for abundances. Found:',len(ablist))
+                print('Error in ',abundfile)
+                print('Need 92 values for abundances. Found:',len(ablist))
                 sys.exit(1)
             for iel in range(len(elements)): abundances[elements[iel]]=ablist[iel]
         for element in abundances:
@@ -632,7 +632,7 @@ for icycle in range(int(ncycles)):
     usecolswitch=usecolswitch.lower()
     if usecolswitch == '-': usecolswitch='n'
     if usecolswitch != 'y' and usecolswitch != 'n':
-        print ('Error, unknown value for Use Collisional Switching')
+        print('Error, unknown value for Use Collisional Switching')
         sys.exit(1)
     if usecolswitch == 'y':
         usecolswitch = '1'
@@ -646,14 +646,14 @@ for icycle in range(int(ncycles)):
         nlteformalsolution=get_value(config,'nlte formal solution','-','NICOLE.input','NLTE')
     if nlteformalsolution=='-': nlteformalsolution='1'
     if nlteformalsolution != '1' and nlteformalsolution != '2':
-        print ('Error in NLTE Formal Solution')
+        print('Error in NLTE Formal Solution')
         sys.exit(1)
     velfree=get_value(config,'vel free','-','NICOLE.input','NLTE')
     if velfree == '-':
         velfree=get_value(config,'velocity free','-','NICOLE.input','NLTE')
     if velfree == '-': velfree='y'
     if velfree != 'y' and velfree != 'n':
-        print ('Error, unknown value for Velocity Free')
+        print('Error, unknown value for Velocity Free')
         sys.exit(1)
     if velfree == 'y':
         velfree = 'T'
@@ -666,7 +666,7 @@ for icycle in range(int(ncycles)):
         ngacc=get_value(config,'ng acceleration','-','NICOLE.input','NLTE')
     if ngacc == '-': ngacc='y'
     if ngacc != 'y' and ngacc != 'n':
-        print ('Error, unknown value for NG Acceleration')
+        print('Error, unknown value for NG Acceleration')
         sys.exit(1)
     if ngacc == 'y':
         ngacc = 'T'
@@ -685,8 +685,8 @@ for icycle in range(int(ncycles)):
     ltepop=ltepop.lower()
     ltepop=ltepop[0:1]
     if ltepop != 'n' and ltepop != 'm':
-        print ('Unknown value for ltepop in LTE section of NICOLE.input')
-        print ('Needs to be either NICOLE or MULTI')
+        print('Unknown value for ltepop in LTE section of NICOLE.input')
+        print('Needs to be either NICOLE or MULTI')
         sys.exit(1)
     if ltepop == 'n': 
         ltepop='1' 
@@ -949,16 +949,16 @@ for icycle in range(int(ncycles)):
         nx=nxprof
         ny=nyprof
         if nlam2 != nlam:
-            print ('Error. Wavelength grid in NICOLE.input has ',nlam,' wavelengths.')
-            print ('But there are ',nlam2,' in the observed profile file:',obsprof)
+            print('Error. Wavelength grid in NICOLE.input has ',nlam,' wavelengths.')
+            print('But there are ',nlam2,' in the observed profile file:',obsprof)
             sys.exit(1)
         useorigfileprof=0
         if filemodeprof == 'nicole18.04' or icycle >= 1:
             useorigfileprof=1
         else:
             f=open('__inputprof.bin'+suffix,'wb')
-            f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole2.3bp     ',nxprof,nyprof,nlam)) # First record
-            for i in range(nlam*4-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
+            f.write(struct.pack('<16s'+int4f+int4f+intf,b'nicole2.3bp     ',nxprof,nyprof,nlam)) # First record
+            for i in range(nlam*4-16//8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
             percent=-1
             seq=0
             for ix in range(nxprof):
@@ -973,7 +973,7 @@ for icycle in range(int(ncycles)):
                         sys.stdout.write('\r'+'Preparing file with observed profiles...'+str(percent)+'%')
                         sys.stdout.flush()
             f.close() # Done with input profiles
-        print ('')
+        print('')
         [filemodemod,nxout,nyout,nzout]=check_model(inputmodel)
         useorigfilemod=0
         if filemodemod == 'inexistent': 
@@ -987,28 +987,28 @@ for icycle in range(int(ncycles)):
             [filemodemod2,nxmod2,nymod2,nz2]=check_model(inputmodel2)
             if (filemodemod2 != 'nicole18.04' or nxmod2 != nxmod or nymod2 != nymod
                 or nz2 != nz): 
-                print ('Error. Model 2 is not in native binary format or is not')
-                print ('compatible with model 1')
-                print ('Offending file:'+inputmodel2)
+                print('Error. Model 2 is not in native binary format or is not')
+                print('compatible with model 1')
+                print('Offending file:'+inputmodel2)
                 sys.exit(1)
         padding=0
         if (nxprof != nxmod or nyprof != nymod) and useorigfilemod == 0:
-            print ('Warning! Observed profile file:'+obsprof)
-            print ('has dimensions:',nxprof,'x',nyprof,'=',nxprof*nyprof,'pixels')
-            print ('The input model has:',nxmod,'x',nymod,'=',nxmod*nymod,'pixels')
-            print ('Adopting geometry in the profile file')
+            print('Warning! Observed profile file:'+obsprof)
+            print('has dimensions:',nxprof,'x',nyprof,'=',nxprof*nyprof,'pixels')
+            print('The input model has:',nxmod,'x',nymod,'=',nxmod*nymod,'pixels')
+            print('Adopting geometry in the profile file')
             if nxmod*nymod > nxprof*nyprof:
-                print ('The last models in the input model file will be ignored')
+                print('The last models in the input model file will be ignored')
             if nxprof*nyprof > nxmod*nymod:
-                print ('The input model will be padded by repeating the last model')
+                print('The input model will be padded by repeating the last model')
             padding=1
         if padding == 0 and (filemodemod == 'nicole18.04' or icycle >= 1):
             useorigfilemod=1
         else:
             useorigfilemod=0
             f=open('__inputmodel.bin'+suffix,'wb')
-            f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxprof,nyprof,nz)) # First record
-            for i in range(22*nz+13+92-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
+            f.write(struct.pack('<16s'+int4f+int4f+intf,b'nicole18.04     ',nxprof,nyprof,nz)) # First record
+            for i in range(22*nz+13+92-16//8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
             percent=-1
             seq=0
             for ix in range(nxprof):
@@ -1025,7 +1025,7 @@ for icycle in range(int(ncycles)):
                         data=read_model(inputmodel, filemodemod, nx, ny, nz, ix2, iy2, sequential=seq)
                     except:
                         data=[x*0. for x in range(22*nz+13+92)]
-                        print ('error in file ',inputmodel)
+                        print('error in file ',inputmodel)
                     seq=1
                     for d in data: f.write(struct.pack('<'+flf,d))
                     if ((ix*ny+iy+1)*100./nx/ny > percent):
@@ -1033,7 +1033,7 @@ for icycle in range(int(ncycles)):
                         sys.stdout.write('\r'+'Preparing file with input model...'+str(percent)+'%')
                         sys.stdout.flush()
             f.close() # Done with input model
-        print ('')
+        print('')
         if stray != '':
             [filemodestray,nxout,nyout,nlout]=check_prof(stray)
             useorigfilestray=0
@@ -1045,20 +1045,20 @@ for icycle in range(int(ncycles)):
             else:
                 nxstray=nxout ; nystray=nyout ; nlam2=nlout
             if nlam2 != nlam:
-                print ('Error. Wavelength grid in NICOLE.input has ',nlam,' wavelengths.')
-                print ('But there are ',nlam2,' in the stray light profile file:',stray)
+                print('Error. Wavelength grid in NICOLE.input has ',nlam,' wavelengths.')
+                print('But there are ',nlam2,' in the stray light profile file:',stray)
                 sys.exit(1)
             if useorigfilestray == 0 and (nxprof != nxstray or nyprof != nystray):
-                print ('Error! Stray light profile file:'+stray)
-                print ('has ',nxstray,'x',nystray,'=',nxstray*nystray,' profiles.')
-                print ('The input profile has ',nxprof*nyprof)
+                print('Error! Stray light profile file:'+stray)
+                print('has ',nxstray,'x',nystray,'=',nxstray*nystray,' profiles.')
+                print('The input profile has ',nxprof*nyprof)
                 sys.exit(1)
             if filemodestray == 'nicole18.04' or icycle >= 1:
                 useorigfilestray=1
             else:
                 f=open('__strayprof.bin'+suffix,'wb')
-                f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxprof,nyprof,nlam)) # First record
-                for i in range(nlam*4-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
+                f.write(struct.pack('<16s'+int4f+int4f+intf,b'nicole18.04     ',nxprof,nyprof,nlam)) # First record
+                for i in range(nlam*4-16//8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
                 percent=-1
                 seq=0
                 for ix in range(nxprof):
@@ -1081,7 +1081,7 @@ for icycle in range(int(ncycles)):
                             sys.stdout.write('\r'+'Preparing file with stray light...'+str(percent)+'%')
                             sys.stdout.flush()
                 f.close() # Done with stray light profiles
-            print ('')
+            print('')
     elif mode == 's' or mode == 'c': # In Synthesis mode
         [filemodemod,nxout,nyout,nzout]=check_model(inputmodel)
         if filemodemod == 'inexistent': 
@@ -1099,8 +1099,8 @@ for icycle in range(int(ncycles)):
         else:
             useorigfilemod=0
             f=open('__inputmodel.bin'+suffix,'wb')
-            f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxmod,nymod,nz)) # First record
-            for i in range(22*nz+92+13-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
+            f.write(struct.pack('<16s'+int4f+int4f+intf,b'nicole18.04     ',nxmod,nymod,nz)) # First record
+            for i in range(22*nz+92+13-16//8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
             percent=-1
             seq=0
             for ix in range(nxmod):
@@ -1112,7 +1112,7 @@ for icycle in range(int(ncycles)):
                         sys.stdout.write('\r'+'Preparing input model...'+str(percent)+'%')
                         sys.stdout.flush()
             f.close() # Done with input model
-        print ('')
+        print('')
         if stray != '':
             [filemodestray,nxout,nyout,nlout]=check_prof(stray)
             useorigfilestray=0
@@ -1124,23 +1124,24 @@ for icycle in range(int(ncycles)):
             else:
                 nxstray=nxout ; nystray=nyout ; nlam2=nlout
             if nlam2 != nlam:
-                print ('Error. Wavelength grid in NICOLE.input has ',nlam,' wavelengths.')
-                print ('But there are ',nlam2,' in the stray light profile file:',stray)
+                print('Error. Wavelength grid in NICOLE.input has ',nlam,' wavelengths.')
+                print('But there are ',nlam2,' in the stray light profile file:',stray)
                 sys.exit(1)
             if useorigfilestray == 0 and (nxmod != nxstray or nymod != nystray):
-                print ('Warning! Stray light profile file:'+stray)
-                print ('has ',nxstray,'x',nystray,'=',nxstray*nystray,' profiles. The input model file has ',nxmod,'x',nymod,'=',nxmod*nymod)
-                print ('Adopting the model geometry')
+                print('Warning! Stray light profile file:'+stray)
+                print('has ',nxstray,'x',nystray,'=',nxstray*nystray,' profiles. The input model file has ',nxmod,'x',nymod,'=',nxmod*nymod)
+                print('Adopting the model geometry')
                 if nxstray*nystray > nxmod*nymod:
-                    print ('The last profiles in the stray light file will be ignored')
+                    print('The last profiles in the stray light file will be ignored')
                 if nxmod*nymod > nxstray*nystray:
-                    print ('The stray light file will be padded by repeating the last profile')
+                    print('The stray light file will be padded by repeating the last profile')
             if filemodestray == 'nicole18.04' or icycle >= 1:
                 useorigfilestray=1
             else:
                 f=open('__strayprof.bin'+suffix,'wb')
-                f.write(struct.pack('<16s'+int4f+int4f+intf,'nicole18.04     ',nxmod,nymod,nlam)) # First record
-                for i in range(nlam*4-16/8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
+                f.write(struct.pack('<16s'+int4f+int4f+intf,b'nicole18.04     ',nxmod,nymod,nlam)) # First record
+
+                for i in range(nlam*4-16//8-1-1): f.write(struct.pack('<'+flf,0.)) # Fill record
                 percent=-1
                 for ix in range(nxmod):
                     for iy in range(nymod):
@@ -1161,7 +1162,7 @@ for icycle in range(int(ncycles)):
                             sys.stdout.write('\r'+'Preparing file with stray light profile...'+str(percent)+'%')
                             sys.stdout.flush()
                 f.close() # Done with stray light profiles
-            print ('')
+            print('')
 #
 # Write __input.dat file for NICOLE
     f=open('__input.dat'+suffix,'w')
@@ -1261,8 +1262,8 @@ for icycle in range(int(ncycles)):
         elem=get_value(config_lines,'Element','','LINES',line_label)
         ion_stage=get_value(config_lines,'Ionization stage','','LINES',line_label)
         if int(ion_stage) < 1 or int(ion_stage) > 3:
-            print ('Ionization stage '+ion_stage+' not supported')
-            print ('File LINES, section:',line_label)
+            print('Ionization stage '+ion_stage+' not supported')
+            print('File LINES, section:',line_label)
             sys.exit()
         wlength=get_value(config_lines,'Wavelength','','LINES',line_label)
         energy_low=get_value(config_lines,'Excitation potential','','LINES',line_label)
@@ -1277,42 +1278,42 @@ for icycle in range(int(ncycles)):
         des_low=string[1]
         j_low=string[2:]
         if re.search('[^0-9]',mult_low):
-            print ('Wrong multiplicity in file LINES, section:',line_label)
-            print ('Found:'+mult_low+' in string:'+string)
-            print ('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
-            print ('form 2s+1Lj. For example: 3S0.5')
+            print('Wrong multiplicity in file LINES, section:',line_label)
+            print('Found:'+mult_low+' in string:'+string)
+            print('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
+            print('form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^0-9.]',j_low):
-            print ('Wrong total angular momentum j in file LINES, section:',line_label)
-            print ('Found:'+j_low+' in string:'+string)
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong total angular momentum j in file LINES, section:',line_label)
+            print('Found:'+j_low+' in string:'+string)
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^SPDFGHIJKLMNOQpfhkmortuvw]',des_low):
-            print ('Wrong angular momentum L in file LINES, section:',line_label)
-            print ('Found:'+des_low+' in string:'+string)
-            print ('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong angular momentum L in file LINES, section:',line_label)
+            print('Found:'+des_low+' in string:'+string)
+            print('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         string=get_value(config_lines,'Term (upper)','','LINES',line_label)
         mult_up=string[0]
         des_up=string[1]
         j_up=string[2:]
         if re.search('[^0-9]',mult_up):
-            print ('Wrong multiplicity in file LINES, section:',line_label)
-            print ('Found:'+mult_up+' in string:'+string)
-            print ('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
-            print ('form 2s+1Lj. For example: 3S0.5')
+            print('Wrong multiplicity in file LINES, section:',line_label)
+            print('Found:'+mult_up+' in string:'+string)
+            print('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
+            print('form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^0-9.]',j_up):
-            print ('Wrong total angular momentum j in file LINES, section:',line_label)
-            print ('Found:'+j_up+' in string:'+string)
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong total angular momentum j in file LINES, section:',line_label)
+            print('Found:'+j_up+' in string:'+string)
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^SPDFGHIJKLMNOQpfhkmortuvw]',des_up):
-            print ('Wrong angular momentum L in file LINES, section:',line_label)
-            print ('Found:'+des_up+' in string:'+string)
-            print ('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong angular momentum L in file LINES, section:',line_label)
+            print('Found:'+des_up+' in string:'+string)
+            print('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         collisions=get_value(config_lines,'Collisions','1','LINES',line_label)
         collisions=collisions.lower()
@@ -1325,9 +1326,9 @@ for icycle in range(int(ncycles)):
         g_strk_12=get_value(config_lines,'Gamma Stark','-1','LINES',line_label)
         g_vdW_16=get_value(config_lines,'Gamma van der Waals','-1','LINES',line_label)
         if collisions != '1' and collisions != '2' and collisions != '3':
-            print ('Collisions must be either Unsold, Barklem et al or Gamma')
-            print ('Or alternatively a number between 1 and 3')
-            print ('File LINES, section:'+line_label)
+            print('Collisions must be either Unsold, Barklem et al or Gamma')
+            print('Or alternatively a number between 1 and 3')
+            print('File LINES, section:'+line_label)
             sys.exit(1)
         if collisions == 1:
             bark_sigma=-1
@@ -1342,8 +1343,8 @@ for icycle in range(int(ncycles)):
         linemode=linemode.lower()
         transition='0' ; nlratio='1.0' ; nuratio='1.0'
         if linemode != 'lte' and linemode != 'nlte':
-            print ('Mode must be either LTE or NLTE')
-            print ('in file LINES, section:',line_label)
+            print('Mode must be either LTE or NLTE')
+            print('in file LINES, section:',line_label)
             sys.exit(1)
         if linemode == 'nlte':
             transition=get_value(config_lines,'Transition index in model atom','','LINES',line_label)
@@ -1372,8 +1373,8 @@ for icycle in range(int(ncycles)):
         elem=get_value(config,'Element',elem,'NICOLE.input','Line '+str(iline+1))
         ion_stage=get_value(config,'Ionization stage',ion_stage,'NICOLE.input','Line '+str(iline+1))
         if int(ion_stage) < 1 or int(ion_stage) > 3:
-            print ('Ionization stage '+ion_stage+' not supported')
-            print ('File NICOLE.input, section:','Line '+str(iline+1))
+            print('Ionization stage '+ion_stage+' not supported')
+            print('File NICOLE.input, section:','Line '+str(iline+1))
             sys.exit()
         wlength=get_value(config,'Wavelength',wlength,'NICOLE.input','Line '+str(iline+1))
         energy_low=get_value(config,'Excitation potential',energy_low,'NICOLE.input','Line '+str(iline+1))
@@ -1388,42 +1389,42 @@ for icycle in range(int(ncycles)):
         des_low=string[1]
         j_low=string[2:]
         if re.search('[^0-9]',mult_low):
-            print ('Wrong multiplicity in file NICOLE.input, section:','Line '+str(iline+1))
-            print ('Found:'+mult_low+' in string:'+string)
-            print ('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
-            print ('form 2s+1Lj. For example: 3S0.5')
+            print('Wrong multiplicity in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Found:'+mult_low+' in string:'+string)
+            print('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
+            print('form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^0-9.]',j_low):
-            print ('Wrong total angular momentum j in file NICOLE.input, section:','Line '+str(iline+1))
-            print ('Found:'+j_low+' in string:'+string)
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong total angular momentum j in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Found:'+j_low+' in string:'+string)
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^SPDFGHIJKLMNOQpfhkmortuvw]',des_low):
-            print ('Wrong angular momentum L in file NICOLE.input, section:','Line '+str(iline+1))
-            print ('Found:'+des_low+' in string:'+string)
-            print ('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong angular momentum L in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Found:'+des_low+' in string:'+string)
+            print('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         string=get_value(config,'Term (upper)',mult_up+des_up+j_up,'NICOLE.input','Line '+str(iline+1))
         mult_up=string[0]
         des_up=string[1]
         j_up=string[2:]
         if re.search('[^0-9]',mult_up):
-            print ('Wrong multiplicity in file NICOLE.input, section:','Line '+str(iline+1))
-            print ('Found:'+mult_up+' in string:'+string)
-            print ('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
-            print ('form 2s+1Lj. For example: 3S0.5')
+            print('Wrong multiplicity in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Found:'+mult_up+' in string:'+string)
+            print('Multiplicity must be 2s+1 (s is the spin moment). The string must be of the')
+            print('form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^0-9.]',j_up):
-            print ('Wrong total angular momentum j in file NICOLE.input, section:','Line '+str(iline+1))
-            print ('Found:'+j_up+' in string:'+string)
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong total angular momentum j in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Found:'+j_up+' in string:'+string)
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         if re.search('[^SPDFGHIJKLMNOQpfhkmortuvw]',des_up):
-            print ('Wrong angular momentum L in file NICOLE.input, section:','Line '+str(iline+1))
-            print ('Found:'+des_up+' in string:'+string)
-            print ('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
-            print ('The string must be of the form 2s+1Lj. For example: 3S0.5')
+            print('Wrong angular momentum L in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Found:'+des_up+' in string:'+string)
+            print('Must be one of S, P, D, F, G, H, I... (p, f, h, k for semi-integers)')
+            print('The string must be of the form 2s+1Lj. For example: 3S0.5')
             sys.exit(1)
         collisions=get_value(config,'Collisions',collisions,'NICOLE.input','Line '+str(iline+1))
         collisions=collisions.lower()
@@ -1436,9 +1437,9 @@ for icycle in range(int(ncycles)):
         g_strk_12=get_value(config,'Gamma Stark',g_strk_12,'NICOLE.input','Line '+str(iline+1))
         g_vdW_16=get_value(config,'Gamma van der Waals',g_vdW_16,'NICOLE.input','Line '+str(iline+1))
         if collisions != '1' and collisions != '2' and collisions != '3':
-            print ('Collisions must be either Unsold, Barklem et al or Gamma')
-            print ('Or alternatively a number between 1 and 3')
-            print ('File LINES, section:'+line_label)
+            print('Collisions must be either Unsold, Barklem et al or Gamma')
+            print('Or alternatively a number between 1 and 3')
+            print('File LINES, section:'+line_label)
             sys.exit(1)
         if collisions == 1:
             bark_sigma=-1
@@ -1452,8 +1453,8 @@ for icycle in range(int(ncycles)):
         linemode=get_value(config,'Mode',linemode,'NICOLE.input','Line '+str(iline+1))
         linemode=linemode.lower()
         if linemode != 'lte' and linemode != 'nlte':
-            print ('Mode must be either LTE or NLTE')
-            print ('in file NICOLE.input, section:','Line '+str(iline+1))
+            print('Mode must be either LTE or NLTE')
+            print('in file NICOLE.input, section:','Line '+str(iline+1))
             sys.exit(1)
         if linemode == 'lte':
             transition='0' ; nlratio='1.0' ; nuratio='1.0'
@@ -1549,8 +1550,8 @@ for icycle in range(int(ncycles)):
 
 #print ' READY\nYou can now run NICOLE'
 
-print ('')
-print ('Starting code execution')
+print('')
+print('Starting code execution')
 status=subprocess.call(nicolecommand.split())
 try:
     import calccorrect

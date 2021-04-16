@@ -60,61 +60,61 @@ def which(program):
 
 # Print usage information
 def usage():
-    print ""
-    print "This program will automatically generate a makefile for your"
-    print "NICOLE distribution. If invoked without arguments it will search"
-    print "the default path in your system for one of the known F90 compilers."
-    print ""
-    print "Alternatively you may specify which compiler you want to use"
-    print "but then you may also need to specify certain common switches"
-    print "to control the compiler behavior."
-    print ""
-    print "Optional arguments:"
-    print " -h, --help: Prints this help and exits"
-    print " -v, --version: Prints version information and exits"
-    print " -y: Answer yes to all questions"
-    print " --mpi: Create makefile for MPI parallel version. If this option"
-    print "   is not present, the makefile is for the serial version (nicole)."
-    print " --recl: Manually specify record length for a 64-bit real in your "
-    print "   compiler/architecture. If not present, detect automatically"
-    print " --quiet: Produces less output (default)"
-    print " --verbose: Produces more output"
-    print " --showtree: Shows the full dependency tree of all source files"
-    print " --ignore: Continue creating makefile even if some dependencies are not"
-    print "   found in the source tree."
-    print " --keepflags: Use exactly the same command-line options as when the current makefile was created"
-    print " --compiler=: Specify F90 compiler to use (may be preceded by the path"
-    print "   if not in the search path). Use --compiler==list to print a list of"
-    print "   known compilers. If your compiler is not one of these you will also"
-    print "   need to specify the following options. Use double quotes to enclose a"
-    print "   complex string. Examples: --compiler=ifort, --compiler=\"/usr/bin/ifort\" "
-    print " --cswitch=: Command-line argument passed to the compiler to invoke it in "
-    print "   compile-only (no linking) mode. Usually this is --cswitch=-c"
-    print " --modpath=: Command-line argument passed to the compiler to specify the"
-    print "   module search path. Usually this is --modpath=-M, --modpath=-I or --modpath=\"-module \""
-    print "   (note the trailing space in this last example)."
-    print " --modsuf=: Suffix of modules produced by the compiler. This is usually"
-    print "   --modsuf=\".mod\", or in some older compilers --modsuf=\".M\""
-    print " --otherflags=: Other flags that will be passed to the compiler, e.g. for"
-    print "   optimization options, debugging, etc. Examples: --otherflags=-O3"
-    print "   --otherflags=-g"
-    print ""
-    print ""
+    print ("")
+    print ("This program will automatically generate a makefile for your")
+    print ("NICOLE distribution. If invoked without arguments it will search")
+    print ("the default path in your system for one of the known F90 compilers.")
+    print ("")
+    print ("Alternatively you may specify which compiler you want to use")
+    print ("but then you may also need to specify certain common switches")
+    print ("to control the compiler behavior.")
+    print ("")
+    print ("Optional arguments:")
+    print (" -h, --help: Prints this help and exits")
+    print (" -v, --version: Prints version information and exits")
+    print (" -y: Answer yes to all questions")
+    print (" --mpi: Create makefile for MPI parallel version. If this option")
+    print ("   is not present, the makefile is for the serial version (nicole).")
+    print (" --recl: Manually specify record length for a 64-bit real in your ")
+    print ("   compiler/architecture. If not present, detect automatically")
+    print (" --quiet: Produces less output (default)")
+    print (" --verbose: Produces more output")
+    print (" --showtree: Shows the full dependency tree of all source files")
+    print (" --ignore: Continue creating makefile even if some dependencies are not")
+    print ("   found in the source tree.")
+    print (" --keepflags: Use exactly the same command-line options as when the current makefile was created")
+    print (" --compiler=: Specify F90 compiler to use (may be preceded by the path")
+    print ("   if not in the search path). Use --compiler==list to print a list of")
+    print ("   known compilers. If your compiler is not one of these you will also")
+    print ("   need to specify the following options. Use double quotes to enclose a")
+    print ("   complex string. Examples: --compiler=ifort, --compiler=\"/usr/bin/ifort\" ")
+    print (" --cswitch=: Command-line argument passed to the compiler to invoke it in ")
+    print ("   compile-only (no linking) mode. Usually this is --cswitch=-c")
+    print (" --modpath=: Command-line argument passed to the compiler to specify the")
+    print ("   module search path. Usually this is --modpath=-M, --modpath=-I or --modpath=\"-module \"")
+    print ("   (note the trailing space in this last example).")
+    print (" --modsuf=: Suffix of modules produced by the compiler. This is usually")
+    print ("   --modsuf=\".mod\", or in some older compilers --modsuf=\".M\"")
+    print (" --otherflags=: Other flags that will be passed to the compiler, e.g. for")
+    print ("   optimization options, debugging, etc. Examples: --otherflags=-O3")
+    print ("   --otherflags=-g")
+    print ("")
+    print ("")
 
 # Print program version
 def printversion():
-    print ""
-    print "Version 1.0"
-    print ""
+    print ("")
+    print ("Version 1.0")
+    print ("")
 
 # List known compilers
 def listknowncompilers():
-    print "Known Fortran90 compilers"
-    print "gfortran"
-    print "ifort"
-    print "pgf90"
-    print "f95"
-    print "xlf90"
+    print ("Known Fortran90 compilers")
+    print ("gfortran")
+    print ("ifort")
+    print ("pgf90")
+    print ("f95")
+    print ("xlf90")
 
 # Recursively find all files under a given directory
 def walktree (top = ".", depthfirst = True):
@@ -139,14 +139,14 @@ def walktree (top = ".", depthfirst = True):
 # is selected)
 def printsubtree(source_files,requires,ifile,irecurs):
     if irecurs > 20:
-        print 'Stopping. Too many recursion levels in printsubtree'
+        print ('Stopping. Too many recursion levels in printsubtree' )
         exit(1)
-#    print 'd',requires[ifile]
-#    print 'd',len(requires[ifile])
+#    print ('d',requires[ifile] )
+#    print ('d',len(requires[ifile]) )
     for required in requires[ifile]:
         for i in range(irecurs):
             sys.stdout.write('....')
-        print required
+        print (required)
         irecurs2=irecurs+1
         ifile2=source_files.index(required)
         printsubtree(source_files,requires,ifile2,irecurs2)
@@ -199,10 +199,10 @@ if "--keepflags" in sys.argv: # Read previous flags from makefile
             break
     f.close()
     if error:
-        print "Couldn't read previous flags in current makefile"
+        print ("Couldn't read previous flags in current makefile")
         sys.exit(1)
     else:
-        print "Using previous command-line arguments:",sysarg
+        print ("Using previous command-line arguments:",sysarg)
 #
 # Look for compiler and flags in the command line
 try:
@@ -214,9 +214,9 @@ try:
                                               "modpath=", "modsuf=",
                                                     "otherflags="]) 
 
-except getopt.GetoptError, err:
+except getopt.GetoptError as err:
     # print help information and exit:
-    print str(err) # will print something like "option -a not recognized"
+    print (str(err)) # will print something like "option -a not recognized"
     usage()
     sys.exit(2)
 
@@ -276,55 +276,55 @@ else:
     rm='rm -f '
     cp='cp '
     dirsep='/'
-    print 'Operating system not recognized:',os.name
+    print ('Operating system not recognized:',os.name )
     if (not ignore):
-        print 'Use the --ignore switch to continue creating the makefile'
-        print 'But the remove file commands in the makefile will likely be wrong'
-        print 'You may need to edit it manually'
+        print ('Use the --ignore switch to continue creating the makefile' )
+        print ('But the remove file commands in the makefile will likely be wrong' )
+        print ('You may need to edit it manually' )
         sys.exit(1)
 
 if (compiler == None):
     # Search for F90 compiler
-    print 'User did not specify a F90 compiler. Searching for available options...'
+    print ('User did not specify a F90 compiler. Searching for available options...' )
     stri='f95'
     if (which(stri) != None):
         compiler='f95'
-        print 'Found '+stri
+        print ('Found '+stri )
     else:
-        print stri+' not found'
+        print (stri+' not found')
     stri='gfortran'
     if (which(stri) != None):
         compiler='gfortran'
-        print 'Found '+stri
+        print ('Found '+stri )
     else:
-        print stri+' not found'
+        print (stri+' not found')
     stri='pgf90'
     if (which(stri) != None):
         compiler='pgf90'
-        print 'Found '+stri
+        print ('Found '+stri )
     else:
-        print stri+' not found'
+        print (stri+' not found')
     stri='xlf90'
     if (which(stri) != None):
         compiler='xlf90'
-        print 'Found '+stri
+        print ('Found '+stri )
     else:
-        print stri+' not found'
+        print (stri+' not found')
     stri='ifort'
     if (which(stri) != None):
         compiler='ifort'
-        print 'Found '+stri
+        print ('Found '+stri )
     else:
-        print stri+' not found'
+        print (stri+' not found')
     stri='mpif90'
     if (which(stri) != None and mpi == 1):
         compiler='mpif90'
-        print 'Found '+stri
+        print ('Found '+stri )
     else:
-        print stri+' not found'
+        print (stri+' not found')
 
     if (compiler == None):
-        print 'Compiler auto-detect failed'
+        print ('Compiler auto-detect failed' )
         sys.exit(1)
 
 # Choose options for compiler
@@ -376,7 +376,7 @@ if (compiler == 'ifort'):
         otherflags=otherflags+' -O3 '
 
 if (compiler == None):
-    print 'Error. You need to have a F90 compiler installed in your system'
+    print ('Error. You need to have a F90 compiler installed in your system' )
     usage()
     sys.exit(1)
 
@@ -395,11 +395,11 @@ if cswitch == None: # Try to autodetect cswitch option
     if retcode == 0 and os.path.exists(scratch_dir+'test.o'):
         cswitch='-c'
     else:
-        print 'Failed to auto-detect cswitch flag for compiler:'+compiler
-        print "Usually it is -c but this didn't seem to work"
-        print 'Please, specify it manually by invoking this program with the --cswitch option'
+        print ('Failed to auto-detect cswitch flag for compiler:'+compiler )
+        print ("Usually it is -c but this didn't seem to work")
+        print ('Please, specify it manually by invoking this program with the --cswitch option' )
     shutil.rmtree(scratch_dir,ignore_errors=True)
-    print 'Autodetected cswitch:',cswitch
+    print ('Autodetected cswitch:',cswitch )
             
 if modsuf == None: # Try to autodetect modsuf option
     scratch_dir=tempfile.mkdtemp()
@@ -421,11 +421,11 @@ if modsuf == None: # Try to autodetect modsuf option
                 os.remove(scratch_dir+'test'+option,ignore_errors=True)
             except:
                 pass
-            print 'Autodetected modsuf:',modsuf
+            print ('Autodetected modsuf:',modsuf )
     if modsuf == None or retcode != 0:
-        print 'Failed to auto-detect modsuf flag for compiler:'+compiler
-        print "Usually it is .mod or .M but these didn't seem to work"
-        print 'Please, specify it manually by invoking this program with the --modsuf option'
+        print ('Failed to auto-detect modsuf flag for compiler:'+compiler )
+        print ("Usually it is .mod or .M but these didn't seem to work")
+        print ('Please, specify it manually by invoking this program with the --modsuf option' )
     shutil.rmtree(scratch_dir,ignore_errors=True)
 
 if modpath == None: # Try to autodetect modpath option
@@ -452,38 +452,38 @@ if modpath == None: # Try to autodetect modpath option
             retcode2=10
         if os.path.exists('a.out') and retcode == 0 and retcode2 == 0:
             modpath=option+' '
-            print 'Autodetected modpath:',modpath
+            print ('Autodetected modpath:',modpath )
             break
     os.chdir(cwd)
     if modpath == None:
-        print 'Failed to auto-detect modpath flag for compiler:'+compiler
-        print "Usually it is -module or -I but these didn't seem to work"
-        print 'Please, specify it manually by invoking this program with the --modpath option'
+        print ('Failed to auto-detect modpath flag for compiler:'+compiler )
+        print ("Usually it is -module or -I but these didn't seem to work")
+        print ('Please, specify it manually by invoking this program with the --modpath option' )
     shutil.rmtree(scratch_dir,ignore_errors=True)
 
 
 if (cswitch == None or modpath == None or modsuf == None):
-    print 'Error autodetecting compiler flags'
-    print 'For cswitch found ',cswitch
-    print 'For modpath found ',modpath
-    print 'For modsuf found ',modsuf
+    print ('Error autodetecting compiler flags' )
+    print ('For cswitch found ',cswitch )
+    print ('For modpath found ',modpath )
+    print ('For modsuf found ',modsuf )
     usage()
     sys.exit(1)
 
-print '**** Using '+compiler+' ****'
-print ''
+print ('**** Using '+compiler+' ****' )
+print ('' )
 
 # Endianness
-print 'Testing system byte order (endianness)'
+print ('Testing system byte order (endianness)' )
 endianness=sys.byteorder
-print 'Found '+endianness+' endian system'
+print ('Found '+endianness+' endian system' )
 if endianness != 'little' and endianness != 'big':
-    print 'sys.byteorder returned an unknown value for machine endianness'
+    print ('sys.byteorder returned an unknown value for machine endianness' )
     sys.exit(1)
 
 # Check that compiler/flags work
-print ''
-print 'Testing compiler and flags with Hello World program'
+print ('' )
+print ('Testing compiler and flags with Hello World program' )
 
 scratch_dir=tempfile.mkdtemp()
 scratch_dir=scratch_dir+dirsep
@@ -495,22 +495,22 @@ cmd=list()
 cmd.append(compiler)
 cmd.extend(otherflags.split())
 cmd.append('test.f90')
-print 'Command:'," ".join(cmd)
+print ('Command:'," ".join(cmd) )
 try:
     retcode=subprocess.call(cmd,stdout=fnull,stderr=fnull)
     pipe=subprocess.Popen('.'+dirsep+'a.out',stdout=subprocess.PIPE)
 except:
-    print '*** ERROR! Your compiler did not produce a suitable executable!'
+    print ('*** ERROR! Your compiler did not produce a suitable executable!' )
     os.chdir(cwd)
     shutil.rmtree(scratch_dir,ignore_errors=True)
     sys.exit(1)
-print 'Ok. Compiler and flags seem to work'
+print ('Ok. Compiler and flags seem to work' )
 os.chdir(cwd)
 shutil.rmtree(scratch_dir,ignore_errors=True)
 
 # Find recl for current architecture
-print ''
-print 'Trying to determine recl parameter'
+print ('' )
+print ('Trying to determine recl parameter' )
 if recl == -1:
     scratch_dir=tempfile.mkdtemp()
     scratch_dir=scratch_dir+dirsep
@@ -529,13 +529,13 @@ if recl == -1:
     os.chdir(cwd)
     shutil.rmtree(scratch_dir,ignore_errors=True)
     if recl==-1:
-        print '**** Error, impossible to determine recl automatically'
-        print 'Proceeding assuming recl=4'
-        print 'Note that this could result in your code not being able to properly'
-        print 'read and write binary files and may lead to crashes!!'
-        print 'You are strongly advised to use the --recl switch to specify it manually'
+        print ('**** Error, impossible to determine recl automatically' )
+        print ('Proceeding assuming recl=4' )
+        print ('Note that this could result in your code not being able to properly' )
+        print ('read and write binary files and may lead to crashes!!' )
+        print ('You are strongly advised to use the --recl switch to specify it manually' )
         recl=4
-print 'Using recl = ',recl
+print ('Using recl = ',recl )
 
 # Start code-specific block
 # Files that contain main programs
@@ -556,22 +556,22 @@ f.write(source)
 f.close()
 
 # Check Numerical Recipes routines
-print 'Checking for availability of required routines from the Numerical Recipes'
+print ('Checking for availability of required routines from the Numerical Recipes' )
 files=['svdcmp','svbksb','pythag','nr','nrutil','nrtype','convlv','twofft','four1','realft','fourrow']
 num_recipes=1
 for file in files:
     if not os.path.isfile(treetop+'numerical_recipes'+dirsep+file+'.f90'):
-        print 'Missing Numerical Recipes routine: '+treetop+file
+        print ('Missing Numerical Recipes routine: '+treetop+file )
         num_recipes=0
 if num_recipes != 1:
-    print 'NICOLE cannot be compiled without the required routines'
-    print 'from the Numerical Recipes. Aborting...'
+    print ('NICOLE cannot be compiled without the required routines' )
+    print ('from the Numerical Recipes. Aborting...' )
     sys.exit(1)
 else:
-    print'  ...Ok'
+    print ('  ...Ok')
 
 # Modify Numerical Recipes routines to suit NICOLE
-print 'Modifying Numerical Recipes routines'
+print ('Modifying Numerical Recipes routines' )
 for file in files:
     source=open(treetop+'numerical_recipes'+dirsep+file+'.f90').read()
     source=re.sub(';','\n',source)
@@ -602,7 +602,7 @@ f.write(source)
 f.close()
 
 # Check if the FLUSH statement is available
-print 'Testing availability of FLUSH statement...'
+print ('Testing availability of FLUSH statement...' )
 flush=0
 scratch_dir=tempfile.mkdtemp()
 scratch_dir=scratch_dir+dirsep
@@ -624,9 +624,9 @@ if os.path.exists(scratch_dir+'a.out'):
         os.remove(scratch_dir+'a.out')
     except:
         pass
-    print '   Flush is available'
+    print ('   Flush is available' )
 else:
-    print '   Flush is not available'
+    print ('   Flush is not available' )
 shutil.rmtree(scratch_dir,ignore_errors=True)
 
 f=open(treetop+'misc'+dirsep+'myflush.f90','w')
@@ -648,7 +648,7 @@ else: # Compile with SOPA
     f.close()
 
 if mpi == 0: # Produce serial version
-    print '*** Producing serial version ***'
+    print ('*** Producing serial version ***' )
     f=open(treetop+'main'+dirsep+'nicole.f90','w')
     source=open(treetop+'main'+dirsep+'nicole.presource').read()
     source=re.sub("!NOMPI","",source)
@@ -662,7 +662,7 @@ if mpi == 0: # Produce serial version
     f.write(source)
     f.close()
 else: # Produce MPI parallel version
-    print '*** Producing MPI parallel version ***'
+    print ('*** Producing MPI parallel version ***' )
     f=open(treetop+'main'+dirsep+'nicole.f90','w')
     source = open(treetop+'main'+dirsep+'nicole.presource').read()
     source=re.sub("!MPI","",source)
@@ -677,7 +677,7 @@ else: # Produce MPI parallel version
     f.close()
 # Set correct RealBytes and Endian parameters in param_struct.f90
 source=open(treetop+'main'+dirsep+'param_struct.f90').read()
-source=re.sub("  Integer, Parameter :: RealBytes=.* !","  Integer, Parameter :: RealBytes="+recl+" !",source)
+source=re.sub("  Integer, Parameter :: RealBytes=.* !","  Integer, Parameter :: RealBytes="+str(int(recl))+" !",source)
 if endianness == 'little': boolean='.True.'
 if endianness == 'big': boolean='.False.'
 source=re.sub("Logical, Parameter :: LittleEndian=.* !","Logical, Parameter :: LittleEndian="+boolean+" !",source)
@@ -686,8 +686,8 @@ f.write(source)
 f.close()
 # End of code-specific block
 
-print ''
-print '**** Analyzing source tree for dependences and modules ****'
+print ('' )
+print ('**** Analyzing source tree for dependences and modules ****' )
 # Create list of all source files
 source_files=['']
 for (basepath, children) in walktree(treetop,False):
@@ -734,14 +734,14 @@ for ifile in range(len(source_files)):
             contains[ifile].append(module_defined)
     contains[ifile]=contains[ifile][1:len(contains[ifile])]
     if (len (contains[ifile]) > 0):
-        if (not quiet): print 'File: '+file+' contains the following module(s):'
+        if (not quiet): print ('File: '+file+' contains the following module(s):' )
         for module in contains[ifile]:
-            if (not quiet): print '  '+module
+            if (not quiet): print ('  '+module )
             if module in modulename:
-                print '      ** Error: Duplicated module *************'
-                print '    Module name:',module
-                print '    Found in files:'+modulefile[modulename.index(module)]+' and '+file
-                print '      *****************************************'
+                print ('      ** Error: Duplicated module *************' )
+                print ('    Module name:',module )
+                print ('    Found in files:'+modulefile[modulename.index(module)]+' and '+file )
+                print ('      *****************************************' )
                 sys.exit(1)
             modulename.append(module)
             modulefile.append(file)
@@ -777,13 +777,13 @@ for ifile in range(len(source_files)):
                 if not required_module in modulename:
                     if not required_module in missing and \
                             not required_module in ignoredeps:
-                        print '     ** Error: Required module not found ******'
-                        print '   Module name:',required_module
-                        print '   Required by file:',file
+                        print ('     ** Error: Required module not found ******' )
+                        print ('   Module name:',required_module )
+                        print ('   Required by file:',file )
                         missing.append(required_module)
                     if (not ignore) and \
                             not required_module in ignoredeps:
-                        print '   Use the --ignore switch to continue creating the makefile'
+                        print ('   Use the --ignore switch to continue creating the makefile' )
                         sys.exit(1)
                 else:
                     required_file=modulefile[modulename.index(required_module)]
@@ -800,13 +800,13 @@ for ifile in range(len(source_files)):
             if not required_module in modulename:
                 if not required_module in missing and \
                         not required_module in ignoredeps:
-                    print '     ** Error: Required included file not found ******'
-                    print '   Required file:',required_module
-                    print '   Required by file:',file
+                    print ('     ** Error: Required included file not found ******' )
+                    print ('   Required file:',required_module )
+                    print ('   Required by file:',file )
                     missing.append(required_module)
                 if (not ignore) and \
                         not required_module in ignoredeps: 
-                    print '   Use the --ignore switch to continue creating the makefile'
+                    print ('   Use the --ignore switch to continue creating the makefile' )
                     sys.exit(1)
             else:
                 required_file=modulefile[modulename.index(required_module)]
@@ -815,33 +815,33 @@ for ifile in range(len(source_files)):
                     requires[ifile].append(required_file)
     requires[ifile]=requires[ifile][1:len(requires[ifile])]
     if (len (requires[ifile]) > 0):
-        if (not quiet): print 'File: '+file+' depends on the following file(s):'
+        if (not quiet): print ('File: '+file+' depends on the following file(s):' )
         for dependency in requires[ifile]:
-            if (not quiet): print '  '+dependency
+            if (not quiet): print ('  '+dependency )
     f.close()
 # If requested, show dependency tree
 if showtree:
     for ifile in range(len(source_files)):
-        print 'File: ',source_files[ifile]
+        print ('File: ',source_files[ifile] )
         printsubtree(source_files,requires,ifile,1)
 
 # Finished analyzing dependencies in the source tree
-print '**** Finished analyzing dependences in source tree'
-print ''
+print ('**** Finished analyzing dependences in source tree' )
+print ('' )
 missing=missing[1:len(missing)]
 if len(missing) > 0:
-    print '***** WARNING: The following modules or files were not found in'
-    print 'the source tree:'
-    for m in missing: print '   '+m
-    print 'Continuing anyway...'
-    print ''
+    print ('***** WARNING: The following modules or files were not found in' )
+    print ('the source tree:' )
+    for m in missing: print ('   '+m )
+    print ('Continuing anyway...' )
+    print ('' )
 
 
 # Create makefile
 ans=''
 if (not yes):
     while (ans != 'y' and ans != 'n'):
-        ans=raw_input("About to overwrite your makefile. Is this ok? [y/n] ")
+        ans=input("About to overwrite your makefile. Is this ok? [y/n] ")
 if ans == 'n':
     sys.exit(0)
 
@@ -856,7 +856,7 @@ f.write('# --modpath='+modpath+'\n')
 f.write('# --modsuf='+modsuf+'\n')
 f.write('# --otherflags='+otherflags+'\n')
 f.write('# --mpi='+str(mpi)+'\n')
-f.write('# --recl='+recl+'\n')
+f.write('# --recl='+str(int(recl))+'\n')
 f.write('# ********************************************************* \n')
 f.write('F90comp='+compiler+'\n')
 f.write('CSwitch='+cswitch+'\n')
@@ -918,7 +918,7 @@ for arg in sysarg:
     f.write('# '+arg+'\n')
 f.close()
 
-print '\n'
-print 'Done. The new makefile has been created\n\n'
+print ('\n' )
+print ('Done. The new makefile has been created\n\n' )
 
 fnull.close()

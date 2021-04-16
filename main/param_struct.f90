@@ -5,7 +5,7 @@ Module Param_structure
 !
 ! Recl parameter for binary read input/output when reading/writing a 64-bit
 ! real number
-  Integer, Parameter :: RealBytes=           2 ! DO NOT MODIFY THIS LINE!!!
+  Integer, Parameter :: RealBytes=2 ! DO NOT MODIFY THIS LINE!!!
 ! Machine endianness
 !  True=Little Endian, e.g. i386
 !  False=Big endian, e.g. Motorola, PowerPC
