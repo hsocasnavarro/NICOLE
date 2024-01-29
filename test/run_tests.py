@@ -28,9 +28,9 @@ def get_args():
     try:
         opts, args = getopt.getopt(sys.argv[1:],"", ["nicolecommand=","check-only","sequential","clean"])
     except:
-        print 'Command-line option not recognized'
-        print 'Usage:'
-        print "run_nicole.py [--check-only] [--nicolecommand='command'] [--sequential] [--clean]"
+        print ('Command-line option not recognized')
+        print ('Usage:')
+        print ("run_nicole.py [--check-only] [--nicolecommand='command'] [--sequential] [--clean]")
         sys.exit(2)
     for o, a in opts:
         if o == '--nicolecommand':
@@ -48,11 +48,11 @@ def test_nicole(dir,message,interactive=1,nicolecommand='../../main/nicole'):
     import time
     import os
 
-    print '\n\n'
-    print '*******************   '+dir+'   *********************'
+    print ('\n\n')
+    print ('*******************   '+dir+'   *********************')
 
     result=1
-    print message
+    print (message)
     try:
         os.remove('Chisq.dat_1')
     except:
@@ -70,9 +70,9 @@ def test_nicole(dir,message,interactive=1,nicolecommand='../../main/nicole'):
     except:
         pass
     if interactive == 1:
-        print 'Starting run. Output will be kept in '+dir+'/log.txt'
-        print '     (Starting at '+str(time.localtime()[3])+':'+ \
-            str(time.localtime()[4])+':'+str(time.localtime()[5])+')'
+        print ('Starting run. Output will be kept in '+dir+'/log.txt')
+        print ('     (Starting at '+str(time.localtime()[3])+':'+ \
+            str(time.localtime()[4])+':'+str(time.localtime()[5])+')')
         logfile=open('log.txt','w')
         pipe=subprocess.Popen(['./run_nicole.py','--nicolecommand='+nicolecommand],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out,err=pipe.communicate()
@@ -80,12 +80,12 @@ def test_nicole(dir,message,interactive=1,nicolecommand='../../main/nicole'):
         if ' DONE' in out:
             result=0
         if result == 0:
-            print '    The run has completed normally'
+            print ('    The run has completed normally')
         else:
-            print '     ** ERROR!! NICOLE crashed during this test'
+            print ('     ** ERROR!! NICOLE crashed during this test')
 
-        print '     (Finished at '+str(time.localtime()[3])+':'+ \
-            str(time.localtime()[4])+':'+str(time.localtime()[5])+')'
+        print ('     (Finished at '+str(time.localtime()[3])+':'+ \
+            str(time.localtime()[4])+':'+str(time.localtime()[5])+')')
     else:
         result=0
     return result
@@ -103,7 +103,7 @@ from model_prof_tools import *
 
 [int4f,intf,flf]=check_types()
  
-print '\n\n                  Testing NICOLE'
+print ('\n\n                  Testing NICOLE')
 
 # Check if numpy is available
 numpy=0
@@ -111,8 +111,8 @@ try:
     import numpy
     numpy=1
 except:
-    print '\nPython module numpy has not been found. You will not be able to read'
-    print 'IDL save files with NICOLE on this machine'
+    print ('\nPython module numpy has not been found. You will not be able to read')
+    print ('IDL save files with NICOLE on this machine')
 
 # Run tests
 cwd=os.getcwd()
@@ -130,20 +130,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will convert electron to gas pressure in the HSRA model',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nlam]=check_model('modelout.model')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,1,95]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
         data=read_model('modelout.model',mode,1,1,95,0,0)
@@ -151,15 +151,15 @@ else:
         data2=read_model('hsra_full.bin','nicole2.3',1,1,95,0,0)
         hsra_pg=data2[95*3:95*3+95]
 
-#        print 'pres=',m_pg[80],hsra_pg[80] # debug
+#        print ('pres=',m_pg[80],hsra_pg[80]) # debug
 
         dif1=abs(m_pg[80]-hsra_pg[80])/hsra_pg[80]
         dif2=abs(m_pg[60]-hsra_pg[60])/hsra_pg[60]
         if dif1 > 0.35 or dif2 > 0.35:
-            print '    ** ERROR!! NICOLE produced inaccurate results'
+            print ('    ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
 
 # conv2
 dir='conv2'
@@ -173,20 +173,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will convert gas to electron pressure in the HSRA model',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nlam]=check_model('modelout.model')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,1,95]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
         data=read_model('modelout.model',mode,1,1,95,0,0)
@@ -194,16 +194,16 @@ else:
         data2=read_model('hsra_full.bin','nicole2.3',1,1,95,0,0)
         hsra_elp=data2[95*5:95*5+95]
 
-#        print 'pres 1=',m_elp[80],hsra_elp[80] # debug
-#        print 'pres 2=',m_elp[60],hsra_elp[60] # debug
+#        print ('pres 1=',m_elp[80],hsra_elp[80]) # debug
+#        print ('pres 2=',m_elp[60],hsra_elp[60]) # debug
 
         dif1=abs(m_elp[80]-hsra_elp[80])/hsra_elp[80]
         dif2=abs(m_elp[60]-hsra_elp[60])/hsra_elp[60]
         if dif1 > 0.5 or dif2 > 0.5:
-            print '    ** ERROR!! NICOLE produced inaccurate results'
+            print ('    ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
 
 # syn1
 dir='syn1'
@@ -217,20 +217,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will test a simple synthesis in LTE with a magnetic atmosphere',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nlam]=check_prof('hsra_mag.pro')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,1,200]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
         data=read_prof('hsra_mag.pro',mode,1,1,200,0,0)
@@ -246,10 +246,10 @@ else:
                 abs(max(q)-0.)>2e-3 or abs(min(q)+.000907)>2e-3 or \
                 abs(max(u)-0.0031)>2e-3 or abs(min(u))>2e-3 or \
                 abs(max(v)-0.02595)>2e-3 or abs(min(v)+0.02598)>2e-3:
-            print '     ** ERROR!! NICOLE produced inaccurate results'
+            print ('     ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
 
 
 # syn2
@@ -264,20 +264,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will test many syntheses in LTE with a magnetic atmosphere',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nlam]=check_prof('manyhsra_mag.pro')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,10,200]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
 #        data=read_prof('manyhsra_mag.pro',mode,1,1000,200,0,0)
@@ -299,10 +299,10 @@ else:
                 abs(max(q)-limq[0])>2e-3 or abs(min(q)-limq[1])>2e-3 or \
                 abs(max(u)-limu[0])>2e-3 or abs(min(u)-limu[1])>2e-3 or \
                 abs(max(v)-limv[0])>2e-3 or abs(min(v)-limv[1])>2e-3:
-            print '     ** ERROR!! NICOLE produced inaccurate results'
+            print ('     ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
 
 # syn3
 dir='syn3'
@@ -316,20 +316,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will test a simple synthesis in NLTE with a magnetic atmosphere',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nlam]=check_prof('valc_mag.pro')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,1,400]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
         data=read_prof('valc_mag.pro',mode,1,1,400,0,0)
@@ -356,10 +356,10 @@ else:
                 abs(max(q)-limq[0])>2e-3 or abs(min(q)-limq[1])>2e-3 or \
                 abs(max(u)-limu[0])>2e-3 or abs(min(u)-limu[1])>2e-3 or \
                 abs(max(v)-limv[0])>2e-3 or abs(min(v)-limv[1])>2e-3:
-            print '     ** ERROR!! NICOLE produced inaccurate results'
+            print ('     ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
 
 # inv1
 dir='inv1'
@@ -373,20 +373,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will test a simple LTE inversion',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nlam]=check_model('inversion.model')
     if [mode[0:6],nx,ny,nlam] != ['nicole',1,1,56]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
         data=read_model('inversion.model',mode, 1,1,56, 0,0)
@@ -394,10 +394,10 @@ else:
         chisq=struct.unpack('<1'+flf,f.read(8))
         if chisq < 10 and \
                 abs(data[56*2+26]-4718) > 250: # Temperature at ltau_500=-1.5
-            print '     ** ERROR!! NICOLE produced inaccurate results'
+            print ('     ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
         
 # inv2
 dir='inv2'
@@ -415,20 +415,20 @@ if interactive != 0 or clean == 1:
     except:
         pass
 if clean == 1:
-    print '\n'+dir+': Removing output files...\n'
+    print ('\n'+dir+': Removing output files...\n')
     result = 1
 else:
     result=test_nicole(dir,'This will test two LTE inversions',interactive,nicolecommand)
 if sequential == 1:
-    print 'Press ENTER to continue'
+    print ('Press ENTER to continue')
     input=raw_input()
 if result != 0:
     success=0
 else:
-    print '    Checking the results produced...'
+    print ('    Checking the results produced...')
     [mode,nx,ny,nz]=check_model('inversion.model_2')
     if [mode[0:6],nx,ny,nz] != ['nicole',1,1,95]:
-        print '     ** ERROR!! NICOLE produced an incorrect file'
+        print ('     ** ERROR!! NICOLE produced an incorrect file')
         success=0
     else:
         data=read_model('inversion.model_2',mode, 1,1,95, 0,0)
@@ -436,10 +436,10 @@ else:
         chisq=struct.unpack('<1'+flf,f.read(8))
         if chisq < 10 and \
                 abs(data[95*2+65]-4718) > 250: # Temperature at ltau_500=-1.5
-            print '     ** ERROR!! NICOLE produced inaccurate results'
+            print ('     ** ERROR!! NICOLE produced inaccurate results')
             success=0
         else:
-            print '    Results appear to be correct'
+            print ('    Results appear to be correct')
 
 
 # Finished. Print summary
@@ -447,16 +447,16 @@ if clean == 1:
     sys.exit(0)
 
 if success == 1:
-    print '\n\n         =========================================='
-    print 'Congratulations! Your build of NICOLE has passed all tests successfully :)\n\n'
+    print ('\n\n         ==========================================')
+    print ('Congratulations! Your build of NICOLE has passed all tests successfully :)\n\n')
     if numpy == 0:
-        print ' (Note, however, that you will not be able to use IDL save files on this machine)'
+        print (' (Note, however, that you will not be able to use IDL save files on this machine)')
     import calccorrect
     calccorrect.message()
     sys.exit(0)
 else:
-    print '\n\n         =========================================='
-    print 'Unfortunately your build of NICOLE has failed one or more tests :(\n\n'
+    print ('\n\n         ==========================================')
+    print ('Unfortunately your build of NICOLE has failed one or more tests :(\n\n')
     import calccorrect
     calccorrect.message(correct=False)
     sys.exit(1)

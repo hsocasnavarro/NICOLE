@@ -1,4 +1,4 @@
-!                      N I C O L E   v 19.11
+!                      N I C O L E   v 24.01
 !       Non-LTE Inversion COde based on the Lorien Engine
 !         By Hector Socas-Navarro, Jaime de la Cruz and
 !                     Andres Asensio Ramos
@@ -84,7 +84,7 @@ Program Nicole
   If (myrank .eq. 0) then
      Print *,''
      Print *,''
-     Print *,'*************** N I C O L E   v 19.11 ******************'
+     Print *,'*************** N I C O L E   v 24.01 ******************'
      Print *,''
      Print *,'Lorien version: ',Lorien_ver
      Print *,'Forward version: ',Forward_ver
@@ -800,7 +800,7 @@ Program Nicole
                       Call Write_direct(LittleEndian, modeloutunit2, &
                       irec+1, TmpModel2, SizeModel, iost1)
                  Call Write_direct(LittleEndian, chisqunit, &
-                      irec, Chisq, 1, iost1)
+                      irec, (/Chisq/), 1, iost1)
               End if
               If (Input%Mode .eq. 's' .and. DidInvert) then
                  Call Write_direct(LittleEndian, profoutunit, &

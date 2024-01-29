@@ -1,13 +1,13 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=latex 2016.4.12)  10 MAR 2020 15:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.6.1)  29 JAN 2024 12:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **manual
 (./manual.tex
-LaTeX2e <2016/03/31>
-Babel <3.9q> and hyphenation patterns for 52 language(s) loaded.
-(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/latex209.def
-File: latex209.def 2015/02/22 v0.53 Standard LaTeX file
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/latex209.def
+File: latex209.def 2020/11/26 v0.55 Standard LaTeX file
 
 
           Entering LaTeX 2.09 COMPATIBILITY MODE
@@ -33,16 +33,18 @@ File: latex209.def 2015/02/22 v0.53 Standard LaTeX file
  author of that file.
  *************************************************************
 
-\footheight=\dimen102
-\@maxsep=\dimen103
-\@dblmaxsep=\dimen104
-\@cla=\count79
-\@clb=\count80
-\mscount=\count81
-(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/tracefnt.sty
-Package: tracefnt 2015/02/21 v3.0k Standard LaTeX package (font tracing)
-\tracingfonts=\count82
-LaTeX Info: Redefining \selectfont on input line 106.
+\footheight=\dimen138
+\@maxsep=\dimen139
+\@dblmaxsep=\dimen140
+\@cla=\count185
+\@clb=\count186
+\mscount=\count187
+(/usr/share/texlive/texmf-dist/tex/latex/base/tracefnt.sty
+Package: tracefnt 2020/12/22 v3.0n Standard LaTeX package (font tracing)
+\tracingfonts=\count188
+LaTeX Info: Redefining \selectfont on input line 107.
+Applying: [2021/06/01] Add hook to \selectfont  on input line 142.
+Already applied: [0000/00/00] Add hook to \selectfont  on input line 145.
 )
 \symbold=\mathgroup4
 \symsans=\mathgroup5
@@ -50,38 +52,38 @@ LaTeX Info: Redefining \selectfont on input line 106.
 \symitalic=\mathgroup7
 \symsmallcaps=\mathgroup8
 \symslanted=\mathgroup9
-LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 268.
-LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 269.
-LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 270.
-LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 276.
-LaTeX Info: Redefining \em on input line 286.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 275.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 276.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 277.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 283.
+LaTeX Info: Redefining \em on input line 293.
 
-(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/latexsym.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/latexsym.sty
 Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 \symlasy=\mathgroup10
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 (Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
 )
-LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 332.
-LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 334.
-LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 336.
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 339.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 341.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 343.
 )
-(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/book.cls
-Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
-(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/bk10.clo
-File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo
+File: bk10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count83
-\c@chapter=\count84
-\c@section=\count85
-\c@subsection=\count86
-\c@subsubsection=\count87
-\c@paragraph=\count88
-\c@subparagraph=\count89
-\c@figure=\count90
-\c@table=\count91
-\abovecaptionskip=\skip41
-\belowcaptionskip=\skip42
+\c@part=\count189
+\c@chapter=\count190
+\c@section=\count191
+\c@subsection=\count192
+\c@subsubsection=\count193
+\c@paragraph=\count194
+\c@subparagraph=\count195
+\c@figure=\count196
+\c@table=\count197
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
 Compatibility mode: definition of \rm ignored.
 Compatibility mode: definition of \sf ignored.
 Compatibility mode: definition of \tt ignored.
@@ -89,19 +91,27 @@ Compatibility mode: definition of \bf ignored.
 Compatibility mode: definition of \it ignored.
 Compatibility mode: definition of \sl ignored.
 Compatibility mode: definition of \sc ignored.
-LaTeX Info: Redefining \cal on input line 582.
-LaTeX Info: Redefining \mit on input line 583.
-\bibindent=\dimen105
-) (./manual.aux)
+LaTeX Info: Redefining \cal on input line 583.
+LaTeX Info: Redefining \mit on input line 584.
+\bibindent=\dimen141
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2022-01-12 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count198
+\l__pdf_internal_box=\box50
+)
+(./manual.aux)
 \openout1 = `manual.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 2.
 LaTeX Font Info:    ... okay on input line 2.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 2.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 2.
 LaTeX Font Info:    ... okay on input line 2.
 LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 2.
 LaTeX Font Info:    ... okay on input line 2.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 2.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 2.
 LaTeX Font Info:    ... okay on input line 2.
 LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 2.
 LaTeX Font Info:    ... okay on input line 2.
@@ -113,18 +123,19 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 26.
-LaTeX Font Info:    Try loading font information for U+lasy on input line 26.
- (/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/ulasy.fd
+LaTeX Font Info:    Trying to load font information for U+lasy on input line 26
+.
+ (/usr/share/texlive/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-Overfull \hbox (43.66466pt too wide) in paragraph at lines 26--26
+Overfull \hbox (43.66467pt too wide) in paragraph at lines 26--26
  [][] 
  []
 
 [0
 
 
-] (./manual.toc
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./manual.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 2.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -135,18 +146,12 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 \tf@toc=\write3
 \openout3 = `manual.toc'.
 
- [2]
-Chapter 1.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 52.
-(/usr/pkg/teTeX/texlive/2015/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 52.
- [3
 
-] [4]
-[5] [6]
+[2]
+Chapter 1.
+[3
+
+] [4] [5] [6]
 Chapter 2.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -311,12 +316,32 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 464 strings out of 493651
- 5524 string characters out of 6151148
- 86723 words of memory out of 5000000
- 3998 multiletter control sequences out of 15000+600000
- 19815 words of font info for 72 fonts, out of 8000000 for 9000
- 783 hyphenation exceptions out of 8191
- 23i,7n,21p,169b,250s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 700 strings out of 478287
+ 11585 string characters out of 5849290
+ 337248 words of memory out of 5000000
+ 18928 multiletter control sequences out of 15000+600000
+ 485769 words of font info for 87 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 43i,7n,39p,172b,299s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr
+/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf/fonts/type1/
+public/cm-super/sfrm1000.pfb>
+Output written on manual.pdf (86 pages, 344471 bytes).
+PDF statistics:
+ 359 PDF objects out of 1000 (max. 8388607)
+ 238 compressed objects within 3 object streams
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on manual.dvi (86 pages, 215500 bytes).

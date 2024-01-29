@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # Script to prepare inputs for use with nicole, run nicole and prepare outputs
 #  for human use
@@ -146,7 +146,6 @@ def lower_to_sep(string, separator='='):
     return retstring
 
 # Main program
-from configobj import ConfigObj
 import sys
 import os
 import re
@@ -154,6 +153,17 @@ import struct
 import subprocess
 import getopt
 from model_prof_tools import *
+
+try:
+    from configobj import ConfigObj
+except:
+    print('Module configobj not found. Please install configobj by running:')
+    print('pip install configobj')
+    print('\n\nFor other alternatives or more information check the project documentation at:')
+    print('https://pypi.org/project/configobj/')
+    print('https://github.com/DiffSK/configobj')
+    sys.exit(3)
+
 
 elements=['h','he','li','be','b','c','n','o','f','ne', 
           'na','mg','al','si','p','s','cl','ar','k','ca','sc','ti','v','cr', 
