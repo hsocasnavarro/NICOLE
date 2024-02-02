@@ -17,7 +17,7 @@ Subroutine Write_direct(CorrectEndian, iunit, irec, Datain, sizedata, iost)
 Implicit None
 Logical :: Correctendian
 integer :: sizedata
-Real, Dimension(:) :: DataIn
+Real, Dimension(:), Intent(In) :: DataIn
 Real (Kind=8) , Dimension(sizedata) :: Data ! 64-bit data to write
 Real (Kind=8), Dimension(:), Allocatable :: Data_swapped
 Integer (Kind=1), Dimension(:), Allocatable :: Buffer
@@ -25,7 +25,7 @@ Integer (Kind=1), Dimension(:), Allocatable :: Buffer_swapped
 Integer :: iost, irec, iunit, nbytes, idat, ibyte
 !
 Data=DataIn ! Put in 64-bit format
-If (Correctendian) then 
+If (Correctendian) then
    Write (iunit, REC=irec, IOSTAT=iost) Data
 Else
    nbytes=kind(Data)

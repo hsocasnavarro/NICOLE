@@ -1,0 +1,31 @@
+Checking syntax in file:LINES
+Checking syntax in file:NICOLE.input
+  ... no errors found
+
+Preparing input model...10%Preparing input model...20%Preparing input model...30%Preparing input model...40%Preparing input model...50%Preparing input model...60%Preparing input model...70%Preparing input model...80%Preparing input model...90%Preparing input model...100% 
+ 
+ *************** N I C O L E   v 24.01 ******************
+ 
+ Lorien version: LORIEN Version 4.2       
+ Forward version: NICOLE Forward v3.6      
+ Compex version: NICOLE Compex v3.5       
+ 
+ ********************************************************
+ 
+  This is the serial build
+ 
+ Point            1  of           10  done by process            0
+ Point            2  of           10  done by process            0
+ Point            3  of           10  done by process            0
+ Point            4  of           10  done by process            0
+ Point            5  of           10  done by process            0
+ Point            6  of           10  done by process            0
+ Point            7  of           10  done by process            0
+ Point            8  of           10  done by process            0
+ Point            9  of           10  done by process            0
+ Point           10  of           10  done by process            0
+ DONE
+
+
+Starting code execution
+Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG IEEE_DIVIDE_BY_ZERO IEEE_DENORMAL

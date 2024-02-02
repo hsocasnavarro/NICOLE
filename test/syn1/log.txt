@@ -1,0 +1,22 @@
+Checking syntax in file:LINES
+Checking syntax in file:NICOLE.input
+  ... no errors found
+
+Preparing input model...100% 
+ 
+ *************** N I C O L E   v 24.01 ******************
+ 
+ Lorien version: LORIEN Version 4.2       
+ Forward version: NICOLE Forward v3.6      
+ Compex version: NICOLE Compex v3.5       
+ 
+ ********************************************************
+ 
+  This is the serial build
+ 
+ Point            1  of            1  done by process            0
+ DONE
+
+
+Starting code execution
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL

@@ -2,7 +2,7 @@
 # Use # to create comments and "=" to specify values
 Command=../../main/nicole
 Mode = i
-Cycles=2
+Cycles=1
 start cycle=1
 #
 # Fields required for both modes, synthesis and inversion:

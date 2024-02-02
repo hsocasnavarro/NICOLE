@@ -1,0 +1,20 @@
+Checking syntax in file:LINES
+Checking syntax in file:NICOLE.input
+  ... no errors found
+
+Preparing input model...100% 
+ 
+ *************** N I C O L E   v 24.01 ******************
+ 
+ Lorien version: LORIEN Version 4.2       
+ Forward version: NICOLE Forward v3.6      
+ Compex version: NICOLE Compex v3.5       
+ 
+ ********************************************************
+ 
+  This is the serial build
+ 
+ DONE
+
+
+Starting code execution

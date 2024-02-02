@@ -7,11 +7,11 @@
 10000000   10000000      ! pixx2, pixy2 
 1          ! irec0 
 i           ! mode. Below: modelin,modelin2, profin, profout, modelout,modelout2 
-inversion.model
+guess.bin
 
 observed.bin
-inversion.pro
-inversion.model_2
+inversion.bin
+inversion.model
 
 0 0      ! formal boundarycond 
 1.0    ! helio 
@@ -24,7 +24,7 @@ inversion.model_2
 1     ! speed 
 1 0     ! always_compute_der, centered_derivatives 
 2.7414e+4     ! gravity 
-1.e-3     ! regularization 
+0     ! regularization 
 10    ! update_opac 
 0    ! negligible_opac 
 1       !  contref 
@@ -34,7 +34,7 @@ t          ! hscale
 1  1  ! opac, opacUV 
 0 ! elements to ignore in opac
 0  0 1e-4          ! Eq state, Eq state for H, Pe_consistency 
-T     T   0   ! sethydro, setnH, restart 
+T     T   -1   ! sethydro, setnH, restart 
 1 F   ! depcoef mode, write 
 6   ! nlines 
 2    ! nregions 
@@ -46,18 +46,18 @@ T     T   0   ! sethydro, setnH, restart
 2.0 SC 2 6300.6780 1.0 1.5070 -1.89 P 3 2.0 D 3 2.0 3 -1 -1 2.30 0.050 1.30  0 1.0 1.0 0 0 0 0 0 0 0
 2. FE 1 6301.5012 1.0 3.6540 -0.718 P 5 2.0 D 5 2.0 2 834.4 0.243 -1 -1 -1  0 1.0 1.0 0 0 0 0 0 0 0
 4. SI 1 10827.091 1.0 4.9538 0.239 P 3 2 P 3 2 1 -1 -1 -1 -1 -1  0 1.0 1.0 0 0 0 0 0 0 0
-12.0 10.93 1.1 1.4 2.55 8.52 7.92 8.83 4.56 8.08 6.33 7.58 6.47 7.55 5.45 7.33 5.5 6.4 5.12 6.36 3.17 5.02 4.0 5.67 5.39 7.5 4.92 6.25 4.21 4.6 2.88 3.41 -10 -10 -10 -10 2.6 2.97 2.24 2.6 1.42 1.92 -10 1.84 1.12 1.69 0.94 1.77 1.66 2.0 1.0 -10 -10 -10 -10 2.13 1.17 1.58 0.71 1.5 -10 1.01 0.51 1.12 -0.1 1.14 0.26 0.93 0.0 1.08 0.06 0.88 -10 1.11 -10 1.45 1.35 1.8 1.01 -10 0.9 1.95 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 
+12.0 10.93 1.1 1.4 2.55 8.52 7.92 8.5 4.56 8.08 6.33 7.58 6.47 7.55 5.45 7.33 5.5 6.4 5.12 6.36 3.17 5.02 4.0 5.67 5.39 7.2 4.92 6.3 4.21 4.6 2.88 3.41 -10 -10 -10 -10 2.6 2.97 2.24 2.6 1.42 1.92 -10 1.84 1.12 1.69 0.94 1.77 1.66 2.0 1.0 -10 -10 -10 -10 2.13 1.17 1.58 0.71 1.5 -10 1.01 0.51 1.12 -0.1 1.14 0.26 0.93 0.0 1.08 0.06 0.88 -10 1.11 -10 1.45 1.35 1.8 1.01 -10 0.9 1.95 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 
 4 ! Nodes in T 
-3 ! Nodes in v_los 
-1 ! Nodes in v_mic 
+1 ! Nodes in v_los 
+0 ! Nodes in v_mic 
 1 ! Nodes in B_long 
 1 ! Nodes in B_x 
 1 ! Nodes in B_y 
 -1 ! Nodes in Sx 
 -1 ! Nodes in Sy 
-1 ! Nodes in Stray light 
-1 ! Nodes in v_mac 
-1 ! Nodes in ffactor 
+0 ! Nodes in Stray light 
+0 ! Nodes in v_mac 
+0 ! Nodes in ffactor 
 3 ! Number of abundances to invert 
 26  8  28  ! Abundances to invert 
 0 ! Nodes in T 2

@@ -40,333 +40,338 @@ def check_types():
         print ('which is not supported in this version. Please, contact the')
         print ('author to get support for this platform.')
         sys.exit(1)
+
     return [int4f,intf,flf]
-    
 
-def check_model (filename):
-# Check the input model and determine what kind of file it is
-# Return nx, ny and nz
-    import re
-    import os
-    import struct
-    import sys
 
-    [int4f,intf,flf]=check_types()
-    try:
-        f=open(filename,'r')
-    except:
-        print ('Could not find model file:',filename)
-        return ['inexistent',-1,-1,-1]
-    filetype='unknown'
-    # Check if it's nicole's binary format
-    f.close()
-    f=open(filename,'rb')
-    header=f.read(16+4+4+8)
-    [string,ny,nz]=struct.unpack('<16s'+intf+intf,header)
-    string=string[0:11] # Remove padding zeros at the end
-    if string == 'nicole1.6bm': # Older format version
-        filetype='nicole1.6'
-        nx=1
-        [string,ny,nz]=struct.unpack('<16s'+intf+intf,header)
-        f.close()
-        filesize=os.path.getsize(filename)
-        if filesize != (13*nz+3)*(nx*ny+1)*8:
-            print ('Incorrect size of model file:',filename)
-            print ('The file is probably corrupted. Proceeding anyway...')
-#            sys.exit(1)
-        return [filetype,nx,ny,nz]
-    if string == 'nicole2.3bm': # Old format version
-        filetype='nicole2.3'
-        [string,nx,ny,nz]=struct.unpack('<16s'+int4f+int4f+intf,header)
-        f.close()
-        filesize=os.path.getsize(filename)
-        if filesize != (17*nz+3)*(nx*ny+1)*8:
-            print ('Incorrect size of model file:',filename)
-            print ('The file is probably corrupted. Proceeding anyway...')
-#            sys.exit(1)
-        return [filetype,nx,ny,nz]
-    if string == 'nicole2.6bm': # Old format version
-        filetype='nicole2.6'
-        [string,nx,ny,nz]=struct.unpack('<16s'+int4f+int4f+intf,header)
-        f.close()
-        filesize=os.path.getsize(filename)
-        if filesize != (22*nz+3+8+92)*(nx*ny+1)*8:
-            print ('Incorrect size of model file:',filename)
-            print ('The file is probably corrupted. Proceeding anyway...')
-#            sys.exit(1)
-        return [filetype,nx,ny,nz]
-    if string == 'nicole18.04': # Current format version
-        filetype='nicole18.04'
-        [string,nx,ny,nz]=struct.unpack('<16s'+int4f+int4f+intf,header)
-        f.close()
-        filesize=os.path.getsize(filename)
-        if filesize != (22*nz+13+92)*(nx*ny+1)*8:
-            print ('Incorrect size of model file:',filename)
-            print ('The file is probably corrupted. Proceeding anyway...')
-#            sys.exit(1)
-        return [filetype,nx,ny,nz]
-    f.close()
-    # Check if it's ASCII    
-    f=open(filename,'r')
-    line='---'
-    while not re.search('(?i)format version',line) and line != '':
-        line=f.readline()
-    if re.search('(?i)format version',line):
-        filetype='ascii'
-        filetype=filetype+line.split()[len(line.split())-1]
-        if filetype != 'ascii1.0' and filetype != 'ascii2.3':
-            print ('Model file:',filename)
-            print ('seems to be an ASCII file of unsupported format')
-            print (line)
-            sys.exit(1)
-        # Count number of model lines
-        string=f.read()
-        string=re.sub('!.*\n','\n',string)
-        string=re.sub('(?i).*format version.*\n','\n',string)
-        lines=string.rsplit('\n')
-        for l in range(lines.count('')):
-            lines.remove('')
-        nz=len(lines)-1
-        #
-        f.close()
-        nx=1
-        ny=1
-        return [filetype,nx,ny,nz]
-    # Check if it's an IDL save file
-    f=open(filename,'rb')
-    stri=struct.unpack('10s',f.read(10))
-    stri=stri[0]
-    bytes=list()
-    for i in range(len(stri)): bytes.append(ord(stri[i]))
-    f.close()
-    if bytes == [83, 82, 0, 4, 0, 0, 0, 10, 0, 0]:
-        filetype='idl'
-        try:
-            import idlsave
-        except:
-            print ('Error. Model file is an IDL save file:',filename)
-            print ('Python modules IDLSave and Numpy are needed to read this kind of files')
-            print ("The modules don't appear to be installed in your system")
-            sys.exit(1)
-        idl=idlsave.read(filename,verbose=0)
-        shape=idl.t.shape
-        ls=list(shape)
-        while (len(ls) < 3):
-#           ls.insert(0,1)
-           ls.append(1)
-        idl.t=idl.t.reshape(ls)
-        try:
-            nz=idl.nz
-        except:
-            nz=idl.t.shape[0]
-        try:
-            ny=idl.ny
-        except:
-            ny=idl.t.shape[1]
-        try:
-            nx=idl.nx
-        except:
-            nx=idl.t.shape[2]
-        return [filetype,nx,ny,nz]
-#
-    print ('Unknown model file type:'+filename)
-    sys.exit(1)
+import re
+import os
+import struct
+import sys
 
-def check_prof (filename):
-# Check the input profile and determine what kind of file it is
-# Return nx, ny and nlambda
-    import re
-    import os
-    import string
-    import struct
-    import sys
+def check_model(filename):
 
-    [int4f,intf,flf]=check_types()
-    try:
-        f=open(filename,'r')
-    except:
-        print ('Could not find profile file:',filename)
-        return ['inexistent',-1,-1,-1]
-    filetype='unknown'
-    # First check if it's ASCII    
-    readstr=f.read(1000000)
-    f.close()
-    nprintable=0
-    for char in readstr: 
-        if char in(string.printable) or char in(string.whitespace): 
-            nprintable=nprintable+1
-    if len(readstr) == 0:
-        print ('Empty file!')
-        print ('filename:',filename)
-        sys.exit(1)
-    if float(nprintable)/float(len(readstr)) > .95:
-        filetype='ascii'
-        # Count number of wavelengths
-        f=open(filename,'r')
-        string=f.read()
-        string=re.sub('!.*\n','\n',string)
-        lines=string.rsplit('\n')
-        for l in range(lines.count('')):
-            lines.remove('')
-        nlam=len(lines)
-        #
-        f.close()
-        nx=1
-        ny=1
-        return [filetype,nx,ny,nlam]
-    # Check if it's nicole's binary format
-    f=open(filename,'rb')
-    header=f.read(16+8+8)
-    [readstr,ny,nlam]=struct.unpack('<16s'+intf+intf,header)
-    readstr=readstr[0:11]
-    if readstr == 'nicole1.6bp': # Older format version
-        filetype='nicole1.6'
-        nx=1
-        [readstr,ny,nlam]=struct.unpack('<16s'+intf+intf,header)
-        f.close()
-        filesize=os.path.getsize(filename)
-        if filesize != (4*nlam)*(nx*ny+1)*8:
-            print ('Incorrect size of profile file:',filename)
-            print ('The file is probably corrupted. Proceeding anyway...')
-#            sys.exit(1)
-        return [filetype,nx,ny,nlam]
-    if readstr == 'nicole2.3bp': # Current format version
-        filetype='nicole2.3'
-        [readstr,nx,ny,nlam]=struct.unpack('<16s'+int4f+int4f+intf,header)
-        f.close()
-        filesize=os.path.getsize(filename)
-        if filesize != (4*nlam)*(nx*ny+1)*8:
-            print ('Incorrect size of profile file:',filename)
-            print ('The file is probably corrupted. Proceeding anyway...')
-#            sys.exit(1)
-        return [filetype,nx,ny,nlam]
-    f.close()
-    # Check if it's an IDL save file
-    f=open(filename,'rb')
-    stri=struct.unpack('10s',f.read(10))
-    stri=stri[0]
-    bytes=list()
-    for i in range(len(stri)): bytes.append(ord(stri[i]))
-    f.close()
-    if bytes == [83, 82, 0, 4, 0, 0, 0, 10, 0, 0]:
-        filetype='idl'
-        try:
-            import idlsave
-        except:
-            print ('Error. Profile file is an IDL save file:',filename)
-            print ('Python modules IDLSave and Numpy are needed to read this kind of files')
-            print ("The modules don't appear to be installed in your system")
-            sys.exit(1)
-        idl=idlsave.read(filename,verbose=0)
-        shape=idl.stki.shape
-        ls=list(shape)
-        while (len(ls) < 3):
-#            ls.insert(0,1)
-            ls.append(1)
-        idl.stki=idl.stki.reshape(ls)
-        try:
-            nlam=idl.nlam
-        except:
-            nlam=idl.stki.shape[0]
-        try:
-            ny=idl.ny
-        except:
-            ny=idl.stki.shape[1]
-        try:
-            nx=idl.nx
-        except:
-            nx=idl.stki.shape[2]
-        return [filetype,nx,ny,nlam]
-#
-    print ('Unknown profile file type:'+filename)
-    sys.exit(1)
+    def check_nicole_binary_format(header, filename):
+        # Logic for checking NICOLE binary format
+        string = header[0:11].decode('utf-8')  # Decode from bytes to string and remove padding zeros
+        if string == 'nicole1.6bm':
+            filetype = 'nicole1.6'
+            nx = 1
+            [_, ny, nz] = struct.unpack('<16s' + intf + intf, header)
+            expected_size = (13 * nz + 3) * (nx * ny + 1) * 8
+        elif string == 'nicole2.3bm':
+            filetype = 'nicole2.3'
+            [_, nx, ny, nz] = struct.unpack('<16s' + int4f + int4f + intf, header)
+            expected_size = (17 * nz + 3) * (nx * ny + 1) * 8
+        elif string == 'nicole2.6bm':
+            filetype = 'nicole2.6'
+            [_, nx, ny, nz] = struct.unpack('<16s' + int4f + int4f + intf, header)
+            expected_size = (22 * nz + 3 + 8 + 92) * (nx * ny + 1) * 8
+        elif string == 'nicole18.04' or string == 'nicole1804m':
+            filetype = 'nicole18.04'
+            [_, nx, ny, nz] = struct.unpack('<16s' + int4f + int4f + intf, header)
+            expected_size = (22 * nz + 13 + 92) * (nx * ny + 1) * 8
 
-def read_prof(filename, filetype, nx, ny, nlam, ix, iy, sequential=0):
-# Read a particular profile from a profile file 
-# Note that ix,iy=0 represents the first profile
-# Use the sequential keyword to specify that this file is going to be
-# read sequentially rather than accessing specific records. In that
-# case, the values of ix and iy are irrelevant. The first record
-# needs to be read with sequential=0 and ix,iy = 0
-    import struct
-    import re
-    import sys
-    global idl, irec, f, lastfilename # Save values between calls
-
-    [int4f,intf,flf]=check_types()
-# Read a particular profile from a profile file 
-# Note that ix, iy=0 represents the first profile
-    if ix < 0 or iy < 0: 
-        print ('Error in call to read_prof')
-        sys.exit(1)
-    if filetype == 'ascii':
-        if ix != 0 and iy != 0:
-            print ('Error in read_prof')
-            print ('Attempt to read ix,iy different from 0 from ascii file:',filename)
-            print ('Requested ix,iy:',ix,iy)
-            sys.exit(1)
-        f=open(filename,'r')
-        readstr=f.read()
-        readstr=re.sub('!.*\n','\n',readstr)
-        lines=readstr.rsplit('\n')
-        for l in range(lines.count('')):
-            lines.remove('')        
-        f.close()
-        if len(lines) != nlam:
-            print ('Error reading profile file:',filename)
-            print ('Incorrect number of wavelengths')
-            sys.exit(1)
-        data=list()
-        for l in lines:
-            row=l.split()    
-            for istk in range(4):
-                data.append(row[istk+1])
-        for i in range(len(data)): data[i]=float(data[i])
-        return data
-    elif filetype[0:6] == 'nicole':
-        if (sequential == 0):
-            irec=iy+ix*ny
         else:
-            irec=irec+1
-        sizerec=4*nlam # Floats (multiply by 8 to convert to bytes)
-        if (sequential == 0):
-            f=open(filename,'rb')
-            f.seek(sizerec*8*(irec+1)) # Skip header and previous records
-        data=struct.unpack('<'+str(sizerec)+flf,f.read(sizerec*8))
-        data=list(data)
-        return data
-    elif filetype == 'idl':
-        import idlsave
+            return None
+
+        filesize = os.path.getsize(filename)
+        if filesize != expected_size:
+            print('Incorrect size of model file:', filename)
+            print('The file is probably corrupted. Proceeding anyway...')
+
+        return [filetype, nx, ny, nz]
+
+    def check_ascii_format(filename):
         try:
-            a=lastfilename
-        except:
-            lastfilename=''
-        if filename != lastfilename:
-            idl=idlsave.read(filename,verbose=0)
-            idl.stki=idl.stki.reshape(nlam,ny,nx)
-            idl.stkq=idl.stkq.reshape(nlam,ny,nx)
-            idl.stku=idl.stku.reshape(nlam,ny,nx)
-            idl.stkv=idl.stkv.reshape(nlam,ny,nx)
-        lastfilename=filename
-        try: 
-            a=idl.stki[0,0,0]
-        except:
-            idl=idlsave.read(filename,verbose=0)
-            idl.stki=idl.stki.reshape(nlam,ny,nx)
-            idl.stkq=idl.stkq.reshape(nlam,ny,nx)
-            idl.stku=idl.stku.reshape(nlam,ny,nx)
-            idl.stkv=idl.stkv.reshape(nlam,ny,nx)
-        data=list()
-        for ilam in range(nlam): 
-            data.append(idl.stki[ilam,iy,ix])
-            data.append(idl.stkq[ilam,iy,ix])
-            data.append(idl.stku[ilam,iy,ix])
-            data.append(idl.stkv[ilam,iy,ix])
-        for i in range(len(data)): data[i]=float(data[i])
-        return data
-    else:
-        print ('Unknown file type')
-        sys.exit(1)
+            with open(filename, 'rb') as f:
+                content = f.read()
+
+            # Attempt to decode content
+            try:
+                content = content.decode('utf-8')
+            except UnicodeDecodeError:
+                content = content.decode('utf-8', errors='replace')
+
+            if not content:
+                print('Empty file!')
+                print('filename:', filename)
+                sys.exit(1)
+
+            lines = content.split('\n')
+            if re.search('(?i)format version', lines[0]):
+                filetype = 'ascii' + lines[0].split()[-1]
+                if filetype not in ['ascii1.0', 'ascii2.3']:
+                    print('Model file:', filename)
+                    print('seems to be an ASCII file of unsupported format')
+                    print(lines[0])
+                    sys.exit(1)
+
+                nz = len(lines) - 2 - lines.count('')  # Subtract 1 for the first line
+
+                return [filetype, 1, 1, nz]  # ASCII files are one-dimensional
+        except Exception as e:
+            print("Error processing ASCII format:", e)
+            return None
+
+    def check_idl_format(filename):
+        try:
+            with open(filename, 'rb') as f:
+                stri = struct.unpack('10s', f.read(10))
+                bytes = list(stri[0])
+
+            if bytes == [83, 82, 0, 4, 0, 0, 0, 10, 0, 0]:
+                try:
+                    import idlsave
+                    idl = idlsave.read(filename, verbose=0)
+                    shape = idl.t.shape
+                    ls = list(shape)
+                    while len(ls) < 3:
+                        ls.append(1)
+                    idl.t = idl.t.reshape(ls)
+                    nz = idl.nz if 'nz' in idl else idl.t.shape[0]
+                    ny = idl.ny if 'ny' in idl else idl.t.shape[1]
+                    nx = idl.nx if 'nx' in idl else idl.t.shape[2]
+                    return ['idl', nx, ny, nz]
+                except ImportError:
+                    print('Error. Model file is an IDL save file:', filename)
+                    print('Python modules IDLSave and Numpy are needed to read this kind of files')
+                    print("The modules don't appear to be installed in your system")
+                    sys.exit(1)
+        except Exception as e:
+            print("Error processing IDL format:", e)
+            return None
+
+    [int4f, intf, flf] = check_types()
+
+    try:
+        with open(filename, 'rb') as f:
+            header = f.read(16 + 4 + 4 + 8)
+            format_check = check_nicole_binary_format(header, filename)
+            if format_check:
+                return format_check
+
+            format_check = check_ascii_format(filename)
+            if format_check:
+                return format_check
+
+            format_check = check_idl_format(filename)
+            if format_check:
+                return format_check
+
+    except FileNotFoundError:
+        print('Could not find model file:', filename)
+        return ['inexistent', -1, -1, -1]
+
+    print('Unknown model file type:', filename)
+    sys.exit(1)
+
+
+
+
+import re
+import os
+import struct
+import sys
+
+def check_prof(filename):
+    
+    def check_ascii_format(filename):
+        with open(filename, 'r') as f:
+            content = f.read()
+
+        if not content:
+            print('Empty file!')
+            print('filename:', filename)
+            sys.exit(1)
+
+        nprintable = sum(1 for char in content if char in string.printable or char in string.whitespace)
+        if float(nprintable) / float(len(content)) > 0.95:
+            content = re.sub('!.*\n', '\n', content)
+            content = re.sub('(?i).*format version.*\n', '\n', content)
+            lines = content.split('\n')
+            nlam = len(lines) - 1 - lines.count('')
+            return ['ascii', 1, 1, nlam]
+        return None
+
+    def check_nicole_binary_format(header, filename):
+        readstr = header[0:11].decode('utf-8')  # Decode and remove padding zeros
+        if readstr == 'nicole1.6bp':
+            filetype = 'nicole1.6'
+            nx = 1
+            [_, ny, nlam] = struct.unpack('<16s' + intf + intf, header)
+            expected_size = (4 * nlam) * (nx * ny + 1) * 8
+        elif readstr == 'nicole2.3bp':
+            filetype = 'nicole2.3'
+            [_, nx, ny, nlam] = struct.unpack('<16s' + int4f + int4f + intf, header)
+            expected_size = (4 * nlam) * (nx * ny + 1) * 8
+        else:
+            return None
+
+        filesize = os.path.getsize(filename)
+        if filesize != expected_size:
+            print('Incorrect size of profile file:', filename)
+            print('The file is probably corrupted. Proceeding anyway...')
+        return [filetype, nx, ny, nlam]
+
+    def check_idl_format(filename):
+        with open(filename, 'rb') as f:
+            stri = struct.unpack('10s', f.read(10))
+            bytes = list(stri[0])
+
+        if bytes == [83, 82, 0, 4, 0, 0, 0, 10, 0, 0]:
+            try:
+                import idlsave
+                idl = idlsave.read(filename, verbose=0)
+                shape = idl.stki.shape
+                ls = list(shape)
+                while len(ls) < 3:
+                    ls.append(1)
+                idl.stki = idl.stki.reshape(ls)
+                nlam = getattr(idl, 'nlam', idl.stki.shape[0])
+                ny = getattr(idl, 'ny', idl.stki.shape[1])
+                nx = getattr(idl, 'nx', idl.stki.shape[2])
+                return ['idl', nx, ny, nlam]
+            except ImportError:
+                print('Error. Profile file is an IDL save file:', filename)
+                print('Python modules IDLSave and Numpy are needed to read this kind of files')
+                print("The modules don't appear to be installed in your system")
+                sys.exit(1)
+        return None
+
+    [int4f, intf, flf] = check_types()
+
+    try:
+        with open(filename, 'rb') as f:
+            header = f.read(16 + 8 + 8)
+
+        format_check = check_nicole_binary_format(header, filename)
+        if format_check:
+            return format_check
+
+        format_check = check_ascii_format(filename)
+        if format_check:
+            return format_check
+
+        format_check = check_idl_format(filename)
+        if format_check:
+            return format_check
+
+    except FileNotFoundError:
+        print('Could not find profile file:', filename)
+        return ['inexistent', -1, -1, -1]
+
+    print('Unknown profile file type:', filename)
+    sys.exit(1)
+
+
+
+
+
+
+
+
+import re
+import os
+import struct
+import sys
+
+def check_ascii_format(filename):
+    try:
+        with open(filename, 'rb') as f:
+            content = f.read()
+
+        # Attempt to decode content; use 'replace' or 'ignore' for error handling
+        try:
+            content = content.decode('utf-8')
+        except UnicodeDecodeError:
+            content = content.decode('utf-8', errors='replace')
+
+        if not content:
+            print('Empty file!')
+            print('filename:', filename)
+            sys.exit(1)
+
+        nprintable = sum(1 for char in content if char in string.printable or char in string.whitespace)
+        if float(nprintable) / float(len(content)) > 0.95:
+            content = re.sub('!.*\n', '\n', content)
+            content = re.sub('(?i).*format version.*\n', '\n', content)
+            lines = content.split('\n')
+            nlam = len(lines) - 1 - lines.count('')
+            return ['ascii', 1, 1, nlam]
+    except Exception as e:
+        print("Error processing ASCII format:", e)
+        return None
+
+    def check_nicole_binary_format(header, filename):
+        readstr = header[0:11].decode('utf-8')  # Decode and remove padding zeros
+        if readstr == 'nicole1.6bp':
+            filetype = 'nicole1.6'
+            nx = 1
+            [_, ny, nlam] = struct.unpack('<16s' + intf + intf, header)
+            expected_size = (4 * nlam) * (nx * ny + 1) * 8
+        elif readstr == 'nicole2.3bp':
+            filetype = 'nicole2.3'
+            [_, nx, ny, nlam] = struct.unpack('<16s' + int4f + int4f + intf, header)
+            expected_size = (4 * nlam) * (nx * ny + 1) * 8
+        else:
+            return None
+
+        filesize = os.path.getsize(filename)
+        if filesize != expected_size:
+            print('Incorrect size of profile file:', filename)
+            print('The file is probably corrupted. Proceeding anyway...')
+        return [filetype, nx, ny, nlam]
+
+    def check_idl_format(filename):
+        with open(filename, 'rb') as f:
+            stri = struct.unpack('10s', f.read(10))
+            bytes = list(stri[0])
+
+        if bytes == [83, 82, 0, 4, 0, 0, 0, 10, 0, 0]:
+            try:
+                import idlsave
+                idl = idlsave.read(filename, verbose=0)
+                shape = idl.stki.shape
+                ls = list(shape)
+                while len(ls) < 3:
+                    ls.append(1)
+                idl.stki = idl.stki.reshape(ls)
+                nlam = getattr(idl, 'nlam', idl.stki.shape[0])
+                ny = getattr(idl, 'ny', idl.stki.shape[1])
+                nx = getattr(idl, 'nx', idl.stki.shape[2])
+                return ['idl', nx, ny, nlam]
+            except ImportError:
+                print('Error. Profile file is an IDL save file:', filename)
+                print('Python modules IDLSave and Numpy are needed to read this kind of files')
+                print("The modules don't appear to be installed in your system")
+                sys.exit(1)
+        return None
+
+    [int4f, intf, flf] = check_types()
+
+    try:
+        with open(filename, 'rb') as f:
+            header = f.read(16 + 8 + 8)
+
+        format_check = check_nicole_binary_format(header, filename)
+        if format_check:
+            return format_check
+
+        format_check = check_ascii_format(filename)
+        if format_check:
+            return format_check
+
+        format_check = check_idl_format(filename)
+        if format_check:
+            return format_check
+
+    except FileNotFoundError:
+        print('Could not find profile file:', filename)
+        return ['inexistent', -1, -1, -1]
+
+    print('Unknown profile file type:', filename)
+    sys.exit(1)
 
 def read_model(filename, filetype, nx, ny, nz, ix, iy, sequential=0):
 # Read a particular model from a model file 
@@ -818,6 +823,94 @@ def read_model(filename, filetype, nx, ny, nz, ix, iy, sequential=0):
 #            data.append(idl.abundance[:,iy,ix])
 #        except:
 #            data.append( 0. )
+        for i in range(len(data)): data[i]=float(data[i])
+        return data
+    else:
+        print ('Unknown file type')
+        sys.exit(1)
+
+
+def read_prof(filename, filetype, nx, ny, nlam, ix, iy, sequential=0):
+# Read a particular profile from a profile file 
+# Note that ix,iy=0 represents the first profile
+# Use the sequential keyword to specify that this file is going to be
+# read sequentially rather than accessing specific records. In that
+# case, the values of ix and iy are irrelevant. The first record
+# needs to be read with sequential=0 and ix,iy = 0
+    import struct
+    import re
+    import sys
+    global idl, irec, f, lastfilename # Save values between calls
+
+    [int4f,intf,flf]=check_types()
+# Read a particular profile from a profile file 
+# Note that ix, iy=0 represents the first profile
+    if ix < 0 or iy < 0: 
+        print ('Error in call to read_prof')
+        sys.exit(1)
+    if filetype == 'ascii':
+        if ix != 0 and iy != 0:
+            print ('Error in read_prof')
+            print ('Attempt to read ix,iy different from 0 from ascii file:',filename)
+            print ('Requested ix,iy:',ix,iy)
+            sys.exit(1)
+        f=open(filename,'r')
+        readstr=f.read()
+        readstr=re.sub('!.*\n','\n',readstr)
+        lines=readstr.rsplit('\n')
+        for l in range(lines.count('')):
+            lines.remove('')        
+        f.close()
+        if len(lines) != nlam:
+            print ('Error reading profile file:',filename)
+            print ('Incorrect number of wavelengths')
+            sys.exit(1)
+        data=list()
+        for l in lines:
+            row=l.split()    
+            for istk in range(4):
+                data.append(row[istk+1])
+        for i in range(len(data)): data[i]=float(data[i])
+        return data
+    elif filetype[0:6] == 'nicole':
+        if (sequential == 0):
+            irec=iy+ix*ny
+        else:
+            irec=irec+1
+        sizerec=4*nlam # Floats (multiply by 8 to convert to bytes)
+        if (sequential == 0):
+            f=open(filename,'rb')
+            f.seek(sizerec*8*(irec+1)) # Skip header and previous records
+        data=struct.unpack('<'+str(sizerec)+flf,f.read(sizerec*8))
+        data=list(data)
+        return data
+    elif filetype == 'idl':
+        import idlsave
+        try:
+            a=lastfilename
+        except:
+            lastfilename=''
+        if filename != lastfilename:
+            idl=idlsave.read(filename,verbose=0)
+            idl.stki=idl.stki.reshape(nlam,ny,nx)
+            idl.stkq=idl.stkq.reshape(nlam,ny,nx)
+            idl.stku=idl.stku.reshape(nlam,ny,nx)
+            idl.stkv=idl.stkv.reshape(nlam,ny,nx)
+        lastfilename=filename
+        try: 
+            a=idl.stki[0,0,0]
+        except:
+            idl=idlsave.read(filename,verbose=0)
+            idl.stki=idl.stki.reshape(nlam,ny,nx)
+            idl.stkq=idl.stkq.reshape(nlam,ny,nx)
+            idl.stku=idl.stku.reshape(nlam,ny,nx)
+            idl.stkv=idl.stkv.reshape(nlam,ny,nx)
+        data=list()
+        for ilam in range(nlam): 
+            data.append(idl.stki[ilam,iy,ix])
+            data.append(idl.stkq[ilam,iy,ix])
+            data.append(idl.stku[ilam,iy,ix])
+            data.append(idl.stkv[ilam,iy,ix])
         for i in range(len(data)): data[i]=float(data[i])
         return data
     else:

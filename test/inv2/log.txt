@@ -1,0 +1,32 @@
+Checking syntax in file:LINES
+Checking syntax in file:NICOLE.input
+  ... no errors found
+
+Preparing file with observed profiles...100%
+Preparing file with input model...100% 
+ 
+ *************** N I C O L E   v 24.01 ******************
+ 
+ Lorien version: LORIEN Version 4.2       
+ Forward version: NICOLE Forward v3.6      
+ Compex version: NICOLE Compex v3.5       
+ 
+ ********************************************************
+ 
+  This is the serial build
+ 
+  Inversion try:           1
+iter= 0 Lambda= 0.100E-02 Regul= 0.000E+00 Chisq= 0.534E+00
+REJECTED: --- iter= 1 Lambda= 0.100E-01 Regul= 0.000E+00 Chisq= 0.342E+02
+REJECTED: --- iter= 2 Lambda= 0.100E+00 Regul= 0.000E+00 Chisq= 0.642E+03
+REJECTED: --- iter= 3 Lambda= 0.100E+01 Regul= 0.000E+00 Chisq= 0.290E+01
+REJECTED: --- iter= 4 Lambda= 0.100E+01 Regul= 0.000E+00 Chisq= 0.924E+00
+REJECTED: --- iter= 5 Lambda= 0.100E+01 Regul= 0.000E+00 Chisq= 0.953E+00
+REJECTED: --- iter= 6 Lambda= 0.100E+01 Regul= 0.000E+00 Chisq= 0.953E+00
+  Chisq=  0.53419721456574976      . Best so far=  0.53419721456574976     
+ Point            1  of            1  done by process            0
+ DONE
+
+
+Starting code execution
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG IEEE_DENORMAL

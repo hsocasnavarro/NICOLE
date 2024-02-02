@@ -55,6 +55,16 @@ Program Nicole
   Integer ::  TaskComing, serialmode=0
   Integer, allocatable :: inverted_host(:), host_busy(:), pixel_to_do(:)
   Integer :: ierr, NotifyWhenFinished, request, ioldnl=-1, ioldnr=-1
+  !
+  Interface ! Needs to be defined so that DataIn can be left assumed-shape
+     Subroutine Write_direct(CorrectEndian, iunit, irec, Datain, sizedata, iost)
+       Logical, Intent(In) :: Correctendian
+       integer, Intent(In) :: iunit, irec, sizedata, iost
+       Real, Dimension(:), Intent(In) :: DataIn ! Assumed shape allows to 
+                                                ! interpret real as size-1 array
+     End Subroutine Write_direct
+  End Interface
+  !
   External :: CheckNaN
   myrank=0
   nprocs=1
@@ -94,6 +104,14 @@ Program Nicole
      Call Open_file(headerunit,'__input.dat')
   End if
   Read (headerunit, *) Params%ncycles
+  If (Params%ncycles .gt. 1) then
+     Print *,'Sorry. ncycles .gt. 1 is not supported any more'
+     Print *,'Please break your problem down into single-cycle runs'
+     Stop
+     ! This is because there is a problem with changing the number of
+     ! free parameters in the saved arrays (dydx_saved, dchidx_saved and
+     ! d2chid2x_saved) in compute_dchisq_dx (lorien/lorien.f90)
+  End if
   Read (headerunit, *) icycle0
   Call Close_File (headerunit)
   !
@@ -530,6 +548,14 @@ Program Nicole
      IntRecord(:)=0
      IntRecord(1)=3328834590979877230_k18
      IntRecord(2)=2314885530823713331_k18
+! Para leerlos como cadenas en Python:
+! import struct
+! int_record_1 = 4049129056382445934
+! int_record_2 = 2314885530823504944
+! bytes_record_1 = struct.pack('<q', int_record_1)
+! bytes_record_2 = struct.pack('<q', int_record_2)
+! string_representation = (bytes_record_1 + bytes_record_2).decode('utf-8')
+! print(string_representation)          
      If (LittleEndian) then
         Integer4(1)=nPix_x
         Integer4(2)=nPix_y
@@ -588,6 +614,14 @@ Program Nicole
         IntRecord(:)=0
         IntRecord(1)=4049129056382445934_k18
         IntRecord(2)=2314885530823504944_k18
+! Para leerlos como cadenas en Python:
+! import struct
+! int_record_1 = 4049129056382445934
+! int_record_2 = 2314885530823504944
+! bytes_record_1 = struct.pack('<q', int_record_1)
+! bytes_record_2 = struct.pack('<q', int_record_2)
+! string_representation = (bytes_record_1 + bytes_record_2).decode('utf-8')
+! print(string_representation)
         If (LittleEndian) then
            Integer4(1)=nPix_x
            Integer4(2)=nPix_y
